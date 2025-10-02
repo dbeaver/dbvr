@@ -7,6 +7,9 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Release-Date: 20251006
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-21
-Require-Bundle: org.jkiss.dbeaver.model;visibility:=reexport,
- org.jkiss.dbeaver.registry;visibility:=reexport
+Require-Bundle: org.jkiss.dbeaver.model.sql,
+ org.jkiss.dbeaver.data.transfer,
+ org.jkiss.dbeaver.registry,
+ com.dbeaver.model,
+ com.google.gson
 Automatic-Module-Name: org.dbvr.cli.sql

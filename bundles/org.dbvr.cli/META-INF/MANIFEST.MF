@@ -8,6 +8,8 @@ Bundle-Release-Date: 20251006
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-21
 Require-Bundle: org.jkiss.dbeaver.model;visibility:=reexport,
- org.jkiss.dbeaver.registry;visibility:=reexport
+ org.jkiss.dbeaver.registry;visibility:=reexport,
+ org.jkiss.dbeaver.model.cli;visibility:=reexport,
+ org.jkiss.dbeaver.model.rcp;visibility:=reexport
 Export-Package: org.dbvr.cli.app
 Automatic-Module-Name: org.dbvr.app.ce

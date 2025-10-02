@@ -16,41 +16,65 @@
  */
 package org.dbvr.cli.app;
 
+import org.apache.commons.cli.CommandLine;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.app.IApplicationContext;
+import org.eclipse.osgi.service.datalocation.Location;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
-import org.jkiss.dbeaver.model.impl.app.BaseApplicationImpl;
 import org.jkiss.dbeaver.model.impl.preferences.SimplePreferenceStore;
 import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
+import org.jkiss.dbeaver.model.rcp.DesktopStandaloneApplicationImpl;
+import org.jkiss.dbeaver.registry.BasePlatformImpl;
+import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.ui.DBPPlatformUI;
 import org.jkiss.dbeaver.runtime.ui.console.ConsoleUserInterface;
 
+import java.net.URL;
 import java.nio.file.Path;
 
 /**
  * Base CLI application
  */
-public class CLIApplicationBase extends BaseApplicationImpl {
+public class CLIApplicationBase extends DesktopStandaloneApplicationImpl {
+    private static final Log log = Log.getLog(CLIApplicationBase.class);
+
+    protected CLIApplicationBase() {
+        super(BasePlatformImpl.DBEAVER_DATA_DIR, DEFAULT_WORKSPACE_FOLDER, DEFAULT_WORKSPACES_FILE);
+    }
 
     @NotNull
     @Override
     public Object start(IApplicationContext context) throws Exception {
-/*
-        Location instanceLoc = Platform.getInstanceLocation();
+        // Register core components
+        initializeApplicationServices();
 
-        CommandLine commandLine = DBeaverCommandLine.getInstance().getCommandLine();
-        String defaultHomePath = getDefaultInstanceLocation();
-        if (DBeaverCommandLine.getInstance()
-            .handleCommandLineAsClient(commandLine, defaultHomePath)
-            .getPostAction() == CliProcessResult.PostAction.SHUTDOWN
-        ) {
-            if (!Log.isQuietMode()) {
-                System.err.println("Commands processed. Exit " + GeneralUtils.getProductName() + ".");
+        CommandLine commandLine = DBVRCommandLine.getInstance().getCommandLine();
+        Location instanceLoc = Platform.getInstanceLocation();
+        try {
+            if (!instanceLoc.isSet()) { // always false?
+                URL wsLocationURL = new URL(
+                    "file",  //$NON-NLS-1$
+                    null,
+                    WORKSPACE_DIR_CURRENT
+                );
+                instanceLoc.set(wsLocationURL, false);
             }
-            return IApplication.EXIT_OK;
+        } catch (Exception e) {
+            log.error("Error setting workspace location to " + WORKSPACE_DIR_CURRENT, e);
+            throw e;
         }
-*/
+        DBWorkbench.getPlatform();
+        DBVRCommandLine.getInstance().executeCommandLineCommands(
+            commandLine,
+            null,
+            false,
+            true
+        );
+        
 
         return EXIT_OK;
     }
@@ -63,7 +87,7 @@ public class CLIApplicationBase extends BaseApplicationImpl {
     @Nullable
     @Override
     public String getDefaultProjectName() {
-        return null;
+        return DBConstants.DEFAULT_PROJECT_NAME;
     }
 
     @Nullable
@@ -93,10 +117,6 @@ public class CLIApplicationBase extends BaseApplicationImpl {
         return true;
     }
 
-    @Override
-    public boolean isEnvironmentVariablesAccessible() {
-        return true;
-    }
 
     @NotNull
     public DBPPreferenceStore getPreferenceStore() {
@@ -106,6 +126,11 @@ public class CLIApplicationBase extends BaseApplicationImpl {
 
             }
         };
+    }
+
+    @Override
+    public boolean isForcedRestart() {
+        return false;
     }
 
 }

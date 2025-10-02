@@ -22,6 +22,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.app.DBACertificateStorage;
+import org.jkiss.dbeaver.model.app.DBPWorkspaceDesktop;
 import org.jkiss.dbeaver.model.impl.app.BaseApplicationImpl;
 import org.jkiss.dbeaver.model.impl.app.DefaultCertificateStorage;
 import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
@@ -50,7 +51,7 @@ public class CLIPlatform extends BasePlatformImpl {
     private static volatile boolean isClosing = false;
 
     private Path tempFolder;
-    private CLIWorkspace workspace;
+    private DBPWorkspaceDesktop workspace;
 
     private QMRegistryImpl qmController;
     private DefaultCertificateStorage defaultCertificateStorage;
@@ -73,8 +74,7 @@ public class CLIPlatform extends BasePlatformImpl {
 
         // Register properties adapter
         try {
-            Path workspacePath = Path.of(Platform.getInstanceLocation().getURL().toURI());
-            this.workspace = new CLIWorkspace(this, workspacePath);
+            this.workspace = getApplication().createWorkspace(this);
             this.workspace.initializeProjects();
         } catch (Exception e) {
             throw new IllegalStateException("Cannot initialize CLI workspace", e);
@@ -105,7 +105,7 @@ public class CLIPlatform extends BasePlatformImpl {
 
     @NotNull
     @Override
-    public CLIWorkspace getWorkspace() {
+    public DBPWorkspaceDesktop getWorkspace() {
         return workspace;
     }
 
