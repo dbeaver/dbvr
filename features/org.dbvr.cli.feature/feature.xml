@@ -11,6 +11,9 @@
 
     <copyright>DBeaver Corp and others</copyright>
     <license url="https://dbeaver.io/product/dbeaver_license.txt"/>
+    <requires>
+        <import plugin="org.apache.felix.scr" version="0.0.0" match="greaterOrEqual"/>
+    </requires>
 
     <includes id="org.jkiss.dbeaver.db.feature" version="0.0.0"/>
 
