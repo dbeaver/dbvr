@@ -25,9 +25,9 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
+import org.jkiss.dbeaver.model.impl.app.BaseSingleUserApplicationImpl;
 import org.jkiss.dbeaver.model.impl.preferences.SimplePreferenceStore;
 import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
-import org.jkiss.dbeaver.model.rcp.DesktopStandaloneApplicationImpl;
 import org.jkiss.dbeaver.registry.BasePlatformImpl;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.ui.DBPPlatformUI;
@@ -39,11 +39,11 @@ import java.nio.file.Path;
 /**
  * Base CLI application
  */
-public class CLIApplicationBase extends DesktopStandaloneApplicationImpl {
+public class CLIApplicationBase extends BaseSingleUserApplicationImpl {
     private static final Log log = Log.getLog(CLIApplicationBase.class);
 
     protected CLIApplicationBase() {
-        super(BasePlatformImpl.DBEAVER_DATA_DIR, DEFAULT_WORKSPACE_FOLDER, DEFAULT_WORKSPACES_FILE);
+        super(BasePlatformImpl.DBEAVER_DATA_DIR, DEFAULT_WORKSPACE_FOLDER);
     }
 
     @NotNull
@@ -74,7 +74,7 @@ public class CLIApplicationBase extends DesktopStandaloneApplicationImpl {
             false,
             true
         );
-        
+
 
         return EXIT_OK;
     }
@@ -93,7 +93,7 @@ public class CLIApplicationBase extends DesktopStandaloneApplicationImpl {
     @Nullable
     @Override
     public Path getDefaultWorkingFolder() {
-        return null;
+        return Path.of(WORKSPACE_DIR_CURRENT);
     }
 
     @NotNull
@@ -108,7 +108,7 @@ public class CLIApplicationBase extends DesktopStandaloneApplicationImpl {
     }
 
     @Override
-    public boolean isStandalone() {
+    public boolean isEnvironmentVariablesAccessible() {
         return true;
     }
 
@@ -116,7 +116,6 @@ public class CLIApplicationBase extends DesktopStandaloneApplicationImpl {
     public boolean isHeadlessMode() {
         return true;
     }
-
 
     @NotNull
     public DBPPreferenceStore getPreferenceStore() {
@@ -128,9 +127,7 @@ public class CLIApplicationBase extends DesktopStandaloneApplicationImpl {
         };
     }
 
-    @Override
-    public boolean isForcedRestart() {
-        return false;
+    public CLIWorkspace createWorkspace(@NotNull CLIPlatform cliPlatform) {
+        return new CLIWorkspace(cliPlatform, Path.of(WORKSPACE_DIR_CURRENT));
     }
-
 }

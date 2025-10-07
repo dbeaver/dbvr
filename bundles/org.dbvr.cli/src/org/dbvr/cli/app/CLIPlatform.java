@@ -22,7 +22,6 @@ import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.app.DBACertificateStorage;
-import org.jkiss.dbeaver.model.app.DBPWorkspaceDesktop;
 import org.jkiss.dbeaver.model.impl.app.BaseApplicationImpl;
 import org.jkiss.dbeaver.model.impl.app.DefaultCertificateStorage;
 import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
@@ -51,7 +50,7 @@ public class CLIPlatform extends BasePlatformImpl {
     private static volatile boolean isClosing = false;
 
     private Path tempFolder;
-    private DBPWorkspaceDesktop workspace;
+    private CLIWorkspace workspace;
 
     private QMRegistryImpl qmController;
     private DefaultCertificateStorage defaultCertificateStorage;
@@ -105,7 +104,7 @@ public class CLIPlatform extends BasePlatformImpl {
 
     @NotNull
     @Override
-    public DBPWorkspaceDesktop getWorkspace() {
+    public CLIWorkspace getWorkspace() {
         return workspace;
     }
 
