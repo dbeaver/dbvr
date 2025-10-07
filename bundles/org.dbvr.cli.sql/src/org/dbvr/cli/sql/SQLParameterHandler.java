@@ -16,8 +16,6 @@
  */
 package org.dbvr.cli.sql;
 
-import com.dbeaver.model.cli.CLIUtils;
-import com.dbeaver.model.cli.OutputFileParameterHandler;
 import org.apache.commons.cli.CommandLine;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -25,10 +23,7 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
-import org.jkiss.dbeaver.model.cli.CLIConstants;
-import org.jkiss.dbeaver.model.cli.CLIException;
-import org.jkiss.dbeaver.model.cli.CommandLineContext;
-import org.jkiss.dbeaver.model.cli.ICommandLineParameterHandler;
+import org.jkiss.dbeaver.model.cli.*;
 import org.jkiss.dbeaver.model.exec.DBCExecutionContext;
 import org.jkiss.dbeaver.model.exec.DBCStatistics;
 import org.jkiss.dbeaver.model.exec.output.DBCOutputSeverity;
@@ -104,7 +99,7 @@ public class SQLParameterHandler implements ICommandLineParameterHandler {
         if (dataSource == null) {
             throw new CLIException("Can't obtain data source", CLIConstants.EXIT_CODE_ERROR);
         }
-        DBRProgressMonitor monitor = new LoggingProgressMonitor();
+        DBRProgressMonitor monitor = new LoggingProgressMonitor(log);
         DBCExecutionContext executionContext = dataSource.getDefaultInstance().getDefaultContext(monitor, false);
 
         List<SQLScriptElement> scriptElements = SQLScriptParser.parseScript(executionContext.getDataSource(), sqlQuery);

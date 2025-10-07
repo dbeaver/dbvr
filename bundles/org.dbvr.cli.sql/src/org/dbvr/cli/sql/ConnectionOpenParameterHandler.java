@@ -55,7 +55,7 @@ public class ConnectionOpenParameterHandler implements ICommandLineParameterHand
         context.addCloseHandler(() -> {
             if (dataSource.isConnected()) {
                 try {
-                    dataSource.disconnect(new LoggingProgressMonitor());
+                    dataSource.disconnect(new LoggingProgressMonitor(log));
                 } catch (Exception e) {
                     log.error("Error disconnecting datasource", e);
                 }
@@ -68,7 +68,7 @@ public class ConnectionOpenParameterHandler implements ICommandLineParameterHand
     ) throws CLIException {
         if (!dataSource.isConnected()) {
             try {
-                dataSource.connect(new LoggingProgressMonitor(), true, true);
+                dataSource.connect(new LoggingProgressMonitor(log), true, true);
             } catch (DBException e) {
                 throw new CLIException(
                     "Failed to connect to database '" + dataSource.getName() + "': " + e.getMessage(),

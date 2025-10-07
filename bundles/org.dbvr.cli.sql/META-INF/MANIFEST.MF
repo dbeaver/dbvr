@@ -10,5 +10,6 @@ Bundle-RequiredExecutionEnvironment: JavaSE-21
 Require-Bundle: org.jkiss.dbeaver.model.sql,
  org.jkiss.dbeaver.data.transfer,
  org.jkiss.dbeaver.registry,
+ org.jkiss.dbeaver.model.cli,
  com.google.gson
 Automatic-Module-Name: org.dbvr.cli.sql
