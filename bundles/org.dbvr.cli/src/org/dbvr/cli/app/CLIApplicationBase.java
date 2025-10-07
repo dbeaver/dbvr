@@ -25,13 +25,14 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
-import org.jkiss.dbeaver.model.impl.app.BaseSingleUserApplicationImpl;
+import org.jkiss.dbeaver.model.impl.app.BaseApplicationImpl;
 import org.jkiss.dbeaver.model.impl.preferences.SimplePreferenceStore;
 import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
 import org.jkiss.dbeaver.registry.BasePlatformImpl;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.ui.DBPPlatformUI;
 import org.jkiss.dbeaver.runtime.ui.console.ConsoleUserInterface;
+import org.jkiss.dbeaver.utils.RuntimeUtils;
 
 import java.net.URL;
 import java.nio.file.Path;
@@ -39,11 +40,26 @@ import java.nio.file.Path;
 /**
  * Base CLI application
  */
-public class CLIApplicationBase extends BaseSingleUserApplicationImpl {
+public class CLIApplicationBase extends BaseApplicationImpl {
     private static final Log log = Log.getLog(CLIApplicationBase.class);
+    protected final String WORKSPACE_DIR_CURRENT;
 
     protected CLIApplicationBase() {
-        super(BasePlatformImpl.DBEAVER_DATA_DIR, DEFAULT_WORKSPACE_FOLDER);
+
+        // Explicitly set UTF-8 as default file encoding
+        // In some places Eclipse reads this property directly.
+        //System.setProperty(StandardConstants.ENV_FILE_ENCODING, GeneralUtils.UTF8_ENCODING);
+
+        // Detect default workspace location
+        // Since 6.1.3 it is different for different OSes
+        // Windows: %AppData%/DBeaverData
+        // MacOS: ~/Library/DBeaverData
+        // Linux: $XDG_DATA_HOME/DBeaverData
+        String workingDirectory = RuntimeUtils.getWorkingDirectory(BasePlatformImpl.DBEAVER_DATA_DIR);
+
+        // Workspace dir
+        WORKSPACE_DIR_CURRENT = Path.of(workingDirectory, DEFAULT_WORKSPACE_FOLDER).toAbsolutePath().toString();
+        Log.setLogHandler(new VoidLogHandler());
     }
 
     @NotNull
