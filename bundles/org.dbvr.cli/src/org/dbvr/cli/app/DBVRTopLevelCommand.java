@@ -14,25 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.dbvr.cli.app.handler;
-
+package org.dbvr.cli.app;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
-import org.jkiss.dbeaver.DBException;
-import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.cli.ApplicationInstanceController;
+import org.jkiss.dbeaver.model.cli.CLIRunMeta;
 import org.jkiss.dbeaver.model.cli.CommandLineContext;
-import org.jkiss.dbeaver.model.cli.ICommandLineParameterHandler;
+import org.jkiss.dbeaver.model.cli.command.AbstractTopLevelCommand;
 import picocli.CommandLine;
 
-public class DebugLogsParameterHandler implements ICommandLineParameterHandler {
-    @Override
-    public void handleParameter(
-        @NotNull CommandLine.ParseResult commandLine,
-        @NotNull String name,
-        @Nullable String value,
-        @NotNull CommandLineContext context
-    ) throws DBException {
-        Log.setLogHandler(null);
+@CommandLine.Command(name = "dbvr", description = "dbvr Top Level Command")
+public class DBVRTopLevelCommand extends AbstractTopLevelCommand {
+
+    protected DBVRTopLevelCommand(
+        @Nullable ApplicationInstanceController controller,
+        @NotNull CommandLineContext context,
+        @NotNull CLIRunMeta meta
+    ) {
+        super(controller, context, meta);
     }
 }

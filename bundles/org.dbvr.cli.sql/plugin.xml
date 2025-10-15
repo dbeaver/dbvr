@@ -3,43 +3,12 @@
 
 <plugin>
     <extension point="org.jkiss.dbeaver.commandLine">
-        <parameter name="format"
-                   longName="output-format"
-                   description="Write the execution result in a specific format (csv, xml, etc. csv by default)."
-                   hasArg="true"
-                   contextInitializer="true"
-                   handler="org.jkiss.dbeaver.model.cli.ContextParameterHandler"/>
-        <parameter name="limit"
-                   longName="limit"
-                   description="Limits number of lines in an executed sql."
-                   hasArg="true"
-                   contextInitializer="true"
-                   handler="org.jkiss.dbeaver.model.cli.ContextParameterHandler"/>
-        <parameter name="op"
-                   longName="output-format-parameters"
-                   description="Parameters (exporter options as list of props prop1=value1,prop2=value2 coma and space are delimiters)."
-                   hasArg="true"
-                   contextInitializer="true"
-                   handler="org.jkiss.dbeaver.model.cli.ContextParameterHandler"/>
 
         <parameter name="con-open"
-                   longName="connection-open"
-                   description="Connects to a specified database."
-                   hasArg="true"
-                   contextInitializer="true"
                    handler="org.dbvr.cli.sql.ConnectionOpenParameterHandler"/>
-
-        <parameter name="project"
-                   longName="project"
-                   description="Specify used project."
-                   hasArg="true"
-                   contextInitializer="true"
-                   handler="org.jkiss.dbeaver.model.cli.ContextParameterHandler"/>
-
+        
         <parameter name="sql"
-                   longName="sql"
                    description="Execute sql"
-                   hasOptionalArg="true"
                    exitAfterExecute="true"
                    handler="org.dbvr.cli.sql.SQLParameterHandler"/>
     </extension>

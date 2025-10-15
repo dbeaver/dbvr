@@ -17,7 +17,6 @@
 package org.dbvr.cli.sql;
 
 
-import org.apache.commons.cli.CommandLine;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -25,34 +24,48 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
-import org.jkiss.dbeaver.model.cli.*;
+import org.jkiss.dbeaver.model.cli.AbstractCommandLineParameterHandler;
+import org.jkiss.dbeaver.model.cli.ApplicationInstanceServer;
+import org.jkiss.dbeaver.model.cli.CLIConstants;
+import org.jkiss.dbeaver.model.cli.CLIException;
+import org.jkiss.dbeaver.model.cli.command.AbstractTopLevelCommand;
+import org.jkiss.dbeaver.model.cli.option.FilesOptions;
 import org.jkiss.dbeaver.model.runtime.LoggingProgressMonitor;
 import org.jkiss.dbeaver.registry.DataSourceUtils;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.dbeaver.utils.SystemVariablesResolver;
 import org.jkiss.utils.CommonUtils;
+import picocli.CommandLine;
 
-public class ConnectionOpenParameterHandler implements ICommandLineParameterHandler {
+@CommandLine.Command(name = "connection-open", aliases = {"con-open"}, description = "Connects to a specified database.")
+public class ConnectionOpenParameterHandler extends AbstractCommandLineParameterHandler {
     private final Log log = Log.getLog(ConnectionOpenParameterHandler.class);
 
+    @CommandLine.Option(names = CLIConstants.PARAM_PROJECT, description = "Project name or ID")
+    private String projectIdOrName;
+
+    @CommandLine.Option(names = "-connection-spec", description = "Connection specification", required = true)
+    private String connectionSpec;
+
+    @CommandLine.Mixin
+    private FilesOptions filesOptions;
+
+    @CommandLine.ParentCommand
+    private AbstractTopLevelCommand topLevelCommand;
+
     @Override
-    public void handleParameter(
-        @NotNull CommandLine commandLine,
-        @NotNull String name,
-        @Nullable String value,
-        @NotNull CommandLineContext context
-    ) throws DBException {
-        if (CommonUtils.isEmpty(value)) {
-            throw new CLIException("--connection-open parameter is empty", CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS);
+    public void run() {
+        if (CommonUtils.isEmpty(connectionSpec)) {
+            throw new CLIException("-connection-spec parameter is empty", CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS);
         }
-        DBPDataSourceContainer dataSource = findDataSource(commandLine, context, value);
+        DBPDataSourceContainer dataSource = findDataSource();
         if (dataSource == null) {
-            throw new CLIException("Can't find connection '" + value + "'", CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS);
+            throw new CLIException("Can't find connection '" + connectionSpec + "'", CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS);
         }
         connectDatasource(dataSource);
-        context.setContextParameter(DBPDataSourceContainer.class.getName(), dataSource);
-        context.addCloseHandler(() -> {
+        context().setContextParameter(DBPDataSourceContainer.class.getName(), dataSource);
+        context().addCloseHandler(() -> {
             if (dataSource.isConnected()) {
                 try {
                     dataSource.disconnect(new LoggingProgressMonitor(log));
@@ -62,6 +75,7 @@ public class ConnectionOpenParameterHandler implements ICommandLineParameterHand
             }
         });
     }
+
 
     protected void connectDatasource(
         @NotNull DBPDataSourceContainer dataSource
@@ -80,12 +94,8 @@ public class ConnectionOpenParameterHandler implements ICommandLineParameterHand
     }
 
     @Nullable
-    protected DBPDataSourceContainer findDataSource(
-        @NotNull CommandLine commandLine,
-        @NotNull CommandLineContext context,
-        @NotNull String connectionSpec
-    ) throws DBException {
-        DBPProject project = findProject(commandLine, context);
+    protected DBPDataSourceContainer findDataSource() {
+        DBPProject project = findProject();
         ApplicationInstanceServer.InstanceConnectionParameters instanceConParameters
             = new ApplicationInstanceServer.InstanceConnectionParameters();
         return DataSourceUtils.getDataSourceBySpec(
@@ -98,23 +108,22 @@ public class ConnectionOpenParameterHandler implements ICommandLineParameterHand
     }
 
     @NotNull
-    private DBPProject findProject(@NotNull CommandLine commandLine, @NotNull CommandLineContext context) throws CLIException {
-        String projectNameOrId = commandLine.getOptionValue(CLIConstants.PARAM_PROJECT);
+    private DBPProject findProject() throws CLIException {
         DBPProject project;
-        DBPWorkspace workspace = context.getContextParameter(DBPWorkspace.class.getName());
+        DBPWorkspace workspace = context().getContextParameter(DBPWorkspace.class.getName());
         if (workspace == null) {
             workspace = DBWorkbench.getPlatform().getWorkspace();
         }
-        if (CommonUtils.isEmpty(projectNameOrId)) {
+        if (CommonUtils.isEmpty(projectIdOrName)) {
             project = workspace.getActiveProject();
         } else {
-            project = workspace.getProject(projectNameOrId);
+            project = workspace.getProject(projectIdOrName);
             if (project == null) {
-                project = workspace.getProjectById(projectNameOrId);
+                project = workspace.getProjectById(projectIdOrName);
             }
         }
         if (project == null) {
-            throw new CLIException("Can't find project '" + projectNameOrId + "'", CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS);
+            throw new CLIException("Can't find project '" + projectIdOrName + "'", CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS);
         }
         return project;
     }

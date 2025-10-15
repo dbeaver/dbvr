@@ -16,8 +16,13 @@
  */
 package org.dbvr.cli.app;
 
+import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.cli.ApplicationCommandLine;
 import org.jkiss.dbeaver.model.cli.ApplicationInstanceController;
+import org.jkiss.dbeaver.model.cli.CLIRunMeta;
+import org.jkiss.dbeaver.model.cli.CommandLineContext;
+import org.jkiss.dbeaver.model.cli.command.AbstractTopLevelCommand;
 
 public class DBVRCommandLine extends ApplicationCommandLine<ApplicationInstanceController> {
     private static DBVRCommandLine INSTANCE = null;
@@ -30,5 +35,14 @@ public class DBVRCommandLine extends ApplicationCommandLine<ApplicationInstanceC
     }
 
     private DBVRCommandLine() {
+    }
+
+    @Override
+    protected AbstractTopLevelCommand createTopLevelCommand(
+        @Nullable ApplicationInstanceController applicationInstanceController,
+        @NotNull CommandLineContext context,
+        @NotNull CLIRunMeta runMeta
+    ) {
+        return new DBVRTopLevelCommand(applicationInstanceController, context, runMeta);
     }
 }

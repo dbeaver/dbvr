@@ -16,7 +16,7 @@
  */
 package org.dbvr.cli.app;
 
-import org.apache.commons.cli.CommandLine;
+
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.equinox.app.IApplicationContext;
 import org.eclipse.osgi.service.datalocation.Location;
@@ -25,6 +25,7 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
+import org.jkiss.dbeaver.model.cli.CLIProcessResult;
 import org.jkiss.dbeaver.model.impl.app.BaseApplicationImpl;
 import org.jkiss.dbeaver.model.impl.preferences.SimplePreferenceStore;
 import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
@@ -59,7 +60,7 @@ public class CLIApplicationBase extends BaseApplicationImpl {
 
         // Workspace dir
         WORKSPACE_DIR_CURRENT = Path.of(workingDirectory, DEFAULT_WORKSPACE_FOLDER).toAbsolutePath().toString();
-        Log.setLogHandler(new VoidLogHandler());
+        //        Log.setLogHandler(new VoidLogHandler());
     }
 
     @NotNull
@@ -68,7 +69,6 @@ public class CLIApplicationBase extends BaseApplicationImpl {
         // Register core components
         initializeApplicationServices();
 
-        CommandLine commandLine = DBVRCommandLine.getInstance().getCommandLine();
         Location instanceLoc = Platform.getInstanceLocation();
         try {
             if (!instanceLoc.isSet()) { // always false?
@@ -84,13 +84,12 @@ public class CLIApplicationBase extends BaseApplicationImpl {
             throw e;
         }
         DBWorkbench.getPlatform();
-        DBVRCommandLine.getInstance().executeCommandLineCommands(
-            commandLine,
+        CLIProcessResult processResult = DBVRCommandLine.getInstance().executeCommandLineCommands(
             null,
             false,
             true
         );
-
+        
 
         return EXIT_OK;
     }
