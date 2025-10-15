@@ -17,22 +17,14 @@
 package org.dbvr.cli.app.handler;
 
 
-import org.jkiss.code.NotNull;
-import org.jkiss.code.Nullable;
-import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.cli.CommandLineContext;
-import org.jkiss.dbeaver.model.cli.ICommandLineParameterHandler;
+import org.jkiss.dbeaver.model.cli.AbstractCommandLineParameterHandler;
 import picocli.CommandLine;
 
-public class DebugLogsParameterHandler implements ICommandLineParameterHandler {
+@CommandLine.Command(name = "-debug-logs", description = "Enable debug logging.")
+public class DebugLogsParameterHandler extends AbstractCommandLineParameterHandler {
     @Override
-    public void handleParameter(
-        @NotNull CommandLine.ParseResult commandLine,
-        @NotNull String name,
-        @Nullable String value,
-        @NotNull CommandLineContext context
-    ) throws DBException {
+    public void run() {
         Log.setLogHandler(null);
     }
 }
