@@ -21,7 +21,7 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.cli.AbstractCommandLineParameterHandler;
 import picocli.CommandLine;
 
-@CommandLine.Command(name = "-debug-logs", description = "Enable debug logging.")
+@CommandLine.Command(name = "-debug-logs", description = "Enable debug logging.", mixinStandardHelpOptions = true)
 public class DebugLogsParameterHandler extends AbstractCommandLineParameterHandler {
     @Override
     public void run() {

@@ -59,14 +59,9 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
 
-@CommandLine.Command(name = "sql", description = "Execute SQL script")
+@CommandLine.Command(name = "-sql", description = "Execute SQL script", mixinStandardHelpOptions = true)
 public class SQLParameterHandler extends AbstractCommandLineParameterHandler {
     private static final Log log = Log.getLog(SQLParameterHandler.class);
-    private static final String DEFAULT_FORMAT = "csv";
-
-    private static final String CONTEXT_PARAM_OUTPUT_FORMAT_PARAMETERS = "output-format-parameters";
-    private static final String CONTEXT_PARAM_OUTPUT_FORMAT = "outputFormat";
-    private static final String CONTEXT_PARAM_LIMIT = "limit";
 
     @CommandLine.Option(names = {"-query"},
         description = "SQL query to execute. If not specified then read from stdin or input file")

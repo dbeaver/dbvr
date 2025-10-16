@@ -38,7 +38,8 @@ import org.jkiss.dbeaver.utils.SystemVariablesResolver;
 import org.jkiss.utils.CommonUtils;
 import picocli.CommandLine;
 
-@CommandLine.Command(name = "connection-open", aliases = {"con-open"}, description = "Connects to a specified database.")
+@CommandLine.Command(name = "-connection-open", aliases = {"-con-open"}, description = "Connects to a specified database.",
+    mixinStandardHelpOptions = true)
 public class ConnectionOpenParameterHandler extends AbstractCommandLineParameterHandler {
     private final Log log = Log.getLog(ConnectionOpenParameterHandler.class);
 
