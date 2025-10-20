@@ -3,13 +3,9 @@
 
 <plugin>
     <extension point="org.jkiss.dbeaver.commandLine">
-
-        <parameter name="con-open"
-                   handler="org.dbvr.cli.sql.ConnectionOpenParameterHandler"/>
-        
-        <parameter name="sql"
-                   description="Execute sql"
-                   exitAfterExecute="true"
-                   handler="org.dbvr.cli.sql.SQLParameterHandler"/>
+        <parameter
+            description="Execute sql"
+            exitAfterExecute="true"
+            handler="org.dbvr.cli.sql.SQLParameterHandler"/>
     </extension>
 </plugin>

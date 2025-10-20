@@ -22,11 +22,12 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
-import org.jkiss.dbeaver.model.cli.AbstractCommandLineParameterHandler;
 import org.jkiss.dbeaver.model.cli.CLIConstants;
 import org.jkiss.dbeaver.model.cli.CLIException;
 import org.jkiss.dbeaver.model.cli.CLIUtils;
-import org.jkiss.dbeaver.model.cli.option.FilesOptions;
+import org.jkiss.dbeaver.model.cli.model.CommandLineWithAuth;
+import org.jkiss.dbeaver.model.cli.model.option.InputFileOption;
+import org.jkiss.dbeaver.model.cli.model.option.OutputFileOption;
 import org.jkiss.dbeaver.model.exec.DBCExecutionContext;
 import org.jkiss.dbeaver.model.exec.DBCStatistics;
 import org.jkiss.dbeaver.model.exec.output.DBCOutputSeverity;
@@ -59,8 +60,8 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
 
-@CommandLine.Command(name = "-sql", description = "Execute SQL script", mixinStandardHelpOptions = true)
-public class SQLParameterHandler extends AbstractCommandLineParameterHandler {
+@CommandLine.Command(name = "sql", description = "Execute SQL script", mixinStandardHelpOptions = true)
+public class SQLParameterHandler extends CommandLineWithAuth {
     private static final Log log = Log.getLog(SQLParameterHandler.class);
 
     @CommandLine.Option(names = {"-query"},
@@ -68,17 +69,26 @@ public class SQLParameterHandler extends AbstractCommandLineParameterHandler {
     private String query;
 
     @CommandLine.Mixin
-    private FilesOptions filesOptions;
+    private InputFileOption inputFileOption;
+
+    @CommandLine.Mixin
+    private OutputFileOption outputFileOption;
 
     @CommandLine.Mixin
     private DataTransferOptions dataTransferOptions;
 
 
+    @CommandLine.Mixin
+    private OpenConnectionOptions connectionOptions;
+
     @Override
     public void run() {
+        super.run();
+        CLIConnectionUtils.connect(connectionOptions, context(), log);
+
         String sqlQuery = query;
         if (CommonUtils.isEmpty(sqlQuery)) {
-            sqlQuery = CLIUtils.readValueFromFileOrSystemIn(filesOptions);
+            sqlQuery = CLIUtils.readValueFromFileOrSystemIn(inputFileOption);
         }
         if (CommonUtils.isEmpty(sqlQuery)) {
             throw new CLIException("SQL query is empty", CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS);
@@ -163,7 +173,7 @@ public class SQLParameterHandler extends AbstractCommandLineParameterHandler {
             }
         }
 
-        Path outputFile = filesOptions.getOutputFile();
+        Path outputFile = outputFileOption.getOutputFile();
 
         DataSourceContextProvider dataSourceContextProvider = new DataSourceContextProvider(dataSource);
         StreamConsumerSettings settings = prepareSettings();
@@ -254,5 +264,6 @@ public class SQLParameterHandler extends AbstractCommandLineParameterHandler {
 
         }
     }
+
 
 }

@@ -14,17 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.dbvr.cli.app.handler;
+package org.dbvr.cli.sql;
 
-
-import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.cli.AbstractCommandLineParameterHandler;
+import org.jkiss.dbeaver.model.cli.CLIConstants;
 import picocli.CommandLine;
 
-@CommandLine.Command(name = "debug-logs", description = "Enable debug logging.", mixinStandardHelpOptions = true)
-public class DebugLogsParameterHandler extends AbstractCommandLineParameterHandler {
-    @Override
-    public void run() {
-        Log.setLogHandler(null);
+public class OpenConnectionOptions {
+    @CommandLine.Option(names = CLIConstants.PARAM_PROJECT, description = "Project name or ID")
+    private String projectIdOrName;
+
+    @CommandLine.Option(names = {"-connection", "--connection-spec"}, description = "Connection specification", required = true)
+    private String connectionSpec;
+
+    public String getConnectionSpec() {
+        return connectionSpec;
+    }
+
+    public String getProjectIdOrName() {
+        return projectIdOrName;
     }
 }
