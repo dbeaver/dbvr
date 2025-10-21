@@ -60,7 +60,7 @@ public class CLIPlatform extends BasePlatformImpl {
 
     protected void initialize() {
         long startTime = System.currentTimeMillis();
-        log.debug("Initialize CLI Platform...");
+        log.trace("Initialize CLI Platform...");
 
         try {
             Path installPath = RuntimeUtils.getLocalPathFromURL(Platform.getInstallLocation().getURL());
@@ -82,11 +82,11 @@ public class CLIPlatform extends BasePlatformImpl {
         QMUtils.initApplication(this);
         this.qmController = new QMRegistryImpl();
 
-        log.debug("CLI Platform initialized (" + (System.currentTimeMillis() - startTime) + "ms)");
+        log.trace("CLI Platform initialized (" + (System.currentTimeMillis() - startTime) + "ms)");
     }
 
     public synchronized void dispose() {
-        log.debug("Shutdown CLI...");
+        log.trace("Shutdown CLI...");
         isClosing = true;
         super.dispose();
         workspace.dispose();
