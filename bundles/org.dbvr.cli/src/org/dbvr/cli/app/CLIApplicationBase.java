@@ -34,6 +34,7 @@ import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.ui.DBPPlatformUI;
 import org.jkiss.dbeaver.runtime.ui.console.ConsoleUserInterface;
 import org.jkiss.dbeaver.utils.RuntimeUtils;
+import org.jkiss.utils.CommonUtils;
 
 import java.net.URL;
 import java.nio.file.Path;
@@ -60,7 +61,7 @@ public class CLIApplicationBase extends BaseApplicationImpl {
 
         // Workspace dir
         WORKSPACE_DIR_CURRENT = Path.of(workingDirectory, DEFAULT_WORKSPACE_FOLDER).toAbsolutePath().toString();
-        //        Log.setLogHandler(new VoidLogHandler());
+        Log.setLogHandler(new VoidLogHandler());
     }
 
     @NotNull
@@ -89,8 +90,9 @@ public class CLIApplicationBase extends BaseApplicationImpl {
             false,
             true
         );
-        
-
+        if (CommonUtils.isNotEmpty(processResult.getOutput())) {
+            System.out.println(processResult.getOutput());
+        }
         return EXIT_OK;
     }
 
