@@ -88,7 +88,7 @@ public class CLIApplicationBase extends BaseApplicationImpl {
         CLIProcessResult processResult = DBVRCommandLine.getInstance().executeCommandLineCommands(
             null,
             false,
-            true,
+            false,
             Platform.getApplicationArgs()
         );
         if (CommonUtils.isNotEmpty(processResult.getOutput())) {
