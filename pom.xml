@@ -24,7 +24,7 @@
     <modules>
         <module>bundles</module>
         <module>features</module>
-        <module>products</module>
+        <module>product</module>
     </modules>
 
 </project>
