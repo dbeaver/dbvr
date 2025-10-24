@@ -14,3 +14,4 @@ Web
   Issue tracker: https://github.com/dbeaver/dbvr/issues
 
   Please use our issue tracker for technical support, feature suggestions and any other questions
+w
