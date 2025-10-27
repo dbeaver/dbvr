@@ -27,12 +27,15 @@ import org.jkiss.dbeaver.model.cli.ApplicationInstanceServer;
 import org.jkiss.dbeaver.model.cli.CLIConstants;
 import org.jkiss.dbeaver.model.cli.CLIException;
 import org.jkiss.dbeaver.model.cli.CommandLineContext;
+import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.runtime.LoggingProgressMonitor;
 import org.jkiss.dbeaver.registry.DataSourceUtils;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.dbeaver.utils.SystemVariablesResolver;
 import org.jkiss.utils.CommonUtils;
+
+import java.util.List;
 
 public class CLIConnectionUtils {
 
@@ -41,8 +44,34 @@ public class CLIConnectionUtils {
             throw new CLIException("-connection-spec parameter is empty", CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS);
         }
         DBPDataSourceContainer dataSource = findDataSource(options, context);
+
         if (dataSource == null) {
             throw new CLIException("Can't find connection '" + options.getConnectionSpec() + "'", CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS);
+        }
+        DBPConnectionConfiguration connectionConfiguration = dataSource.getConnectionConfiguration();
+
+        if (CommonUtils.isNotEmpty(options.getDbUser())) {
+            connectionConfiguration.setUserName(options.getDbUser());
+        }
+
+        if (CommonUtils.isNotEmpty(options.getDbPassword())) {
+            connectionConfiguration.setUserPassword(options.getDbPassword());
+        }
+        List<String> authParams = options.getAuthParams();
+        if (!CommonUtils.isEmpty(authParams)) {
+
+            for (String authParam : authParams) {
+                String[] paramParts = authParam.split("=", 2);
+                if (paramParts.length == 2) {
+                    String paramName = paramParts[0].trim();
+                    String paramValue = paramParts[1].trim();
+                    if (CommonUtils.isNotEmpty(paramName) && CommonUtils.isNotEmpty(paramValue)) {
+                        connectionConfiguration.setAuthProperty(paramName, paramValue);
+                    }
+                } else {
+                    throw new CLIException("Invalid auth-param format: " + authParam, CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS);
+                }
+            }
         }
         connectDatasource(dataSource, parentLog);
         context.setContextParameter(DBPDataSourceContainer.class.getName(), dataSource);

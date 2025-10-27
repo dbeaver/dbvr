@@ -16,21 +16,63 @@
  */
 package org.dbvr.cli.sql;
 
+import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.cli.CLIConstants;
 import picocli.CommandLine;
 
+import java.util.List;
+
 public class OpenConnectionOptions {
+    @Nullable
     @CommandLine.Option(names = CLIConstants.PARAM_PROJECT, description = "Project name or ID")
     private String projectIdOrName;
 
-    @CommandLine.Option(names = {"-connection", "--connection-spec"}, description = "Connection specification", required = true)
+    @NotNull
+    @CommandLine.Option(
+        names = {"-connection", "--connection-spec"},
+        arity = "1",
+        description = "Connection specification",
+        required = true
+    )
     private String connectionSpec;
 
+    @Nullable
+    @CommandLine.Option(names = {"-u", "--user"}, arity = "1", description = "Database user name for database native authentication")
+    private String dbUser;
+
+    @Nullable
+    @CommandLine.Option(names = {"-p", "--password"}, arity = "1", description = "Database password for database native authentication")
+    private String dbPassword;
+
+    @Nullable
+    @CommandLine.Option(names = {"--auth-param"},
+        description = "Authentication parameter in the form 'name=value'. May be specified multiple times")
+    private List<String> authParams;
+
+
+    @NotNull
     public String getConnectionSpec() {
         return connectionSpec;
     }
 
+    @Nullable
     public String getProjectIdOrName() {
         return projectIdOrName;
+    }
+
+    @Nullable
+    public List<String> getAuthParams() {
+        return authParams;
+    }
+
+    @Nullable
+    public String getDbPassword() {
+        return dbPassword;
+    }
+
+    @Nullable
+    public String getDbUser() {
+        return dbUser;
     }
 }
