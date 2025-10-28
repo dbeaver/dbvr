@@ -51,6 +51,7 @@ public class CLIConnectionUtils {
         if (dataSource == null) {
             throw new CLIException("Can't find connection '" + options.getConnectionSpec() + "'", CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS);
         }
+        var monitor = new LoggingProgressMonitor(parentLog);
         DBPConnectionConfiguration connectionConfiguration = dataSource.getConnectionConfiguration();
 
         if (CommonUtils.isNotEmpty(options.getDbUser())) {
@@ -63,37 +64,52 @@ public class CLIConnectionUtils {
         connectionConfiguration.getAuthModel().createCredentials();
         List<String> authParams = options.getAuthParams();
         if (!CommonUtils.isEmpty(authParams)) {
-            Map<String, String> authProperties = new LinkedHashMap<>(connectionConfiguration.getAuthProperties());
-            for (String authParam : authParams) {
-                String[] paramParts = authParam.split("=", 2);
-                if (paramParts.length == 2) {
-                    String paramName = paramParts[0].trim();
-                    String paramValue = paramParts[1].trim();
-                    if (CommonUtils.isNotEmpty(paramName) && CommonUtils.isNotEmpty(paramValue)) {
-                        authProperties.put(paramName, paramValue);
-                    }
-                } else {
-                    throw new CLIException("Invalid auth-param format: " + authParam, CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS);
-                }
-            }
+            Map<String, String> authProperties = prepareKeyValueParams(connectionConfiguration.getAuthProperties(), authParams);
             if (!CommonUtils.isEmpty(authProperties)) {
                 DBAAuthCredentials credentialsInstance = dataSource.getConnectionConfiguration().getAuthModel().createCredentials();
-                DataSourceUtils.updateCredentialsFromProperties(credentialsInstance, authProperties);
+                DataSourceUtils.updateCredentialsFromProperties(monitor, credentialsInstance, authProperties);
                 dataSource.getConnectionConfiguration().getAuthModel()
                     .saveCredentials(dataSource, dataSource.getConnectionConfiguration(), credentialsInstance);
             }
+        }
+        if (!CommonUtils.isEmpty(options.getProviderParams())) {
+            Map<String, String> providerProperties = prepareKeyValueParams(
+                connectionConfiguration.getProviderProperties(),
+                options.getProviderParams()
+            );
+            connectionConfiguration.setProviderProperties(providerProperties);
         }
         connectDatasource(dataSource, parentLog);
         context.setContextParameter(DBPDataSourceContainer.class.getName(), dataSource);
         context.addCloseHandler(() -> {
             if (dataSource.isConnected()) {
                 try {
-                    dataSource.disconnect(new LoggingProgressMonitor(parentLog));
+                    dataSource.disconnect(monitor);
                 } catch (Exception e) {
                     parentLog.error("Error disconnecting datasource", e);
                 }
             }
         });
+    }
+
+    private static @NotNull Map<String, String> prepareKeyValueParams(
+        Map<String, String> parentParams,
+        List<String> cliParams
+    ) {
+        Map<String, String> properties = new LinkedHashMap<>(parentParams);
+        for (String authParam : cliParams) {
+            String[] paramParts = authParam.split("=", 2);
+            if (paramParts.length == 2) {
+                String paramName = paramParts[0].trim();
+                String paramValue = paramParts[1].trim();
+                if (CommonUtils.isNotEmpty(paramName) && CommonUtils.isNotEmpty(paramValue)) {
+                    properties.put(paramName, paramValue);
+                }
+            } else {
+                throw new CLIException("Invalid auth-param format: " + authParam, CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS);
+            }
+        }
+        return properties;
     }
 
 

@@ -91,8 +91,10 @@ public class CLIApplicationBase extends BaseApplicationImpl {
             false,
             Platform.getApplicationArgs()
         );
-        if (CommonUtils.isNotEmpty(processResult.getOutput())) {
-            System.out.println(processResult.getOutput());
+        if (!CommonUtils.isEmpty(processResult.getOutput())) {
+            for (String res : processResult.getOutput()) {
+                System.out.println(res);
+            }
         }
         return EXIT_OK;
     }

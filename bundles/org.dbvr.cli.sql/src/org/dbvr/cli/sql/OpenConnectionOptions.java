@@ -50,6 +50,11 @@ public class OpenConnectionOptions {
         description = "Authentication parameter in the form 'name=value'. May be specified multiple times")
     private List<String> authParams;
 
+    @Nullable
+    @CommandLine.Option(names = {"--provider-param"},
+        description = "Database provider parameter in the form 'name=value'. May be specified multiple times")
+    private List<String> providerParams;
+
 
     @NotNull
     public String getConnectionSpec() {
@@ -74,5 +79,10 @@ public class OpenConnectionOptions {
     @Nullable
     public String getDbUser() {
         return dbUser;
+    }
+
+    @Nullable
+    public List<String> getProviderParams() {
+        return providerParams;
     }
 }

@@ -16,19 +16,23 @@
  */
 package org.dbvr.cli.sql;
 
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.access.DBAAuthCredentials;
 import org.jkiss.dbeaver.model.access.DBAAuthModel;
 import org.jkiss.dbeaver.model.cli.AbstractCommandLineParameterHandler;
+import org.jkiss.dbeaver.model.cli.CLIProcessResult;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceAuthModelDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.runtime.properties.PropertyCollector;
+import org.jkiss.utils.CommonUtils;
 import picocli.CommandLine;
 
 import java.util.List;
 
 @CommandLine.Command(name = "database-authentication-model-list", description = "List available authentication models")
 public class ListAuthenticationModelParameterHandler extends AbstractCommandLineParameterHandler {
+    // provider/driver/connection filter
     @Override
     public void run() {
         List<DataSourceAuthModelDescriptor> authModels = DataSourceProviderRegistry.getInstance().getAllAuthModels();
@@ -46,15 +50,30 @@ public class ListAuthenticationModelParameterHandler extends AbstractCommandLine
             PropertyCollector propertyCollector = new PropertyCollector(credentials, true);
             propertyCollector.collectProperties();
             for (DBPPropertyDescriptor property : propertyCollector.getProperties()) {
-                outBuilder.append(String.format(
-                    "  - %s (%s): %s\n",
-                    property.getId(),
-                    property.getDisplayName(),
-                    property.getDescription()
-                ));
+                String helpText = getHelpText(property);
+                outBuilder.append(helpText);
             }
-
         }
-        System.out.println(outBuilder.toString());
+        context().addResult(outBuilder.toString());
+        context().setPostAction(CLIProcessResult.PostAction.SHUTDOWN);
+    }
+
+    private static @NotNull String getHelpText(DBPPropertyDescriptor property) {
+        String displayName = property.getDisplayName();
+        String description = property.getDisplayName();
+        String helpText;
+        if (CommonUtils.equalObjects(displayName, description)) {
+            helpText = "  - %s: %s\n".formatted(
+                property.getId(),
+                property.getDescription()
+            );
+        } else {
+            helpText = "  - %s (%s): %s\n".formatted(
+                property.getId(),
+                property.getDisplayName(),
+                property.getDescription()
+            );
+        }
+        return helpText;
     }
 }
