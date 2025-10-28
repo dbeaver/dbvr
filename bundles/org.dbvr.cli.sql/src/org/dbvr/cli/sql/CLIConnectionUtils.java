@@ -21,6 +21,7 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
+import org.jkiss.dbeaver.model.access.DBAAuthCredentials;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.cli.ApplicationInstanceServer;
@@ -35,7 +36,9 @@ import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.dbeaver.utils.SystemVariablesResolver;
 import org.jkiss.utils.CommonUtils;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class CLIConnectionUtils {
 
@@ -57,20 +60,27 @@ public class CLIConnectionUtils {
         if (CommonUtils.isNotEmpty(options.getDbPassword())) {
             connectionConfiguration.setUserPassword(options.getDbPassword());
         }
+        connectionConfiguration.getAuthModel().createCredentials();
         List<String> authParams = options.getAuthParams();
         if (!CommonUtils.isEmpty(authParams)) {
-
+            Map<String, String> authProperties = new LinkedHashMap<>(connectionConfiguration.getAuthProperties());
             for (String authParam : authParams) {
                 String[] paramParts = authParam.split("=", 2);
                 if (paramParts.length == 2) {
                     String paramName = paramParts[0].trim();
                     String paramValue = paramParts[1].trim();
                     if (CommonUtils.isNotEmpty(paramName) && CommonUtils.isNotEmpty(paramValue)) {
-                        connectionConfiguration.setAuthProperty(paramName, paramValue);
+                        authProperties.put(paramName, paramValue);
                     }
                 } else {
                     throw new CLIException("Invalid auth-param format: " + authParam, CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS);
                 }
+            }
+            if (!CommonUtils.isEmpty(authProperties)) {
+                DBAAuthCredentials credentialsInstance = dataSource.getConnectionConfiguration().getAuthModel().createCredentials();
+                DataSourceUtils.updateCredentialsFromProperties(credentialsInstance, authProperties);
+                dataSource.getConnectionConfiguration().getAuthModel()
+                    .saveCredentials(dataSource, dataSource.getConnectionConfiguration(), credentialsInstance);
             }
         }
         connectDatasource(dataSource, parentLog);

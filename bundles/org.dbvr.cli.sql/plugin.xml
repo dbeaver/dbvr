@@ -4,8 +4,10 @@
 <plugin>
     <extension point="org.jkiss.dbeaver.commandLine">
         <parameter
-            description="Execute sql"
             exitAfterExecute="true"
             handler="org.dbvr.cli.sql.SQLParameterHandler"/>
+        <parameter
+            exitAfterExecute="true"
+            handler="org.dbvr.cli.sql.ListAuthenticationModelParameterHandler"/>
     </extension>
 </plugin>
