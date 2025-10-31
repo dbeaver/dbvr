@@ -92,9 +92,10 @@ public class CLIConnectionUtils {
         });
     }
 
-    private static @NotNull Map<String, String> prepareKeyValueParams(
-        Map<String, String> parentParams,
-        List<String> cliParams
+    @NotNull
+    private static Map<String, String> prepareKeyValueParams(
+        @NotNull Map<String, String> parentParams,
+        @NotNull List<String> cliParams
     ) {
         Map<String, String> properties = new LinkedHashMap<>(parentParams);
         for (String authParam : cliParams) {
