@@ -20,10 +20,15 @@ import org.jkiss.dbeaver.model.cli.CLIConstants;
 import picocli.CommandLine;
 
 public class OpenConnectionOptions {
-    @CommandLine.Option(names = CLIConstants.PARAM_PROJECT, description = "Project name or ID")
+    @CommandLine.Option(names = CLIConstants.PARAM_PROJECT, arity = "1", description = "Project name or ID")
     private String projectIdOrName;
 
-    @CommandLine.Option(names = {"-connection", "--connection-spec"}, description = "Connection specification", required = true)
+    @CommandLine.Option(
+        names = {"-connection", "--connection-spec"},
+        arity = "1",
+        description = "Connection specification",
+        required = true
+    )
     private String connectionSpec;
 
     public String getConnectionSpec() {
