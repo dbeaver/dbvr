@@ -9,7 +9,7 @@
         <version>1.0.0-SNAPSHOT</version>
         <relativePath>../</relativePath>
     </parent>
-    <artifactId>products</artifactId>
+    <artifactId>product</artifactId>
     <packaging>pom</packaging>
 
     <modules>
