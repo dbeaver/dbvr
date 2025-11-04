@@ -51,8 +51,11 @@ public class OpenConnectionOptions {
     private List<String> authParams;
 
     @Nullable
-    @CommandLine.Option(names = {"--provider-param"},
-        description = "Database provider parameter in the form 'name=value'. May be specified multiple times")
+    @CommandLine.Option(
+        names = {"--provider-param"},
+        arity = "1",
+        description = "Database provider parameter in the form 'name=value'. May be specified multiple times"
+    )
     private List<String> providerParams;
 
 
