@@ -46,7 +46,9 @@ public class OpenConnectionOptions {
     private String dbPassword;
 
     @Nullable
-    @CommandLine.Option(names = {"--auth-param"},
+    @CommandLine.Option(
+        names = {"--auth-param"},
+        arity = "1",
         description = "Authentication parameter in the form 'name=value'. May be specified multiple times")
     private List<String> authParams;
 
