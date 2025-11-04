@@ -64,8 +64,11 @@ import java.util.*;
 public class SQLParameterHandler extends CommandLineWithAuth {
     private static final Log log = Log.getLog(SQLParameterHandler.class);
 
-    @CommandLine.Option(names = {"-query"},
-        description = "SQL query to execute. If not specified then read from stdin or input file")
+    @CommandLine.Parameters(
+        index = "0",
+        arity = "0..1",
+        description = "SQL query to execute. If not specified then read from stdin or input file"
+    )
     private String query;
 
     @CommandLine.Mixin
@@ -76,7 +79,6 @@ public class SQLParameterHandler extends CommandLineWithAuth {
 
     @CommandLine.Mixin
     private DataTransferOptions dataTransferOptions;
-
 
     @CommandLine.Mixin
     private OpenConnectionOptions connectionOptions;

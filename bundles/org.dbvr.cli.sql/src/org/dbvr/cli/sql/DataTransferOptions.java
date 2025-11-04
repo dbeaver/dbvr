@@ -22,18 +22,22 @@ import picocli.CommandLine;
 
 public class DataTransferOptions {
 
-    @CommandLine.Option(names = {"-limit"}, description = "Limits number of lines in an executed sql. Default: unlimited",
+    @CommandLine.Option(names = {"-limit"},
+        arity = "1",
+        description = "Limits number of lines in an executed sql. Default: unlimited",
         defaultValue = "0")
     private int limit = 0;
 
     @NotNull
     @CommandLine.Option(names = {"-format", "-output-format"},
+        arity = "1",
         description = "Write the execution result in a specific format (csv, xml, etc. csv by default)",
         defaultValue = "csv")
     private String outputFormat = "csv";
 
     @Nullable
     @CommandLine.Option(names = {"-op", "-output-format-parameters"},
+        arity = "1",
         description = "Parameters (exporter options as list of props prop1=value1,prop2=value2 coma and space are delimiters).")
     private String outputFormatParameters;
 

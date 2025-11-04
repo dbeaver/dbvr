@@ -24,11 +24,9 @@ import picocli.CommandLine;
 import java.util.List;
 
 public class OpenConnectionOptions {
-    @Nullable
-    @CommandLine.Option(names = CLIConstants.PARAM_PROJECT, description = "Project name or ID")
+    @CommandLine.Option(names = CLIConstants.PARAM_PROJECT, arity = "1", description = "Project name or ID")
     private String projectIdOrName;
 
-    @NotNull
     @CommandLine.Option(
         names = {"-connection", "--connection-spec"},
         arity = "1",
