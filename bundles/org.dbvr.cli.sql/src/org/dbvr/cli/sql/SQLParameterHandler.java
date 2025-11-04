@@ -66,7 +66,7 @@ public class SQLParameterHandler extends CommandLineWithAuth {
 
     @CommandLine.Parameters(
         index = "0",
-        arity = "1",
+        arity = "0..1",
         description = "SQL query to execute. If not specified then read from stdin or input file"
     )
     private String query;
