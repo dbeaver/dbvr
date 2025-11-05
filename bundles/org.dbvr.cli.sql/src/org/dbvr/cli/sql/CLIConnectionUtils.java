@@ -66,7 +66,8 @@ public class CLIConnectionUtils {
         if (!CommonUtils.isEmpty(authParams)) {
             Map<String, String> authProperties = prepareKeyValueParams(connectionConfiguration.getAuthProperties(), authParams);
             if (!CommonUtils.isEmpty(authProperties)) {
-                DBAAuthCredentials credentialsInstance = dataSource.getConnectionConfiguration().getAuthModel().createCredentials();
+                DBAAuthCredentials credentialsInstance = connectionConfiguration.getAuthModel()
+                    .loadCredentials(dataSource, connectionConfiguration);
                 DataSourceUtils.updateCredentialsFromProperties(monitor, credentialsInstance, authProperties);
                 dataSource.getConnectionConfiguration().getAuthModel()
                     .saveCredentials(dataSource, dataSource.getConnectionConfiguration(), credentialsInstance);
@@ -94,10 +95,10 @@ public class CLIConnectionUtils {
 
     @NotNull
     private static Map<String, String> prepareKeyValueParams(
-        @NotNull Map<String, String> parentParams,
+        @Nullable Map<String, String> parentParams,
         @NotNull List<String> cliParams
     ) {
-        Map<String, String> properties = new LinkedHashMap<>(parentParams);
+        Map<String, String> properties = parentParams == null ? new LinkedHashMap<>() : new LinkedHashMap<>(parentParams);
         for (String authParam : cliParams) {
             String[] paramParts = authParam.split("=", 2);
             if (paramParts.length == 2) {
