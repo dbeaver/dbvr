@@ -85,7 +85,8 @@ public class CLIApplicationBase extends BaseApplicationImpl {
             throw e;
         }
         DBWorkbench.getPlatform();
-        CLIProcessResult processResult = DBVRCommandLine.getInstance().executeCommandLineCommands(
+        DBVRCommandLine commandLine = createCommandLine();
+        CLIProcessResult processResult = commandLine.executeCommandLineCommands(
             null,
             false,
             false,
@@ -97,6 +98,11 @@ public class CLIApplicationBase extends BaseApplicationImpl {
             }
         }
         return EXIT_OK;
+    }
+
+    @NotNull
+    protected DBVRCommandLine createCommandLine() {
+        return new DBVRCommandLine();
     }
 
     @Override

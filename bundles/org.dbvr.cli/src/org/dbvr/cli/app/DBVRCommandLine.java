@@ -25,16 +25,9 @@ import org.jkiss.dbeaver.model.cli.CommandLineContext;
 import org.jkiss.dbeaver.model.cli.command.AbstractTopLevelCommand;
 
 public class DBVRCommandLine extends ApplicationCommandLine<ApplicationInstanceController> {
-    private static DBVRCommandLine INSTANCE = null;
 
-    public synchronized static DBVRCommandLine getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new DBVRCommandLine();
-        }
-        return INSTANCE;
-    }
 
-    private DBVRCommandLine() {
+    public DBVRCommandLine() {
     }
 
     @Override
