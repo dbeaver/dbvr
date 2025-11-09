@@ -84,7 +84,7 @@ public class SQLParameterHandler extends CommandLineWithAuth {
     private OpenConnectionOptions connectionOptions;
 
     @Override
-    public void run() {
+    public void run() throws CLIException {
         super.run();
         CLIConnectionUtils.connect(connectionOptions, context(), log);
 
