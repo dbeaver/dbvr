@@ -71,7 +71,7 @@ public class CLIApplicationBase extends BaseApplicationImpl {
         // Workspace dir
         WORKSPACE_DIR_CURRENT = Path.of(workingDirectory, DEFAULT_WORKSPACE_FOLDER).toAbsolutePath().toString();
         Log.setLogHandler(new VoidLogHandler());
-        this.commandLine = new DBVRCommandLine();
+        this.commandLine = createCommandLine();
     }
 
     @NotNull
@@ -96,8 +96,6 @@ public class CLIApplicationBase extends BaseApplicationImpl {
         }
         DBWorkbench.getPlatform();
         configureApplication();
-        CLIProcessResult processResult = commandLine.executeCommandLineCommands(
-        DBVRCommandLine commandLine = createCommandLine();
         CLIProcessResult processResult = commandLine.executeCommandLineCommands(
             null,
             false,
