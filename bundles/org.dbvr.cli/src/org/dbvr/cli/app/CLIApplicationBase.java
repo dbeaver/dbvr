@@ -157,6 +157,7 @@ public class CLIApplicationBase extends BaseApplicationImpl {
         return preferenceStore;
     }
 
+    @NotNull
     public CLIWorkspace createWorkspace(@NotNull CLIPlatform cliPlatform) {
         return new CLIWorkspace(cliPlatform, Path.of(WORKSPACE_DIR_CURRENT));
     }

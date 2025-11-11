@@ -120,11 +120,16 @@ public class CLIWorkspace extends BaseWorkspaceImpl {
             log.error("Can't load cli workspace projects", e);
         }
         for (Path projectPath : projectPaths) {
-            projects.add(new LocalProjectImpl(this, getAuthContext(), projectPath));
+            projects.add(createProject(projectPath));
         }
 
         activeProject = getProject(platform.getApplication().getDefaultProjectName());
         // noop
+    }
+
+    @NotNull
+    protected LocalProjectImpl createProject(@NotNull Path projectPath) {
+        return new LocalProjectImpl(this, getAuthContext(), projectPath);
     }
 
     @Override
