@@ -46,7 +46,6 @@ import java.nio.file.Path;
 public class CLIApplicationBase extends BaseApplicationImpl {
     private static final Log log = Log.getLog(CLIApplicationBase.class);
     protected final String WORKSPACE_DIR_CURRENT;
-    protected final DBVRCommandLine commandLine;
 
     private final DBPPreferenceStore preferenceStore = new SimplePreferenceStore() {
         @Override
@@ -71,7 +70,6 @@ public class CLIApplicationBase extends BaseApplicationImpl {
         // Workspace dir
         WORKSPACE_DIR_CURRENT = Path.of(workingDirectory, DEFAULT_WORKSPACE_FOLDER).toAbsolutePath().toString();
         Log.setLogHandler(new VoidLogHandler());
-        this.commandLine = createCommandLine();
     }
 
     @NotNull
@@ -96,7 +94,8 @@ public class CLIApplicationBase extends BaseApplicationImpl {
         }
         DBWorkbench.getPlatform();
         configureApplication();
-        CLIProcessResult processResult = commandLine.executeCommandLineCommands(
+        DBVRCommandLine commandLine = createCommandLine();
+        CLIProcessResult processResult = createCommandLine().executeCommandLineCommands(
             null,
             false,
             false,
@@ -111,7 +110,7 @@ public class CLIApplicationBase extends BaseApplicationImpl {
     }
 
     @NotNull
-    protected DBVRCommandLine createCommandLine() {
+    public DBVRCommandLine createCommandLine() {
         return new DBVRCommandLine();
     }
 
