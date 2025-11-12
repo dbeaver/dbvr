@@ -3,7 +3,7 @@
 <feature
         id="org.dbvr.app.ce.feature"
         label="DBeaver CLI Community"
-        version="25.2.2.qualifier"
+        version="25.3.0.qualifier"
         provider-name="DBeaver Corp"
         plugin="org.dbvr.app.ce">
 
