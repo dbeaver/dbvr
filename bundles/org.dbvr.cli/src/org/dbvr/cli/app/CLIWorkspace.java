@@ -129,6 +129,8 @@ public class CLIWorkspace extends BaseWorkspaceImpl {
         }
 
         activeProject = defaultProject;
+
+        initializeWorkspaceSession();
     }
 
     @Nullable
