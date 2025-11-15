@@ -18,32 +18,51 @@ package org.dbvr.cli.sql;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.utils.CommonUtils;
 import picocli.CommandLine;
 
 public class DataTransferOptions {
 
-    @CommandLine.Option(names = {"-limit"},
+    @CommandLine.Option(names = {"-l", "--limit"},
         arity = "1",
-        description = "Limits number of lines in an executed sql. Default: unlimited",
-        defaultValue = "0")
-    private int limit = 0;
+        description = "Limits number of fetched rows and sets offset. Format: \"[offset,]limit\". Default: 1000",
+        defaultValue = "1000")
+    private String limit = "1000";
 
     @NotNull
-    @CommandLine.Option(names = {"-format", "-output-format"},
+    @CommandLine.Option(names = {"-format", "--output-format"},
         arity = "1",
         description = "Write the execution result in a specific format (csv, xml, etc. csv by default)",
         defaultValue = "txt")
     private String outputFormat = "txt";
 
     @Nullable
-    @CommandLine.Option(names = {"-op", "-output-format-parameters"},
+    @CommandLine.Option(names = {"-op", "--output-format-parameters"},
         arity = "1",
         description = "Parameters (exporter options as list of props prop1=value1,prop2=value2 coma and space are delimiters).")
     private String outputFormatParameters;
 
 
-    public int getLimit() {
-        return limit;
+    public long getOffset() {
+        if (limit != null) {
+            int divPos = limit.indexOf(',');
+            if (divPos != -1) {
+                return CommonUtils.toLong(limit.substring(0, divPos).trim());
+            }
+        }
+        return 0;
+    }
+
+    public long getLimit() {
+        if (limit != null) {
+            int divPos = limit.indexOf(',');
+            if (divPos != -1) {
+                return CommonUtils.toLong(limit.substring(divPos + 1).trim());
+            } else {
+                return CommonUtils.toLong(limit.trim());
+            }
+        }
+        return 0;
     }
 
     @NotNull
