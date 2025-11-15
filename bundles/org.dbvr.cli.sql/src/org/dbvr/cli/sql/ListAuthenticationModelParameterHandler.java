@@ -30,7 +30,7 @@ import picocli.CommandLine;
 
 import java.util.List;
 
-@CommandLine.Command(name = "database-authentication-model-list", description = "List available authentication models")
+@CommandLine.Command(name = "auth-models", description = "List available database authentication models")
 public class ListAuthenticationModelParameterHandler extends AbstractCommandLineParameterHandler {
     // provider/driver/connection filter
     @Override
