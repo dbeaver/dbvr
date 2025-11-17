@@ -14,17 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.dbvr.cli.app.handler;
+package org.dbvr.cli.app;
 
-
-import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.cli.AbstractCommandLineParameterHandler;
 import picocli.CommandLine;
 
-@CommandLine.Command(name = "debug-logs", description = "Enable debug logging.", mixinStandardHelpOptions = true)
-public class DebugLogsParameterHandler extends AbstractCommandLineParameterHandler {
-    @Override
-    public void run() {
-        Log.setLogHandler(null);
+public class DBVRMixin {
+    @CommandLine.Option(names = {"--debug-logs"},
+        description = "Enable debug logging.",
+        scope = CommandLine.ScopeType.INHERIT
+    )
+    private boolean debugLogs;
+
+    public boolean isDebugLogs() {
+        return debugLogs;
     }
 }
