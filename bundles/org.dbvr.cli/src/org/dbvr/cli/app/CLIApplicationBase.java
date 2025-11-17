@@ -36,6 +36,7 @@ import org.jkiss.dbeaver.runtime.ui.console.ConsoleUserInterface;
 import org.jkiss.dbeaver.utils.RuntimeUtils;
 import org.jkiss.utils.CommonUtils;
 
+import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
 
@@ -45,6 +46,13 @@ import java.nio.file.Path;
 public class CLIApplicationBase extends BaseApplicationImpl {
     private static final Log log = Log.getLog(CLIApplicationBase.class);
     protected final String WORKSPACE_DIR_CURRENT;
+
+    private final DBPPreferenceStore preferenceStore = new SimplePreferenceStore() {
+        @Override
+        public void save() throws IOException {
+
+        }
+    };
 
     protected CLIApplicationBase() {
 
@@ -85,8 +93,9 @@ public class CLIApplicationBase extends BaseApplicationImpl {
             throw e;
         }
         DBWorkbench.getPlatform();
+        configureApplication();
         DBVRCommandLine commandLine = createCommandLine();
-        CLIProcessResult processResult = commandLine.executeCommandLineCommands(
+        CLIProcessResult processResult = createCommandLine().executeCommandLineCommands(
             null,
             false,
             false,
@@ -101,8 +110,12 @@ public class CLIApplicationBase extends BaseApplicationImpl {
     }
 
     @NotNull
-    protected DBVRCommandLine createCommandLine() {
+    public DBVRCommandLine createCommandLine() {
         return new DBVRCommandLine();
+    }
+
+    protected void configureApplication() {
+
     }
 
     @Override
@@ -145,14 +158,10 @@ public class CLIApplicationBase extends BaseApplicationImpl {
 
     @NotNull
     public DBPPreferenceStore getPreferenceStore() {
-        return new SimplePreferenceStore() {
-            @Override
-            public void save() {
-
-            }
-        };
+        return preferenceStore;
     }
 
+    @NotNull
     public CLIWorkspace createWorkspace(@NotNull CLIPlatform cliPlatform) {
         return new CLIWorkspace(cliPlatform, Path.of(WORKSPACE_DIR_CURRENT));
     }

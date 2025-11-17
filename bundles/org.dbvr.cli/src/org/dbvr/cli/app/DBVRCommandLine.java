@@ -26,7 +26,6 @@ import org.jkiss.dbeaver.model.cli.command.AbstractTopLevelCommand;
 
 public class DBVRCommandLine extends ApplicationCommandLine<ApplicationInstanceController> {
 
-
     public DBVRCommandLine() {
     }
 
