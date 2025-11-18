@@ -60,7 +60,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
 
-@CommandLine.Command(name = "sql", description = "Execute SQL script", mixinStandardHelpOptions = true)
+@CommandLine.Command(name = "sql", description = "Execute SQL script")
 public class SQLParameterHandler extends CommandLineWithAuth {
     private static final Log log = Log.getLog(SQLParameterHandler.class);
 

@@ -24,7 +24,7 @@ import org.jkiss.dbeaver.model.cli.CommandLineContext;
 import org.jkiss.dbeaver.model.cli.command.AbstractTopLevelCommand;
 import picocli.CommandLine;
 
-@CommandLine.Command(name = "dbvr", description = "dbvr commands", mixinStandardHelpOptions = true)
+@CommandLine.Command(name = "dbvr", description = "dbvr commands")
 public class DBVRTopLevelCommand extends AbstractTopLevelCommand {
 
     protected DBVRTopLevelCommand(
