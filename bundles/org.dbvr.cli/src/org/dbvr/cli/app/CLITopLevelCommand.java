@@ -18,7 +18,6 @@ package org.dbvr.cli.app;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
-import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.cli.ApplicationInstanceController;
 import org.jkiss.dbeaver.model.cli.CLIRunMeta;
 import org.jkiss.dbeaver.model.cli.CommandLineContext;
@@ -26,11 +25,9 @@ import org.jkiss.dbeaver.model.cli.command.AbstractTopLevelCommand;
 import picocli.CommandLine;
 
 @CommandLine.Command(name = "dbvr", description = "dbvr commands", mixinStandardHelpOptions = true)
-public class DBVRTopLevelCommand extends AbstractTopLevelCommand {
-    @CommandLine.Mixin
-    private DBVRMixin dbvrMixin;
+public class CLITopLevelCommand extends AbstractTopLevelCommand {
 
-    protected DBVRTopLevelCommand(
+    protected CLITopLevelCommand(
         @Nullable ApplicationInstanceController controller,
         @NotNull CommandLineContext context,
         @NotNull CLIRunMeta meta
@@ -43,9 +40,6 @@ public class DBVRTopLevelCommand extends AbstractTopLevelCommand {
         super.run();
         if (context.getPostAction() != null) {
             return;
-        }
-        if (dbvrMixin != null && dbvrMixin.isDebugLogs()) {
-            Log.setLogHandler(null);
         }
     }
 }

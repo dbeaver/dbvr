@@ -24,9 +24,9 @@ import org.jkiss.dbeaver.model.cli.CLIRunMeta;
 import org.jkiss.dbeaver.model.cli.CommandLineContext;
 import org.jkiss.dbeaver.model.cli.command.AbstractTopLevelCommand;
 
-public class DBVRCommandLine extends ApplicationCommandLine<ApplicationInstanceController> {
+public class CLICommandLine extends ApplicationCommandLine<ApplicationInstanceController> {
 
-    public DBVRCommandLine() {
+    public CLICommandLine() {
     }
 
     @Override
@@ -35,6 +35,6 @@ public class DBVRCommandLine extends ApplicationCommandLine<ApplicationInstanceC
         @NotNull CommandLineContext context,
         @NotNull CLIRunMeta runMeta
     ) {
-        return new DBVRTopLevelCommand(applicationInstanceController, context, runMeta);
+        return new CLITopLevelCommand(applicationInstanceController, context, runMeta);
     }
 }
