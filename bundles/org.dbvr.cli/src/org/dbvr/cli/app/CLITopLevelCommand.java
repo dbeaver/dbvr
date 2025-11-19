@@ -24,7 +24,7 @@ import org.jkiss.dbeaver.model.cli.CommandLineContext;
 import org.jkiss.dbeaver.model.cli.command.AbstractTopLevelCommand;
 import picocli.CommandLine;
 
-@CommandLine.Command(name = "dbvr", description = "dbvr commands", mixinStandardHelpOptions = true)
+@CommandLine.Command(name = "dbvr", description = "dbvr commands")
 public class CLITopLevelCommand extends AbstractTopLevelCommand {
 
     protected CLITopLevelCommand(
@@ -33,13 +33,5 @@ public class CLITopLevelCommand extends AbstractTopLevelCommand {
         @NotNull CLIRunMeta meta
     ) {
         super(controller, context, meta);
-    }
-
-    @Override
-    public void run() {
-        super.run();
-        if (context.getPostAction() != null) {
-            return;
-        }
     }
 }
