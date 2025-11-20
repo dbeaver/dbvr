@@ -26,6 +26,7 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.model.cli.CLIProcessResult;
+import org.jkiss.dbeaver.model.cli.command.AbstractTopLevelCommand;
 import org.jkiss.dbeaver.model.impl.app.BaseApplicationImpl;
 import org.jkiss.dbeaver.model.impl.preferences.SimplePreferenceStore;
 import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
@@ -34,6 +35,7 @@ import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.ui.DBPPlatformUI;
 import org.jkiss.dbeaver.runtime.ui.console.ConsoleUserInterface;
 import org.jkiss.dbeaver.utils.RuntimeUtils;
+import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
 
 import java.io.IOException;
@@ -95,11 +97,15 @@ public class CLIApplicationBase extends BaseApplicationImpl {
         DBWorkbench.getPlatform();
         configureApplication();
         DBVRCommandLine commandLine = createCommandLine();
+        String[] appArgs = commandLine.preprocessCommandLine(Platform.getApplicationArgs());
+        if (ArrayUtils.isEmpty(appArgs)) {
+            appArgs = new String[] {AbstractTopLevelCommand.HELP_OPTION};
+        }
         CLIProcessResult processResult = createCommandLine().executeCommandLineCommands(
             null,
             false,
             false,
-            Platform.getApplicationArgs()
+            appArgs
         );
         if (!CommonUtils.isEmpty(processResult.getOutput())) {
             for (String res : processResult.getOutput()) {
