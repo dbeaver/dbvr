@@ -70,7 +70,7 @@ public class CLIConnectionUtils {
                     .loadCredentials(dataSource, connectionConfiguration);
                 DataSourceUtils.updateCredentialsFromProperties(monitor, credentialsInstance, authProperties);
                 dataSource.getConnectionConfiguration().getAuthModel()
-                    .saveCredentials(dataSource, dataSource.getConnectionConfiguration(), credentialsInstance);
+                    .provideCredentials(dataSource, dataSource.getConnectionConfiguration(), credentialsInstance);
             }
         }
         if (!CommonUtils.isEmpty(options.getProviderParams())) {
