@@ -60,7 +60,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
 
-@CommandLine.Command(name = "sql", description = "Execute SQL script", mixinStandardHelpOptions = true)
+@CommandLine.Command(name = "sql", description = "Execute SQL script")
 public class SQLParameterHandler extends CommandLineWithAuth {
     private static final Log log = Log.getLog(SQLParameterHandler.class);
 
@@ -181,10 +181,11 @@ public class SQLParameterHandler extends CommandLineWithAuth {
         StreamConsumerSettings settings = prepareSettings();
 
         boolean first = true;
-        int limit = dataTransferOptions.getLimit();
+        long offset = dataTransferOptions.getOffset();
+        long limit = dataTransferOptions.getLimit();
 
         for (var script : scriptElements) {
-            if (!(script instanceof SQLQuery query)) {
+            if (!(script instanceof SQLQuery q)) {
                 log.debug("Skip non-query script element: " + script.getText());
                 continue;
             }
@@ -199,7 +200,7 @@ public class SQLParameterHandler extends CommandLineWithAuth {
                 first = false;
                 StreamTransferConsumer consumer = new StreamTransferConsumer();
                 SQLQueryDataContainer sqlQueryDataContainer = new SQLQueryDataContainer(
-                    dataSourceContextProvider, query, scriptContext, log
+                    dataSourceContextProvider, q, scriptContext, log
                 );
                 consumer.initTransfer(
                     sqlQueryDataContainer,
@@ -216,11 +217,14 @@ public class SQLParameterHandler extends CommandLineWithAuth {
 
                 SQLScriptProcessor scriptProcessor = new SQLScriptProcessor(
                     executionContext,
-                    List.of(query),
+                    List.of(q),
                     scriptContext,
                     consumer,
                     log
                 );
+                if (offset > 0) {
+                    scriptProcessor.setOffset(offset);
+                }
                 if (limit > 0) {
                     scriptProcessor.setMaxRows(limit);
                 }

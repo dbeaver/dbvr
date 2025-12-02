@@ -25,6 +25,7 @@ import org.jkiss.dbeaver.model.impl.app.BaseProjectImpl;
 import org.jkiss.dbeaver.model.impl.app.BaseWorkspaceImpl;
 import org.jkiss.dbeaver.registry.project.LocalProjectImpl;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
+import org.jkiss.utils.CommonUtils;
 
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
@@ -120,11 +121,42 @@ public class CLIWorkspace extends BaseWorkspaceImpl {
             log.error("Can't load cli workspace projects", e);
         }
         for (Path projectPath : projectPaths) {
-            projects.add(new LocalProjectImpl(this, getAuthContext(), projectPath));
+            projects.add(createProject(projectPath));
+        }
+        var defaultProject = getProject(platform.getApplication().getDefaultProjectName());
+        if (defaultProject == null) {
+            defaultProject = createDefaultProject();
         }
 
-        activeProject = getProject(platform.getApplication().getDefaultProjectName());
-        // noop
+        activeProject = defaultProject;
+
+        initializeWorkspaceSession();
+    }
+
+    @Nullable
+    private DBPProject createDefaultProject() {
+        try {
+            if (CommonUtils.isEmpty(platform.getApplication().getDefaultProjectName())) {
+                return null;
+            }
+            Path defaultProjectPath = getAbsolutePath().resolve(
+                platform.getApplication().getDefaultProjectName()
+            );
+            if (!Files.exists(defaultProjectPath)) {
+                Files.createDirectories(defaultProjectPath);
+            }
+            var defaultProject = createProject(defaultProjectPath);
+            projects.add(defaultProject);
+            return defaultProject;
+        } catch (IOException e) {
+            log.error("Error creating default project", e);
+            return null;
+        }
+    }
+
+    @NotNull
+    protected LocalProjectImpl createProject(@NotNull Path projectPath) {
+        return new LocalProjectImpl(this, getAuthContext(), projectPath);
     }
 
     @Override

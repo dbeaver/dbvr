@@ -14,17 +14,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.dbvr.cli.app.handler;
+package org.dbvr.cli.app;
 
-
-import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.model.cli.AbstractCommandLineParameterHandler;
+import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.model.cli.ApplicationInstanceController;
+import org.jkiss.dbeaver.model.cli.CLIRunMeta;
+import org.jkiss.dbeaver.model.cli.CommandLineContext;
+import org.jkiss.dbeaver.model.cli.command.AbstractTopLevelCommand;
 import picocli.CommandLine;
 
-@CommandLine.Command(name = "debug-logs", description = "Enable debug logging.", mixinStandardHelpOptions = true)
-public class DebugLogsParameterHandler extends AbstractCommandLineParameterHandler {
-    @Override
-    public void run() {
-        Log.setLogHandler(null);
+@CommandLine.Command(name = "dbvr", description = "dbvr commands")
+public class CLITopLevelCommand extends AbstractTopLevelCommand {
+
+    protected CLITopLevelCommand(
+        @Nullable ApplicationInstanceController controller,
+        @NotNull CommandLineContext context,
+        @NotNull CLIRunMeta meta
+    ) {
+        super(controller, context, meta);
     }
 }

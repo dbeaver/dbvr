@@ -18,20 +18,23 @@ package org.dbvr.cli.app;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.model.cli.ApplicationCommandLine;
 import org.jkiss.dbeaver.model.cli.ApplicationInstanceController;
 import org.jkiss.dbeaver.model.cli.CLIRunMeta;
 import org.jkiss.dbeaver.model.cli.CommandLineContext;
 import org.jkiss.dbeaver.model.cli.command.AbstractTopLevelCommand;
-import picocli.CommandLine;
 
-@CommandLine.Command(name = "dbvr", description = "dbvr commands", mixinStandardHelpOptions = true)
-public class DBVRTopLevelCommand extends AbstractTopLevelCommand {
+public class CLICommandLine extends ApplicationCommandLine<ApplicationInstanceController> {
 
-    protected DBVRTopLevelCommand(
-        @Nullable ApplicationInstanceController controller,
+    public CLICommandLine() {
+    }
+
+    @Override
+    protected AbstractTopLevelCommand createTopLevelCommand(
+        @Nullable ApplicationInstanceController applicationInstanceController,
         @NotNull CommandLineContext context,
-        @NotNull CLIRunMeta meta
+        @NotNull CLIRunMeta runMeta
     ) {
-        super(controller, context, meta);
+        return new CLITopLevelCommand(applicationInstanceController, context, runMeta);
     }
 }
