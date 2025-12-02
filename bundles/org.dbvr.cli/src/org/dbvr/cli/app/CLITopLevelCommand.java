@@ -25,9 +25,9 @@ import org.jkiss.dbeaver.model.cli.command.AbstractTopLevelCommand;
 import picocli.CommandLine;
 
 @CommandLine.Command(name = "dbvr", description = "dbvr commands")
-public class DBVRTopLevelCommand extends AbstractTopLevelCommand {
+public class CLITopLevelCommand extends AbstractTopLevelCommand {
 
-    protected DBVRTopLevelCommand(
+    protected CLITopLevelCommand(
         @Nullable ApplicationInstanceController controller,
         @NotNull CommandLineContext context,
         @NotNull CLIRunMeta meta

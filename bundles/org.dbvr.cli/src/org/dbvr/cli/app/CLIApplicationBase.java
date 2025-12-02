@@ -96,7 +96,7 @@ public class CLIApplicationBase extends BaseApplicationImpl {
         }
         DBWorkbench.getPlatform();
         configureApplication();
-        DBVRCommandLine commandLine = createCommandLine();
+        CLICommandLine commandLine = createCommandLine();
         String[] appArgs = commandLine.preprocessCommandLine(Platform.getApplicationArgs());
         if (ArrayUtils.isEmpty(appArgs)) {
             appArgs = new String[] {AbstractTopLevelCommand.HELP_OPTION};
@@ -116,8 +116,8 @@ public class CLIApplicationBase extends BaseApplicationImpl {
     }
 
     @NotNull
-    public DBVRCommandLine createCommandLine() {
-        return new DBVRCommandLine();
+    public CLICommandLine createCommandLine() {
+        return new CLICommandLine();
     }
 
     protected void configureApplication() {
