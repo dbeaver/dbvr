@@ -36,7 +36,6 @@ import org.jkiss.dbeaver.runtime.ui.console.ConsoleUserInterface;
 import org.jkiss.dbeaver.utils.RuntimeUtils;
 import org.jkiss.utils.CommonUtils;
 
-import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
 
@@ -45,11 +44,11 @@ import java.nio.file.Path;
  */
 public class CLIApplicationBase extends BaseApplicationImpl {
     private static final Log log = Log.getLog(CLIApplicationBase.class);
-    protected final String WORKSPACE_DIR_CURRENT;
+    protected final Path WORKSPACE_DIR_CURRENT;
 
     private final DBPPreferenceStore preferenceStore = new SimplePreferenceStore() {
         @Override
-        public void save() throws IOException {
+        public void save() {
 
         }
     };
@@ -68,7 +67,7 @@ public class CLIApplicationBase extends BaseApplicationImpl {
         String workingDirectory = RuntimeUtils.getWorkingDirectory(BasePlatformImpl.DBEAVER_DATA_DIR);
 
         // Workspace dir
-        WORKSPACE_DIR_CURRENT = Path.of(workingDirectory, DEFAULT_WORKSPACE_FOLDER).toAbsolutePath().toString();
+        WORKSPACE_DIR_CURRENT = Path.of(workingDirectory, DEFAULT_WORKSPACE_FOLDER);
         Log.setLogHandler(new VoidLogHandler());
     }
 
@@ -81,11 +80,7 @@ public class CLIApplicationBase extends BaseApplicationImpl {
         Location instanceLoc = Platform.getInstanceLocation();
         try {
             if (!instanceLoc.isSet()) { // always false?
-                URL wsLocationURL = new URL(
-                    "file",  //$NON-NLS-1$
-                    null,
-                    WORKSPACE_DIR_CURRENT
-                );
+                URL wsLocationURL = WORKSPACE_DIR_CURRENT.toUri().toURL();
                 instanceLoc.set(wsLocationURL, false);
             }
         } catch (Exception e) {
@@ -132,7 +127,7 @@ public class CLIApplicationBase extends BaseApplicationImpl {
     @Nullable
     @Override
     public Path getDefaultWorkingFolder() {
-        return Path.of(WORKSPACE_DIR_CURRENT);
+        return WORKSPACE_DIR_CURRENT;
     }
 
     @NotNull
@@ -163,6 +158,6 @@ public class CLIApplicationBase extends BaseApplicationImpl {
 
     @NotNull
     public CLIWorkspace createWorkspace(@NotNull CLIPlatform cliPlatform) {
-        return new CLIWorkspace(cliPlatform, Path.of(WORKSPACE_DIR_CURRENT));
+        return new CLIWorkspace(cliPlatform, WORKSPACE_DIR_CURRENT);
     }
 }
