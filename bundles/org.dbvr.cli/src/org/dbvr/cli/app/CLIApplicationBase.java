@@ -47,6 +47,8 @@ import java.nio.file.Path;
 public class CLIApplicationBase extends BaseApplicationImpl {
     private static final Log log = Log.getLog(CLIApplicationBase.class);
     protected final Path WORKSPACE_DIR_CURRENT;
+    private boolean started = false;
+    private static final String[] DEFAULT_ARGS = new String[] {AbstractTopLevelCommand.HELP_OPTION};
 
     private final DBPPreferenceStore preferenceStore = new SimplePreferenceStore() {
         @Override
@@ -91,23 +93,28 @@ public class CLIApplicationBase extends BaseApplicationImpl {
         }
         DBWorkbench.getPlatform();
         configureApplication();
-        CLICommandLine commandLine = createCommandLine();
-        String[] appArgs = commandLine.preprocessCommandLine(Platform.getApplicationArgs());
-        if (ArrayUtils.isEmpty(appArgs)) {
-            appArgs = new String[] {AbstractTopLevelCommand.HELP_OPTION};
-        }
-        CLIProcessResult processResult = createCommandLine().executeCommandLineCommands(
-            null,
-            false,
-            false,
-            appArgs
-        );
+        started = true;
+        CLIProcessResult processResult = executeCommandLine(Platform.getApplicationArgs());
         if (!CommonUtils.isEmpty(processResult.getOutput())) {
             for (String res : processResult.getOutput()) {
                 System.out.println(res);
             }
         }
         return EXIT_OK;
+    }
+
+    public CLIProcessResult executeCommandLine(@NotNull String[] args) throws Exception {
+        CLICommandLine commandLine = createCommandLine();
+        String[] appArgs = commandLine.preprocessCommandLine(args);
+        if (ArrayUtils.isEmpty(appArgs)) {
+            appArgs = DEFAULT_ARGS;
+        }
+        return commandLine.executeCommandLineCommands(
+            null,
+            false,
+            false,
+            appArgs
+        );
     }
 
     @NotNull
@@ -165,5 +172,9 @@ public class CLIApplicationBase extends BaseApplicationImpl {
     @NotNull
     public CLIWorkspace createWorkspace(@NotNull CLIPlatform cliPlatform) {
         return new CLIWorkspace(cliPlatform, WORKSPACE_DIR_CURRENT);
+    }
+
+    public synchronized boolean isStarted() {
+        return started;
     }
 }

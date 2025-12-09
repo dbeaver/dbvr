@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?pde version="3.5"?>
+
+<product name="dbvr-test" uid="org.dbvr.app.test.product" id="org.dbvr.app.test.product"
+    application="org.dbvr.app.test.application" version="1.0.0.qualifier" useFeatures="true"
+    includeLaunchers="true">
+
+    <configIni use="default">
+    </configIni>
+
+    <launcherArgs>
+        <programArgs></programArgs>
+        <programArgsMac>-vm ../Eclipse/jre/Contents/Home/lib/libjli.dylib</programArgsMac>
+
+        <vmArgs>
+            -XX:+IgnoreUnrecognizedVMOptions
+            -Dosgi.requiredJavaVersion=21
+            -Dfile.encoding=UTF-8
+            -Ddbeaver.disable.remote.cli.execution=true
+            --add-modules=ALL-DEFAULT
+            --add-opens=java.base/java.io=ALL-UNNAMED
+            --add-opens=java.base/java.lang=ALL-UNNAMED
+            --add-opens=java.base/java.lang.reflect=ALL-UNNAMED
+            --add-opens=java.base/java.net=ALL-UNNAMED
+            --add-opens=java.base/java.nio=ALL-UNNAMED
+            --add-opens=java.base/java.nio.charset=ALL-UNNAMED
+            --add-opens=java.base/java.text=ALL-UNNAMED
+            --add-opens=java.base/java.time=ALL-UNNAMED
+            --add-opens=java.base/java.util=ALL-UNNAMED
+            --add-opens=java.base/java.util.concurrent=ALL-UNNAMED
+            --add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED
+            --add-opens=java.base/jdk.internal.vm=ALL-UNNAMED
+            --add-opens=java.base/jdk.internal.misc=ALL-UNNAMED
+            --add-opens=java.base/sun.nio.ch=ALL-UNNAMED
+            --add-opens=java.base/sun.nio.fs=ALL-UNNAMED
+            --add-opens=java.base/sun.security.ssl=ALL-UNNAMED
+            --add-opens=java.base/sun.security.action=ALL-UNNAMED
+            --add-opens=java.base/sun.security.util=ALL-UNNAMED
+            --add-opens=java.security.jgss/sun.security.jgss=ALL-UNNAMED
+            --add-opens=java.security.jgss/sun.security.krb5=ALL-UNNAMED
+            --add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED
+            --add-opens=java.desktop/java.awt=ALL-UNNAMED
+            --add-opens=java.desktop/java.awt.peer=ALL-UNNAMED
+            --add-opens=java.sql/java.sql=ALL-UNNAMED
+            -Xms64m
+            -Xmx1024m</vmArgs>
+        <vmArgsMac>-XstartOnFirstThread</vmArgsMac>
+    </launcherArgs>
+
+    <vm>
+    </vm>
+
+    <license>
+        <url>https://dbvr.prg/about/</url>
+    </license>
+
+    <plugins>
+    </plugins>
+
+    <features>
+        <feature id="org.dbvr.app.ce.test.feature"/>
+    </features>
+
+    <configurations>
+        <plugin id="org.eclipse.osgi" autoStart="true" startLevel="-1"/>
+        <plugin id="org.apache.felix.scr" autoStart="true" startLevel="1"/>
+        <plugin id="org.eclipse.core.runtime" autoStart="true" startLevel="2"/>
+    </configurations>
+
+</product>
