@@ -42,7 +42,7 @@ import java.util.Map;
 
 public class CLIConnectionUtils {
 
-    public static void connect(@NotNull OpenConnectionOptions options, @NotNull CommandLineContext context, @NotNull Log parentLog) {
+    public static void connect(@NotNull OpenConnectionOptions options, @NotNull CommandLineContext context, @NotNull Log parentLog) throws CLIException {
         if (CommonUtils.isEmpty(options.getConnectionSpec())) {
             throw new CLIException("-connection-spec parameter is empty", CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS);
         }
@@ -97,7 +97,7 @@ public class CLIConnectionUtils {
     private static Map<String, String> prepareKeyValueParams(
         @Nullable Map<String, String> parentParams,
         @NotNull List<String> cliParams
-    ) {
+    ) throws CLIException {
         Map<String, String> properties = parentParams == null ? new LinkedHashMap<>() : new LinkedHashMap<>(parentParams);
         for (String authParam : cliParams) {
             String[] paramParts = authParam.split("=", 2);
@@ -133,7 +133,7 @@ public class CLIConnectionUtils {
     }
 
     @Nullable
-    private static DBPDataSourceContainer findDataSource(@NotNull OpenConnectionOptions options, @NotNull CommandLineContext context) {
+    private static DBPDataSourceContainer findDataSource(@NotNull OpenConnectionOptions options, @NotNull CommandLineContext context) throws CLIException {
         DBPProject project = findProject(options, context);
         ApplicationInstanceServer.InstanceConnectionParameters instanceConParameters
             = new ApplicationInstanceServer.InstanceConnectionParameters();
