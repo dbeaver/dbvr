@@ -26,6 +26,12 @@ import picocli.CommandLine;
 
 @CommandLine.Command(name = "dbvr", description = "dbvr commands")
 public class CLITopLevelCommand extends AbstractTopLevelCommand {
+    @CommandLine.Option(
+        names = {NOSPASH_OPTION},
+        hidden = true,
+        scope = CommandLine.ScopeType.INHERIT
+    )
+    private boolean noSplash;
 
     protected CLITopLevelCommand(
         @Nullable ApplicationInstanceController controller,
