@@ -26,7 +26,6 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
-import org.jkiss.dbeaver.model.cli.CLIConstants;
 import org.jkiss.dbeaver.model.cli.CLIProcessResult;
 import org.jkiss.dbeaver.model.cli.command.AbstractTopLevelCommand;
 import org.jkiss.dbeaver.model.impl.app.BaseApplicationImpl;
@@ -106,11 +105,10 @@ public class CLIApplicationBase extends BaseApplicationImpl {
                     out.println(res);
                 }
             }
-            return processResult.getExitCode() > 0 ? processResult.getExitCode() : EXIT_OK;
         } catch (DBException e) {
             System.err.println("Error: " + e.getMessage());
-            return CLIConstants.EXIT_CODE_ERROR;
         }
+        return EXIT_OK;
     }
 
     public CLIProcessResult executeCommandLine(@NotNull String[] args) throws DBException {
