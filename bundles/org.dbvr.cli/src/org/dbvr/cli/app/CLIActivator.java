@@ -31,6 +31,8 @@ import org.osgi.framework.hooks.bundle.EventHook;
  */
 public class CLIActivator extends Plugin {
 
+    private static final Log log = Log.getLog(CLIActivator.class);
+
     private static CLIActivator instance;
 
     public static CLIActivator getInstance() {
@@ -48,6 +50,7 @@ public class CLIActivator extends Plugin {
 
     private static void checkTraceLogging(BundleContext context) {
         if (ArrayUtils.contains(Platform.getApplicationArgs(), AbstractTopLevelCommand.TRACE_LOGS_OPTION) && !Log.isQuietMode()) {
+            Log.enableTraceLogs(true);
             context.registerService(
                 EventHook.class,
                 (event, contexts) -> {
@@ -55,11 +58,11 @@ public class CLIActivator extends Plugin {
                     Bundle bundle = event.getBundle();
                     if (event.getType() == BundleEvent.STARTED) {
                         if (bundle.getState() == Bundle.ACTIVE) {
-                            message = "> Start " + bundle.getSymbolicName();
+                            message = "Start bundle " + bundle.getSymbolicName();
                         }
                     }
                     if (message != null) {
-                        System.err.println(message);
+                        log.trace(message);
                     }
                 },
                 null);
