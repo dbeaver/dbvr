@@ -41,23 +41,29 @@ public class CLIActivator extends Plugin {
     public void start(BundleContext context) throws Exception {
         instance = this;
 
-        if (ArrayUtils.contains(Platform.getApplicationArgs(), AbstractTopLevelCommand.TRACE_LOGS_OPTION) && !Log.isQuietMode()) {
-            context.registerService(EventHook.class, (event, contexts) -> {
-                String message = null;
-                Bundle bundle = event.getBundle();
-                if (event.getType() == BundleEvent.STARTED) {
-                    if (bundle.getState() == Bundle.ACTIVE) {
-                        message = "> Start " + bundle.getSymbolicName() + " [" + bundle.getSymbolicName() + " " + bundle.getVersion() + "]";
-                    }
-                }
-                if (message != null) {
-                    System.err.println(message);
-                }
-            }, null);
-            //context.addBundleListener(new BundleLoadListener());
-        }
+        checkTraceLogging(context);
 
         super.start(context);
+    }
+
+    private static void checkTraceLogging(BundleContext context) {
+        if (ArrayUtils.contains(Platform.getApplicationArgs(), AbstractTopLevelCommand.TRACE_LOGS_OPTION) && !Log.isQuietMode()) {
+            context.registerService(
+                EventHook.class,
+                (event, contexts) -> {
+                    String message = null;
+                    Bundle bundle = event.getBundle();
+                    if (event.getType() == BundleEvent.STARTED) {
+                        if (bundle.getState() == Bundle.ACTIVE) {
+                            message = "> Start " + bundle.getSymbolicName();
+                        }
+                    }
+                    if (message != null) {
+                        System.err.println(message);
+                    }
+                },
+                null);
+        }
     }
 
     @Override
