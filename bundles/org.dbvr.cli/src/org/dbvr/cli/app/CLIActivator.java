@@ -16,8 +16,15 @@
  */
 package org.dbvr.cli.app;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
+import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.model.cli.command.AbstractTopLevelCommand;
+import org.jkiss.utils.ArrayUtils;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleEvent;
+import org.osgi.framework.hooks.bundle.EventHook;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -33,6 +40,23 @@ public class CLIActivator extends Plugin {
     @Override
     public void start(BundleContext context) throws Exception {
         instance = this;
+
+        if (ArrayUtils.contains(Platform.getApplicationArgs(), AbstractTopLevelCommand.TRACE_LOGS_OPTION) && !Log.isQuietMode()) {
+            context.registerService(EventHook.class, (event, contexts) -> {
+                String message = null;
+                Bundle bundle = event.getBundle();
+                if (event.getType() == BundleEvent.STARTED) {
+                    if (bundle.getState() == Bundle.ACTIVE) {
+                        message = "> Start " + bundle.getSymbolicName() + " [" + bundle.getSymbolicName() + " " + bundle.getVersion() + "]";
+                    }
+                }
+                if (message != null) {
+                    System.err.println(message);
+                }
+            }, null);
+            //context.addBundleListener(new BundleLoadListener());
+        }
+
         super.start(context);
     }
 

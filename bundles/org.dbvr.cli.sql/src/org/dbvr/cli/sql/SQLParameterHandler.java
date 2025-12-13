@@ -116,6 +116,20 @@ public class SQLParameterHandler extends CommandLineWithAuth {
             throw new CLIException("Can't obtain data source", CLIConstants.EXIT_CODE_ERROR);
         }
         DBRProgressMonitor monitor = new LoggingProgressMonitor(log);
+        monitor.beginTask("Execute SQL script", 1);
+
+        try {
+            executeScript(monitor, dataSource, sqlQuery);
+        } finally {
+            monitor.done();
+        }
+    }
+
+    private void executeScript(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull DBPDataSource dataSource,
+        @NotNull String sqlQuery
+    ) throws CLIException {
         DBCExecutionContext executionContext = dataSource.getDefaultInstance().getDefaultContext(monitor, false);
 
         List<SQLScriptElement> scriptElements = SQLScriptParser.parseScript(executionContext.getDataSource(), sqlQuery);
@@ -212,7 +226,7 @@ public class SQLParameterHandler extends CommandLineWithAuth {
                     ),
                     streamDataExporter,
                     processorProperties,
-                    dataSourceContainer.getProject()
+                    dataSource.getContainer().getProject()
                 );
 
                 SQLScriptProcessor scriptProcessor = new SQLScriptProcessor(
@@ -247,7 +261,6 @@ public class SQLParameterHandler extends CommandLineWithAuth {
                 throw new CLIException("Failed to execute script", e, CLIConstants.EXIT_CODE_ERROR);
             }
         }
-
     }
 
     private StreamConsumerSettings prepareSettings() {
