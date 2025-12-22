@@ -57,7 +57,6 @@ import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.util.*;
 
 @CommandLine.Command(name = "sql", description = "Execute SQL script")
@@ -197,21 +196,16 @@ public class SQLParameterHandler extends CommandLineWithAuth {
         boolean first = true;
         long offset = dataTransferOptions.getOffset();
         long limit = dataTransferOptions.getLimit();
-
-        for (var script : scriptElements) {
-            if (!(script instanceof SQLQuery q)) {
-                log.debug("Skip non-query script element: " + script.getText());
-                continue;
-            }
-
-            try (
-                var out = outputFile == null ? new ByteArrayOutputStream() : new BufferedOutputStream(
-                    Files.newOutputStream(
-                        outputFile,
-                        first ? StandardOpenOption.CREATE : StandardOpenOption.APPEND
-                    ))
-            ) {
-                first = false;
+        try (
+            var out = outputFile == null
+                ? new ByteArrayOutputStream()
+                : new BufferedOutputStream(Files.newOutputStream(outputFile))
+        ) {
+            for (var script : scriptElements) {
+                if (!(script instanceof SQLQuery q)) {
+                    log.debug("Skip non-query script element: " + script.getText());
+                    continue;
+                }
                 StreamTransferConsumer consumer = new StreamTransferConsumer();
                 SQLQueryDataContainer sqlQueryDataContainer = new SQLQueryDataContainer(
                     dataSourceContextProvider, q, scriptContext, log
@@ -257,9 +251,10 @@ public class SQLParameterHandler extends CommandLineWithAuth {
                     String result = byteArrayOutputStream.toString(settings.getOutputEncoding());
                     context().addResult(result);
                 }
-            } catch (Exception e) {
-                throw new CLIException("Failed to execute script", e, CLIConstants.EXIT_CODE_ERROR);
+
             }
+        } catch (Exception e) {
+            throw new CLIException("Failed to execute script", e, CLIConstants.EXIT_CODE_ERROR);
         }
     }
 
