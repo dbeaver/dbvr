@@ -23,17 +23,13 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.access.DBAAuthCredentials;
 import org.jkiss.dbeaver.model.app.DBPProject;
-import org.jkiss.dbeaver.model.app.DBPWorkspace;
-import org.jkiss.dbeaver.model.cli.ApplicationInstanceServer;
 import org.jkiss.dbeaver.model.cli.CLIConstants;
 import org.jkiss.dbeaver.model.cli.CLIException;
+import org.jkiss.dbeaver.model.cli.CLIUtils;
 import org.jkiss.dbeaver.model.cli.CommandLineContext;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.runtime.LoggingProgressMonitor;
 import org.jkiss.dbeaver.registry.DataSourceUtils;
-import org.jkiss.dbeaver.runtime.DBWorkbench;
-import org.jkiss.dbeaver.utils.GeneralUtils;
-import org.jkiss.dbeaver.utils.SystemVariablesResolver;
 import org.jkiss.utils.CommonUtils;
 
 import java.util.LinkedHashMap;
@@ -134,36 +130,11 @@ public class CLIConnectionUtils {
 
     @Nullable
     private static DBPDataSourceContainer findDataSource(@NotNull OpenConnectionOptions options, @NotNull CommandLineContext context) throws CLIException {
-        DBPProject project = findProject(options, context);
-        ApplicationInstanceServer.InstanceConnectionParameters instanceConParameters
-            = new ApplicationInstanceServer.InstanceConnectionParameters();
-        return DataSourceUtils.getDataSourceBySpec(
+        DBPProject project = CLIUtils.findProject(options.getProjectIdOrName(), context);
+        return CLIUtils.findDataSource(
             project,
-            GeneralUtils.replaceVariables(options.getConnectionSpec(), SystemVariablesResolver.INSTANCE),
-            instanceConParameters,
-            false,
-            instanceConParameters.isCreateNewConnection()
+            options.getConnectionSpec()
         );
     }
 
-    @NotNull
-    private static DBPProject findProject(@NotNull OpenConnectionOptions options, @NotNull CommandLineContext context) throws CLIException {
-        DBPProject project;
-        DBPWorkspace workspace = context.getContextParameter(DBPWorkspace.class.getName());
-        if (workspace == null) {
-            workspace = DBWorkbench.getPlatform().getWorkspace();
-        }
-        if (CommonUtils.isEmpty(options.getProjectIdOrName())) {
-            project = workspace.getActiveProject();
-        } else {
-            project = workspace.getProject(options.getProjectIdOrName());
-            if (project == null) {
-                project = workspace.getProjectById(options.getProjectIdOrName());
-            }
-        }
-        if (project == null) {
-            throw new CLIException("Can't find project '" + options.getProjectIdOrName() + "'", CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS);
-        }
-        return project;
-    }
 }

@@ -18,22 +18,19 @@ package org.dbvr.cli.sql;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
-import org.jkiss.dbeaver.model.cli.CLIConstants;
+import org.jkiss.dbeaver.model.cli.model.option.ConnectionSpecOption;
+import org.jkiss.dbeaver.model.cli.model.option.ProjectOption;
 import picocli.CommandLine;
 
 import java.util.List;
 
 public class OpenConnectionOptions {
-    @CommandLine.Option(names = {CLIConstants.PARAM_PROJECT}, arity = "1", description = "Project name or ID")
-    private String projectIdOrName;
+    @CommandLine.Mixin
+    private ProjectOption projectIdOrName;
 
-    @CommandLine.Option(
-        names = {"-connection", "--connection-spec"},
-        arity = "1",
-        description = "Connection specification",
-        required = true
-    )
-    private String connectionSpec;
+    @NotNull //required
+    @CommandLine.Mixin
+    private ConnectionSpecOption connectionSpecOption;
 
     @Nullable
     @CommandLine.Option(names = {"-u", "--user"}, arity = "1", description = "Database user name for database native authentication")
@@ -61,12 +58,12 @@ public class OpenConnectionOptions {
 
     @NotNull
     public String getConnectionSpec() {
-        return connectionSpec;
+        return connectionSpecOption.getConnectionSpec();
     }
 
     @Nullable
     public String getProjectIdOrName() {
-        return projectIdOrName;
+        return projectIdOrName != null ? projectIdOrName.getProjectIdOrName() : null;
     }
 
     @Nullable
