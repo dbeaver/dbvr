@@ -14,22 +14,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.dbvr.cli.sql;
+package org.dbvr.cli.model;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.cli.model.option.ConnectionSpecOption;
-import org.jkiss.dbeaver.model.cli.model.option.ProjectOption;
 import picocli.CommandLine;
 
 import java.util.List;
 
-public class OpenConnectionOptions {
-    @CommandLine.Mixin
-    private ProjectOption projectIdOrName;
-
+public class ConnectionOptions {
     @NotNull //required
-    @CommandLine.Mixin
+    @CommandLine.ArgGroup
     private ConnectionSpecOption connectionSpecOption;
 
     @Nullable
@@ -59,11 +55,6 @@ public class OpenConnectionOptions {
     @NotNull
     public String getConnectionSpec() {
         return connectionSpecOption.getConnectionSpec();
-    }
-
-    @Nullable
-    public String getProjectIdOrName() {
-        return projectIdOrName != null ? projectIdOrName.getProjectIdOrName() : null;
     }
 
     @Nullable

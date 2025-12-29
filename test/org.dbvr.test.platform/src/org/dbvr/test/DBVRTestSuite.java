@@ -27,7 +27,8 @@ import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-    HelpArgTest.class
+    HelpArgTest.class,
+    ConnectionManagementTest.class
 })
 public class DBVRTestSuite {
     private static CLIApplicationCE applicationCE;

@@ -11,5 +11,6 @@ Bundle-RequiredExecutionEnvironment: JavaSE-21
 Require-Bundle: org.jkiss.dbeaver.model;visibility:=reexport,
  org.jkiss.dbeaver.registry;visibility:=reexport,
  org.jkiss.dbeaver.model.cli;visibility:=reexport
-Export-Package: org.dbvr.cli.app
+Export-Package: org.dbvr.cli.app,
+ org.dbvr.cli.model
 Automatic-Module-Name: org.dbvr.app.ce

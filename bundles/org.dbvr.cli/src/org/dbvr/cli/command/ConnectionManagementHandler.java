@@ -16,6 +16,7 @@
  */
 package org.dbvr.cli.command;
 
+import org.dbvr.cli.model.ConnectionOptions;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
@@ -26,7 +27,6 @@ import org.jkiss.dbeaver.model.cli.CLIException;
 import org.jkiss.dbeaver.model.cli.CLIProcessResult;
 import org.jkiss.dbeaver.model.cli.CLIUtils;
 import org.jkiss.dbeaver.model.cli.model.CommandLineWithAuth;
-import org.jkiss.dbeaver.model.cli.model.option.ConnectionSpecOption;
 import org.jkiss.dbeaver.model.cli.model.option.ProjectOption;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.registry.DataSourceConfigurationManagerBuffer;
@@ -50,20 +50,24 @@ public class ConnectionManagementHandler extends CommandLineWithAuth {
     }
 
     private static class CreateAction {
-        @CommandLine.Option(names = "--create", required = true, description = ConnectionSpecOption.DESCRIPTION)
-        private String connectionSpec;
+        @CommandLine.Option(names = "--create", required = true, description = "Create connection")
+        private boolean create;
+        @CommandLine.ArgGroup(exclusive = false)
+        private ConnectionOptions connectionOptions;
     }
 
     private static class UpdateAction {
-        @CommandLine.Option(names = "--create", required = true, description = ConnectionSpecOption.DESCRIPTION)
-        private String connectionSpec;
+        @CommandLine.Option(names = "--update", required = true, description = "Update connection")
+        private boolean create;
+        @CommandLine.ArgGroup(exclusive = false)
+        private ConnectionOptions connectionOptions;
     }
 
     private static class Actions {
         @CommandLine.ArgGroup(exclusive = false)
         private CreateAction create;
 
-        @CommandLine.ArgGroup(exclusive = false)
+        //        @CommandLine.ArgGroup(exclusive = false)
         private UpdateAction updateAction;
 
         @CommandLine.Option(names = "--list", description = "List connections")
@@ -94,7 +98,7 @@ public class ConnectionManagementHandler extends CommandLineWithAuth {
     }
 
     private void createConnection(@NotNull DBPProject project) throws CLIException {
-        String spec = actions.create.connectionSpec.trim();
+        String spec = actions.create.connectionOptions.getConnectionSpec().trim();
         spec = spec + "|" + DataSourceUtils.PARAM_SAVE + "=true";
         DBPDataSourceContainer container = CLIUtils.findDataSource(
             project,
@@ -102,7 +106,7 @@ public class ConnectionManagementHandler extends CommandLineWithAuth {
         );
         if (container == null) {
             throw new CLIException(
-                "Can't create connection by spec: " + actions.create.connectionSpec,
+                "Can't create connection by spec: " + spec,
                 CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS
             );
         }
@@ -112,14 +116,14 @@ public class ConnectionManagementHandler extends CommandLineWithAuth {
     }
 
     private void updateConnection(@NotNull DBPProject project) throws CLIException {
-        String spec = actions.updateAction.connectionSpec.trim();
+        String spec = actions.updateAction.connectionOptions.getConnectionSpec();
         DBPDataSourceContainer container = CLIUtils.findDataSource(
             project,
             spec
         );
         if (container == null) {
             throw new CLIException(
-                "Can't update connection by spec: " + actions.create.connectionSpec,
+                "Can't update connection by spec: " + spec,
                 CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS
             );
         }

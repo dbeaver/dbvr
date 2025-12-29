@@ -17,6 +17,7 @@
 package org.dbvr.cli.sql;
 
 
+import org.dbvr.cli.model.ConnectionOptions;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
@@ -28,6 +29,7 @@ import org.jkiss.dbeaver.model.cli.CLIUtils;
 import org.jkiss.dbeaver.model.cli.model.CommandLineWithAuth;
 import org.jkiss.dbeaver.model.cli.model.option.InputFileOption;
 import org.jkiss.dbeaver.model.cli.model.option.OutputFileOption;
+import org.jkiss.dbeaver.model.cli.model.option.ProjectOption;
 import org.jkiss.dbeaver.model.exec.DBCExecutionContext;
 import org.jkiss.dbeaver.model.exec.DBCStatistics;
 import org.jkiss.dbeaver.model.exec.output.DBCOutputSeverity;
@@ -79,13 +81,22 @@ public class SQLParameterHandler extends CommandLineWithAuth {
     @CommandLine.Mixin
     private DataTransferOptions dataTransferOptions;
 
+    @Nullable
     @CommandLine.Mixin
-    private OpenConnectionOptions connectionOptions;
+    private ProjectOption projectOption;
+
+    @CommandLine.Mixin
+    private ConnectionOptions connectionOptions;
 
     @Override
     public void run() throws CLIException {
         super.run();
-        CLIConnectionUtils.connect(connectionOptions, context(), log);
+        CLIConnectionUtils.connect(
+            connectionOptions,
+            projectOption == null ? null : projectOption.getProjectIdOrName(),
+            context(),
+            log
+        );
 
         String sqlQuery = query;
         if (CommonUtils.isEmpty(sqlQuery)) {

@@ -16,6 +16,7 @@
  */
 package org.dbvr.cli.sql;
 
+import org.dbvr.cli.model.ConnectionOptions;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -38,11 +39,17 @@ import java.util.Map;
 
 public class CLIConnectionUtils {
 
-    public static void connect(@NotNull OpenConnectionOptions options, @NotNull CommandLineContext context, @NotNull Log parentLog) throws CLIException {
+    public static void connect(
+        @NotNull ConnectionOptions options,
+        @Nullable String projectIdOrName,
+        @NotNull CommandLineContext context,
+        @NotNull Log parentLog
+    )
+    throws CLIException {
         if (CommonUtils.isEmpty(options.getConnectionSpec())) {
             throw new CLIException("-connection-spec parameter is empty", CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS);
         }
-        DBPDataSourceContainer dataSource = findDataSource(options, context);
+        DBPDataSourceContainer dataSource = findDataSource(options, projectIdOrName, context);
 
         if (dataSource == null) {
             throw new CLIException("Can't find connection '" + options.getConnectionSpec() + "'", CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS);
@@ -129,8 +136,13 @@ public class CLIConnectionUtils {
     }
 
     @Nullable
-    private static DBPDataSourceContainer findDataSource(@NotNull OpenConnectionOptions options, @NotNull CommandLineContext context) throws CLIException {
-        DBPProject project = CLIUtils.findProject(options.getProjectIdOrName(), context);
+    private static DBPDataSourceContainer findDataSource(
+        @NotNull ConnectionOptions options,
+        @Nullable String projectIdOrName,
+        @NotNull CommandLineContext context
+    )
+    throws CLIException {
+        DBPProject project = CLIUtils.findProject(projectIdOrName, context);
         return CLIUtils.findDataSource(
             project,
             options.getConnectionSpec()
