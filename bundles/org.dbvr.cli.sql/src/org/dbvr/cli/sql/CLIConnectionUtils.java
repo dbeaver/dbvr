@@ -16,105 +16,62 @@
  */
 package org.dbvr.cli.sql;
 
-import org.dbvr.cli.model.ConnectionOptions;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
-import org.jkiss.dbeaver.model.access.DBAAuthCredentials;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.cli.CLIConstants;
 import org.jkiss.dbeaver.model.cli.CLIException;
 import org.jkiss.dbeaver.model.cli.CLIUtils;
 import org.jkiss.dbeaver.model.cli.CommandLineContext;
-import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
+import org.jkiss.dbeaver.model.cli.model.option.ConnectionAuthOptions;
+import org.jkiss.dbeaver.model.cli.model.option.ConnectionOptions;
 import org.jkiss.dbeaver.model.runtime.LoggingProgressMonitor;
-import org.jkiss.dbeaver.registry.DataSourceUtils;
 import org.jkiss.utils.CommonUtils;
-
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 public class CLIConnectionUtils {
 
     public static void connect(
-        @NotNull ConnectionOptions options,
+        @Nullable String existConnectionIdOrName,
+        @Nullable ConnectionOptions tempConnectionOptions,
+        @NotNull ConnectionAuthOptions authOptions,
         @Nullable String projectIdOrName,
         @NotNull CommandLineContext context,
         @NotNull Log parentLog
     )
     throws CLIException {
-        if (CommonUtils.isEmpty(options.getConnectionSpec())) {
-            throw new CLIException("-connection-spec parameter is empty", CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS);
-        }
-        DBPDataSourceContainer dataSource = findDataSource(options, projectIdOrName, context);
-
-        if (dataSource == null) {
-            throw new CLIException("Can't find connection '" + options.getConnectionSpec() + "'", CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS);
-        }
-        var monitor = new LoggingProgressMonitor(parentLog);
-        DBPConnectionConfiguration connectionConfiguration = dataSource.getConnectionConfiguration();
-
-        if (CommonUtils.isNotEmpty(options.getDbUser())) {
-            connectionConfiguration.setUserName(options.getDbUser());
-        }
-
-        if (CommonUtils.isNotEmpty(options.getDbPassword())) {
-            connectionConfiguration.setUserPassword(options.getDbPassword());
-        }
-        connectionConfiguration.getAuthModel().createCredentials();
-        List<String> authParams = options.getAuthParams();
-        if (!CommonUtils.isEmpty(authParams)) {
-            Map<String, String> authProperties = prepareKeyValueParams(connectionConfiguration.getAuthProperties(), authParams);
-            if (!CommonUtils.isEmpty(authProperties)) {
-                DBAAuthCredentials credentialsInstance = connectionConfiguration.getAuthModel()
-                    .loadCredentials(dataSource, connectionConfiguration);
-                DataSourceUtils.updateCredentialsFromProperties(monitor, credentialsInstance, authProperties);
-                dataSource.getConnectionConfiguration().getAuthModel()
-                    .provideCredentials(dataSource, dataSource.getConnectionConfiguration(), credentialsInstance);
-            }
-        }
-        if (!CommonUtils.isEmpty(options.getProviderParams())) {
-            Map<String, String> providerProperties = prepareKeyValueParams(
-                connectionConfiguration.getProviderProperties(),
-                options.getProviderParams()
+        DBPDataSourceContainer dataSourceContainer;
+        DBPProject project = CLIUtils.findProject(projectIdOrName, context);
+        if (CommonUtils.isNotEmpty(existConnectionIdOrName)) {
+            dataSourceContainer = CLIUtils.findDataSource(
+                project,
+                existConnectionIdOrName
             );
-            connectionConfiguration.setProviderProperties(providerProperties);
+            CLIUtils.processDataSourceAuthOptions(dataSourceContainer, authOptions);
+        } else if (tempConnectionOptions != null) {
+            dataSourceContainer = CLIUtils.createTempDataSource(
+                project,
+                tempConnectionOptions,
+                authOptions
+            );
+        } else {
+            throw new CLIException("No connection options provided", CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS);
         }
-        connectDatasource(dataSource, parentLog);
-        context.setContextParameter(DBPDataSourceContainer.class.getName(), dataSource);
+
+        var monitor = new LoggingProgressMonitor(parentLog);
+        connectDatasource(dataSourceContainer, parentLog);
+        context.setContextParameter(DBPDataSourceContainer.class.getName(), dataSourceContainer);
         context.addCloseHandler(() -> {
-            if (dataSource.isConnected()) {
+            if (dataSourceContainer.isConnected()) {
                 try {
-                    dataSource.disconnect(monitor);
+                    dataSourceContainer.disconnect(monitor);
                 } catch (Exception e) {
                     parentLog.error("Error disconnecting datasource", e);
                 }
             }
         });
-    }
-
-    @NotNull
-    private static Map<String, String> prepareKeyValueParams(
-        @Nullable Map<String, String> parentParams,
-        @NotNull List<String> cliParams
-    ) throws CLIException {
-        Map<String, String> properties = parentParams == null ? new LinkedHashMap<>() : new LinkedHashMap<>(parentParams);
-        for (String authParam : cliParams) {
-            String[] paramParts = authParam.split("=", 2);
-            if (paramParts.length == 2) {
-                String paramName = paramParts[0].trim();
-                String paramValue = paramParts[1].trim();
-                if (CommonUtils.isNotEmpty(paramName) && CommonUtils.isNotEmpty(paramValue)) {
-                    properties.put(paramName, paramValue);
-                }
-            } else {
-                throw new CLIException("Invalid auth-param format: " + authParam, CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS);
-            }
-        }
-        return properties;
     }
 
 
@@ -135,17 +92,17 @@ public class CLIConnectionUtils {
         }
     }
 
-    @Nullable
-    private static DBPDataSourceContainer findDataSource(
-        @NotNull ConnectionOptions options,
+    @NotNull
+    public static DBPDataSourceContainer findDataSource(
         @Nullable String projectIdOrName,
+        @NotNull String connectionIdOrName,
+
         @NotNull CommandLineContext context
-    )
-    throws CLIException {
+    ) throws CLIException {
         DBPProject project = CLIUtils.findProject(projectIdOrName, context);
         return CLIUtils.findDataSource(
             project,
-            options.getConnectionSpec()
+            connectionIdOrName
         );
     }
 

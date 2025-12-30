@@ -16,7 +16,6 @@
  */
 package org.dbvr.cli.command;
 
-import org.dbvr.cli.model.ConnectionOptions;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
@@ -27,11 +26,13 @@ import org.jkiss.dbeaver.model.cli.CLIException;
 import org.jkiss.dbeaver.model.cli.CLIProcessResult;
 import org.jkiss.dbeaver.model.cli.CLIUtils;
 import org.jkiss.dbeaver.model.cli.model.CommandLineWithAuth;
+import org.jkiss.dbeaver.model.cli.model.option.ConnectionAuthOptions;
+import org.jkiss.dbeaver.model.cli.model.option.ConnectionOptions;
 import org.jkiss.dbeaver.model.cli.model.option.ProjectOption;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.registry.DataSourceConfigurationManagerBuffer;
 import org.jkiss.dbeaver.registry.DataSourceRegistry;
-import org.jkiss.dbeaver.registry.DataSourceUtils;
+import org.jkiss.utils.CommonUtils;
 import picocli.CommandLine;
 
 import java.nio.charset.StandardCharsets;
@@ -44,51 +45,56 @@ public class ConnectionManagementHandler extends CommandLineWithAuth {
     @CommandLine.ArgGroup(exclusive = true, multiplicity = "1")
     private Actions actions;
 
-    private static class DeleteAction {
-        @CommandLine.Option(names = "--delete", required = true, arity = "1", description = "Connection name or ID")
+    private static class UpdateAction {
+        @CommandLine.Option(names = "--update", required = true, arity = "1", description = "Connection ID or name")
         private String datasourceIdOrName;
     }
 
-    private static class CreateAction {
-        @CommandLine.Option(names = "--create", required = true, description = "Create connection")
+    private static class UpsertMode {
+        @CommandLine.Option(names = "--create", description = "Create connection")
         private boolean create;
-        @CommandLine.ArgGroup(exclusive = false)
-        private ConnectionOptions connectionOptions;
+
+        @CommandLine.Option(names = "--update", description = "Update connection by ID or name")
+        private String updateDataSourceIdOrName;
     }
 
-    private static class UpdateAction {
-        @CommandLine.Option(names = "--update", required = true, description = "Update connection")
-        private boolean create;
+    private static class UpsertAction {
+        @CommandLine.ArgGroup(exclusive = true, multiplicity = "1")
+        private UpsertMode mode;
         @CommandLine.ArgGroup(exclusive = false)
         private ConnectionOptions connectionOptions;
+        @CommandLine.ArgGroup(exclusive = false)
+        private ConnectionAuthOptions authOptions;
     }
+
 
     private static class Actions {
         @CommandLine.ArgGroup(exclusive = false)
-        private CreateAction create;
-
-        //        @CommandLine.ArgGroup(exclusive = false)
-        private UpdateAction updateAction;
+        private UpsertAction upsert;
 
         @CommandLine.Option(names = "--list", description = "List connections")
         private boolean list;
 
-        @CommandLine.ArgGroup(exclusive = false)
-        private DeleteAction delete;
+        @CommandLine.Option(names = "--delete", arity = "1", description = "Delete connection by ID or name")
+        private String deleteDataSourceIdOrName;
     }
 
     @Override
     public void run() throws CLIException {
         super.run();
         DBPProject project = CLIUtils.findProject(projectOption == null ? null : projectOption.getProjectIdOrName(), context());
-        if (actions == null || actions.list) {
+        if (actions.list) {
             listConnections(project);
-        } else if (actions.create != null) {
-            createConnection(project);
-        } else if (actions.updateAction != null) {
-            updateConnection(project);
-        } else if (actions.delete != null) {
+        } else if (actions.upsert != null) {
+            if (actions.upsert.mode.create) {
+                createConnection(project);
+            } else if (CommonUtils.isNotEmpty(actions.upsert.mode.updateDataSourceIdOrName)) {
+                updateConnection(project);
+            }
+        } else if (CommonUtils.isNotEmpty(actions.deleteDataSourceIdOrName)) {
             deleteConnection(project);
+        } else {
+            listConnections(project);
         }
     }
 
@@ -98,44 +104,37 @@ public class ConnectionManagementHandler extends CommandLineWithAuth {
     }
 
     private void createConnection(@NotNull DBPProject project) throws CLIException {
-        String spec = actions.create.connectionOptions.getConnectionSpec().trim();
-        spec = spec + "|" + DataSourceUtils.PARAM_SAVE + "=true";
-        DBPDataSourceContainer container = CLIUtils.findDataSource(
+        DBPDataSourceContainer dataSourceContainer = CLIUtils.createDataSource(
             project,
-            spec
+            actions.upsert.connectionOptions,
+            actions.upsert.authOptions,
+            false
         );
-        if (container == null) {
-            throw new CLIException(
-                "Can't create connection by spec: " + spec,
-                CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS
-            );
-        }
+
 
         context().setPostAction(CLIProcessResult.PostAction.SHUTDOWN);
-        context().addResult(serializeDataSources(project, container.getId()));
+        context().addResult(serializeDataSources(project, dataSourceContainer.getId()));
     }
 
     private void updateConnection(@NotNull DBPProject project) throws CLIException {
-        String spec = actions.updateAction.connectionOptions.getConnectionSpec();
-        DBPDataSourceContainer container = CLIUtils.findDataSource(
+        DBPDataSourceContainer dataSourceContainer = CLIUtils.findDataSource(
             project,
-            spec
+            actions.upsert.mode.updateDataSourceIdOrName
         );
-        if (container == null) {
-            throw new CLIException(
-                "Can't update connection by spec: " + spec,
-                CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS
-            );
-        }
-        if (container.isTemporary()) {
-            throw new CLIException(
-                "No existing connection found by spec: " + spec,
-                CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS
-            );
-        }
+
+        CLIUtils.updateDataSource(
+            actions.upsert.connectionOptions,
+            actions.upsert.authOptions,
+            dataSourceContainer
+        );
+        CLIUtils.updateConnectionConfiguration(
+            actions.upsert.connectionOptions,
+            dataSourceContainer.getConnectionConfiguration()
+        );
+
         try {
             var registry = project.getDataSourceRegistry();
-            registry.updateDataSource(container);
+            registry.updateDataSource(dataSourceContainer);
             registry.checkForErrors();
         } catch (Exception e) {
             throw new CLIException(
@@ -146,22 +145,12 @@ public class ConnectionManagementHandler extends CommandLineWithAuth {
         }
 
         context().setPostAction(CLIProcessResult.PostAction.SHUTDOWN);
-        context().addResult(serializeDataSources(project, container.getId()));
+        context().addResult(serializeDataSources(project, dataSourceContainer.getId()));
     }
 
     private void deleteConnection(@NotNull DBPProject project) throws CLIException {
-        DataSourceRegistry<?> registry = (DataSourceRegistry<?>) project.getDataSourceRegistry();
-        DBPDataSourceContainer container =
-            registry.getDataSource(actions.delete.datasourceIdOrName);
-        if (container == null) {
-            container = registry.findDataSourceByName(actions.delete.datasourceIdOrName);
-        }
-        if (container == null) {
-            throw new CLIException(
-                "Can't find connection " + actions.delete.datasourceIdOrName + " in project " + project.getName(),
-                CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS
-            );
-        }
+        DBPDataSourceContainer container = CLIUtils.findDataSource(project, actions.deleteDataSourceIdOrName);
+
         project.getDataSourceRegistry().removeDataSource(
             container
         );

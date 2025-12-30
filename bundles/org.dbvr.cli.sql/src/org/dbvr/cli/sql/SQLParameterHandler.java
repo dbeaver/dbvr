@@ -17,7 +17,6 @@
 package org.dbvr.cli.sql;
 
 
-import org.dbvr.cli.model.ConnectionOptions;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
@@ -27,9 +26,7 @@ import org.jkiss.dbeaver.model.cli.CLIConstants;
 import org.jkiss.dbeaver.model.cli.CLIException;
 import org.jkiss.dbeaver.model.cli.CLIUtils;
 import org.jkiss.dbeaver.model.cli.model.CommandLineWithAuth;
-import org.jkiss.dbeaver.model.cli.model.option.InputFileOption;
-import org.jkiss.dbeaver.model.cli.model.option.OutputFileOption;
-import org.jkiss.dbeaver.model.cli.model.option.ProjectOption;
+import org.jkiss.dbeaver.model.cli.model.option.*;
 import org.jkiss.dbeaver.model.exec.DBCExecutionContext;
 import org.jkiss.dbeaver.model.exec.DBCStatistics;
 import org.jkiss.dbeaver.model.exec.output.DBCOutputSeverity;
@@ -81,19 +78,34 @@ public class SQLParameterHandler extends CommandLineWithAuth {
     @CommandLine.Mixin
     private DataTransferOptions dataTransferOptions;
 
-    @Nullable
     @CommandLine.Mixin
     private ProjectOption projectOption;
 
     @CommandLine.Mixin
-    private ConnectionOptions connectionOptions;
+    private ConnectionAuthOptions authOptions;
+
+    @CommandLine.ArgGroup(exclusive = true, multiplicity = "1")
+    private CreateOrFindConnection connectionOptions;
+
+    private static class CreateOrFindConnection {
+        @CommandLine.ArgGroup(
+            exclusive = false
+        )
+        private ConnectionOptions tempConnectionOptions;
+
+        @CommandLine.Option(names = "--connection", arity = "1", description = "Connection ID or name")
+
+        private String existConnectionIdOrName;
+    }
 
     @Override
     public void run() throws CLIException {
         super.run();
         CLIConnectionUtils.connect(
-            connectionOptions,
-            projectOption == null ? null : projectOption.getProjectIdOrName(),
+            connectionOptions.existConnectionIdOrName,
+            connectionOptions.tempConnectionOptions,
+            authOptions,
+            projectOption.getProjectIdOrName(),
             context(),
             log
         );
@@ -204,7 +216,6 @@ public class SQLParameterHandler extends CommandLineWithAuth {
         DataSourceContextProvider dataSourceContextProvider = new DataSourceContextProvider(dataSource);
         StreamConsumerSettings settings = prepareSettings();
 
-        boolean first = true;
         long offset = dataTransferOptions.getOffset();
         long limit = dataTransferOptions.getLimit();
         try (
