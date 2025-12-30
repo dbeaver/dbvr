@@ -28,13 +28,13 @@ import org.junit.runners.Suite;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
     HelpArgTest.class,
-    ConnectionManagementTest.class
+    DataSourceManagementTest.class
 })
 public class DBVRTestSuite {
     private static CLIApplicationCE applicationCE;
 
     @BeforeClass
-    public static void initEEServer() throws Exception {
+    public static void initApplication() throws Exception {
         System.out.println("Start CLI Application");
         if (DBWorkbench.isPlatformStarted()) {
             applicationCE = (CLIApplicationCE) DBWorkbench.getPlatform().getApplication();
