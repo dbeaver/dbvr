@@ -18,8 +18,12 @@ package org.dbvr.cli.app;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.ModelPreferences;
 import org.jkiss.dbeaver.model.cli.command.AbstractTopLevelCommand;
+import org.jkiss.dbeaver.model.impl.preferences.BundlePreferenceStore;
+import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
 import org.jkiss.utils.ArrayUtils;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -35,6 +39,8 @@ public class CLIActivator extends Plugin {
 
     private static CLIActivator instance;
 
+    private DBPPreferenceStore preferences;
+
     public static CLIActivator getInstance() {
         return instance;
     }
@@ -42,7 +48,13 @@ public class CLIActivator extends Plugin {
     @Override
     public void start(BundleContext context) throws Exception {
         instance = this;
+        this.preferences = new BundlePreferenceStore(this.getBundle()) {
+            @Override
+            public void save() {
 
+            }
+        };
+        ModelPreferences.setMainBundle(getBundle());
         checkTraceLogging(context);
 
         super.start(context);
@@ -75,4 +87,8 @@ public class CLIActivator extends Plugin {
         instance = null;
     }
 
+    @NotNull
+    public DBPPreferenceStore getPreferenceStore() {
+        return preferences;
+    }
 }

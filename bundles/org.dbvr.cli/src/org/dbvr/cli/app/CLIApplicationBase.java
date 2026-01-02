@@ -185,7 +185,7 @@ public class CLIApplicationBase extends BaseApplicationImpl {
 
     @NotNull
     public DBPPreferenceStore getPreferenceStore() {
-        return preferenceStore;
+        return CLIActivator.getInstance().getPreferenceStore();
     }
 
     @NotNull
