@@ -82,7 +82,7 @@ public class SQLParameterHandler extends CommandLineWithAuth {
     private ProjectOption projectOption;
 
     @CommandLine.Mixin
-    private ConnectionAuthOptions authOptions;
+    private DataSourceAuthOptions authOptions;
 
     @CommandLine.ArgGroup(exclusive = true, multiplicity = "1")
     private CreateOrFindConnection connectionOptions;
@@ -91,7 +91,7 @@ public class SQLParameterHandler extends CommandLineWithAuth {
         @CommandLine.ArgGroup(
             exclusive = false
         )
-        private DataSourceOptions tempDataSourceOptions;
+        private CreateDataSourceOptions tempDataSourceOptions;
 
         @CommandLine.Option(names = "--connection", arity = "1", description = "Connection ID or name")
         private String existConnectionIdOrName;

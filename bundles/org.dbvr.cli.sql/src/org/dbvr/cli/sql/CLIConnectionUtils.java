@@ -23,8 +23,8 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.cli.*;
-import org.jkiss.dbeaver.model.cli.model.option.ConnectionAuthOptions;
-import org.jkiss.dbeaver.model.cli.model.option.DataSourceOptions;
+import org.jkiss.dbeaver.model.cli.model.option.CreateDataSourceOptions;
+import org.jkiss.dbeaver.model.cli.model.option.DataSourceAuthOptions;
 import org.jkiss.dbeaver.model.runtime.LoggingProgressMonitor;
 import org.jkiss.dbeaver.registry.DataSourceUtils;
 import org.jkiss.dbeaver.utils.GeneralUtils;
@@ -35,9 +35,9 @@ public class CLIConnectionUtils {
 
     public static void connect(
         @Nullable String existConnectionIdOrName,
-        @Nullable DataSourceOptions tempDataSourceOptions,
+        @Nullable CreateDataSourceOptions tempDataSourceOptions,
         @Nullable String connectionSpec,
-        @NotNull ConnectionAuthOptions authOptions,
+        @NotNull DataSourceAuthOptions authOptions,
         @Nullable String projectIdOrName,
         @NotNull CommandLineContext context,
         @NotNull Log parentLog
@@ -55,7 +55,8 @@ public class CLIConnectionUtils {
         } else if (tempDataSourceOptions != null) {
             dataSourceContainer = CLIUtils.createTempDataSource(
                 project,
-                tempDataSourceOptions,
+                tempDataSourceOptions.getDriver(),
+                tempDataSourceOptions.getDataSourceOptions(),
                 authOptions
             );
         } else if (CommonUtils.isNotEmpty(connectionSpec)) {

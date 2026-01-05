@@ -22,7 +22,7 @@ import org.jkiss.dbeaver.model.cli.CLIConstants;
 import org.jkiss.dbeaver.model.cli.CLIException;
 import org.jkiss.dbeaver.model.cli.CLIProcessResult;
 import org.jkiss.dbeaver.model.cli.CLIUtils;
-import org.jkiss.dbeaver.model.cli.model.option.ConnectionAuthOptions;
+import org.jkiss.dbeaver.model.cli.model.option.DataSourceAuthOptions;
 import org.jkiss.dbeaver.model.cli.model.option.DataSourceOptions;
 import picocli.CommandLine;
 
@@ -34,7 +34,7 @@ public class UpdateDataSource extends AbstractDataSourceCommand {
     @CommandLine.Mixin
     private DataSourceOptions dataSourceOptions;
     @CommandLine.Mixin
-    private ConnectionAuthOptions authOptions;
+    private DataSourceAuthOptions authOptions;
 
     @Override
     public void run() throws CLIException {
