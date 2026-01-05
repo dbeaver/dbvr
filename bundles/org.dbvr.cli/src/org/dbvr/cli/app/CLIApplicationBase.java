@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -73,7 +73,7 @@ public class CLIApplicationBase extends BaseApplicationImpl {
 
         // Workspace dir
         WORKSPACE_DIR_CURRENT = Path.of(workingDirectory, DEFAULT_WORKSPACE_FOLDER);
-        //        Log.setLogHandler(new VoidLogHandler());
+        Log.setLogHandler(new VoidLogHandler());
     }
 
     @NotNull
