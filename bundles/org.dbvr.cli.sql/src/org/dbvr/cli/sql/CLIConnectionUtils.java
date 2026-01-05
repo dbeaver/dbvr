@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,13 +22,13 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPProject;
-import org.jkiss.dbeaver.model.cli.CLIConstants;
-import org.jkiss.dbeaver.model.cli.CLIException;
-import org.jkiss.dbeaver.model.cli.CLIUtils;
-import org.jkiss.dbeaver.model.cli.CommandLineContext;
+import org.jkiss.dbeaver.model.cli.*;
 import org.jkiss.dbeaver.model.cli.model.option.ConnectionAuthOptions;
 import org.jkiss.dbeaver.model.cli.model.option.ConnectionOptions;
 import org.jkiss.dbeaver.model.runtime.LoggingProgressMonitor;
+import org.jkiss.dbeaver.registry.DataSourceUtils;
+import org.jkiss.dbeaver.utils.GeneralUtils;
+import org.jkiss.dbeaver.utils.SystemVariablesResolver;
 import org.jkiss.utils.CommonUtils;
 
 public class CLIConnectionUtils {
@@ -36,12 +36,14 @@ public class CLIConnectionUtils {
     public static void connect(
         @Nullable String existConnectionIdOrName,
         @Nullable ConnectionOptions tempConnectionOptions,
+        @Nullable String connectionSpec,
         @NotNull ConnectionAuthOptions authOptions,
         @Nullable String projectIdOrName,
         @NotNull CommandLineContext context,
         @NotNull Log parentLog
     )
     throws CLIException {
+        var monitor = new LoggingProgressMonitor(parentLog);
         DBPDataSourceContainer dataSourceContainer;
         DBPProject project = CLIUtils.findProject(projectIdOrName, context);
         if (CommonUtils.isNotEmpty(existConnectionIdOrName)) {
@@ -56,11 +58,23 @@ public class CLIConnectionUtils {
                 tempConnectionOptions,
                 authOptions
             );
+        } else if (CommonUtils.isNotEmpty(connectionSpec)) {
+            var instanceConnectionParameters = new ApplicationInstanceServer.InstanceConnectionParameters();
+            dataSourceContainer = DataSourceUtils.getDataSourceBySpec(
+                project,
+                GeneralUtils.replaceVariables(connectionSpec, SystemVariablesResolver.INSTANCE),
+                instanceConnectionParameters,
+                false,
+                instanceConnectionParameters.isCreateNewConnection()
+            );
         } else {
             throw new CLIException("No connection options provided", CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS);
         }
 
-        var monitor = new LoggingProgressMonitor(parentLog);
+        if (dataSourceContainer == null) {
+            throw new CLIException("Can't find or create connection", CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS);
+        }
+
         connectDatasource(dataSourceContainer, parentLog);
         context.setContextParameter(DBPDataSourceContainer.class.getName(), dataSourceContainer);
         context.addCloseHandler(() -> {
