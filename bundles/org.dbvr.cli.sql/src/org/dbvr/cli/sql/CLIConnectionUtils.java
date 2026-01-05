@@ -24,7 +24,7 @@ import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.cli.*;
 import org.jkiss.dbeaver.model.cli.model.option.ConnectionAuthOptions;
-import org.jkiss.dbeaver.model.cli.model.option.ConnectionOptions;
+import org.jkiss.dbeaver.model.cli.model.option.DataSourceOptions;
 import org.jkiss.dbeaver.model.runtime.LoggingProgressMonitor;
 import org.jkiss.dbeaver.registry.DataSourceUtils;
 import org.jkiss.dbeaver.utils.GeneralUtils;
@@ -35,7 +35,7 @@ public class CLIConnectionUtils {
 
     public static void connect(
         @Nullable String existConnectionIdOrName,
-        @Nullable ConnectionOptions tempConnectionOptions,
+        @Nullable DataSourceOptions tempDataSourceOptions,
         @Nullable String connectionSpec,
         @NotNull ConnectionAuthOptions authOptions,
         @Nullable String projectIdOrName,
@@ -52,10 +52,10 @@ public class CLIConnectionUtils {
                 existConnectionIdOrName
             );
             CLIUtils.processDataSourceAuthOptions(dataSourceContainer, authOptions);
-        } else if (tempConnectionOptions != null) {
+        } else if (tempDataSourceOptions != null) {
             dataSourceContainer = CLIUtils.createTempDataSource(
                 project,
-                tempConnectionOptions,
+                tempDataSourceOptions,
                 authOptions
             );
         } else if (CommonUtils.isNotEmpty(connectionSpec)) {

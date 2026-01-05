@@ -91,7 +91,7 @@ public class SQLParameterHandler extends CommandLineWithAuth {
         @CommandLine.ArgGroup(
             exclusive = false
         )
-        private ConnectionOptions tempConnectionOptions;
+        private DataSourceOptions tempDataSourceOptions;
 
         @CommandLine.Option(names = "--connection", arity = "1", description = "Connection ID or name")
         private String existConnectionIdOrName;
@@ -105,7 +105,7 @@ public class SQLParameterHandler extends CommandLineWithAuth {
         super.run();
         CLIConnectionUtils.connect(
             connectionOptions.existConnectionIdOrName,
-            connectionOptions.tempConnectionOptions,
+            connectionOptions.tempDataSourceOptions,
             connectionOptions.connectionSpec,
             authOptions,
             projectOption.getProjectIdOrName(),

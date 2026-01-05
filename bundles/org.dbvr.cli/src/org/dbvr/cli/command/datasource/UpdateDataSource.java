@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import org.jkiss.dbeaver.model.cli.CLIException;
 import org.jkiss.dbeaver.model.cli.CLIProcessResult;
 import org.jkiss.dbeaver.model.cli.CLIUtils;
 import org.jkiss.dbeaver.model.cli.model.option.ConnectionAuthOptions;
-import org.jkiss.dbeaver.model.cli.model.option.ConnectionOptions;
+import org.jkiss.dbeaver.model.cli.model.option.DataSourceOptions;
 import picocli.CommandLine;
 
 @CommandLine.Command(name = "update", description = "Update datasource")
@@ -32,7 +32,7 @@ public class UpdateDataSource extends AbstractDataSourceCommand {
     private String datasourceIdOrName;
 
     @CommandLine.Mixin
-    private ConnectionOptions connectionOptions;
+    private DataSourceOptions dataSourceOptions;
     @CommandLine.Mixin
     private ConnectionAuthOptions authOptions;
 
@@ -46,12 +46,12 @@ public class UpdateDataSource extends AbstractDataSourceCommand {
         );
 
         CLIUtils.updateDataSource(
-            connectionOptions,
+            dataSourceOptions,
             authOptions,
             dataSourceContainer
         );
         CLIUtils.updateConnectionConfiguration(
-            connectionOptions,
+            dataSourceOptions,
             dataSourceContainer.getConnectionConfiguration()
         );
 
