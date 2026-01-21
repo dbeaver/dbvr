@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,8 +26,7 @@ import org.jkiss.dbeaver.model.cli.CLIConstants;
 import org.jkiss.dbeaver.model.cli.CLIException;
 import org.jkiss.dbeaver.model.cli.CLIUtils;
 import org.jkiss.dbeaver.model.cli.model.CommandLineWithAuth;
-import org.jkiss.dbeaver.model.cli.model.option.InputFileOption;
-import org.jkiss.dbeaver.model.cli.model.option.OutputFileOption;
+import org.jkiss.dbeaver.model.cli.model.option.*;
 import org.jkiss.dbeaver.model.exec.DBCExecutionContext;
 import org.jkiss.dbeaver.model.exec.DBCStatistics;
 import org.jkiss.dbeaver.model.exec.output.DBCOutputSeverity;
@@ -57,7 +56,6 @@ import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.util.*;
 
 @CommandLine.Command(name = "sql", description = "Execute SQL script")
@@ -81,12 +79,39 @@ public class SQLParameterHandler extends CommandLineWithAuth {
     private DataTransferOptions dataTransferOptions;
 
     @CommandLine.Mixin
-    private OpenConnectionOptions connectionOptions;
+    private ProjectOption projectOption;
+
+    @CommandLine.Mixin
+    private DataSourceAuthOptions authOptions;
+
+    @CommandLine.ArgGroup(exclusive = true, multiplicity = "1")
+    private CreateOrFindConnection connectionOptions;
+
+    private static class CreateOrFindConnection {
+        @CommandLine.ArgGroup(
+            exclusive = false
+        )
+        private CreateDataSourceOptions tempDataSourceOptions;
+
+        @CommandLine.Option(names = "--connection", arity = "1", description = "Connection ID or name")
+        private String existConnectionIdOrName;
+
+        @CommandLine.Option(names = "--connection-spec", arity = "1", description = "Connection specification")
+        private String connectionSpec;
+    }
 
     @Override
-    public void run() {
+    public void run() throws CLIException {
         super.run();
-        CLIConnectionUtils.connect(connectionOptions, context(), log);
+        CLIConnectionUtils.connect(
+            connectionOptions.existConnectionIdOrName,
+            connectionOptions.tempDataSourceOptions,
+            connectionOptions.connectionSpec,
+            authOptions,
+            projectOption.getProjectIdOrName(),
+            context(),
+            log
+        );
 
         String sqlQuery = query;
         if (CommonUtils.isEmpty(sqlQuery)) {
@@ -116,6 +141,20 @@ public class SQLParameterHandler extends CommandLineWithAuth {
             throw new CLIException("Can't obtain data source", CLIConstants.EXIT_CODE_ERROR);
         }
         DBRProgressMonitor monitor = new LoggingProgressMonitor(log);
+        monitor.beginTask("Execute SQL script", 1);
+
+        try {
+            executeScript(monitor, dataSource, sqlQuery);
+        } finally {
+            monitor.done();
+        }
+    }
+
+    private void executeScript(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull DBPDataSource dataSource,
+        @NotNull String sqlQuery
+    ) throws CLIException {
         DBCExecutionContext executionContext = dataSource.getDefaultInstance().getDefaultContext(monitor, false);
 
         List<SQLScriptElement> scriptElements = SQLScriptParser.parseScript(executionContext.getDataSource(), sqlQuery);
@@ -180,24 +219,18 @@ public class SQLParameterHandler extends CommandLineWithAuth {
         DataSourceContextProvider dataSourceContextProvider = new DataSourceContextProvider(dataSource);
         StreamConsumerSettings settings = prepareSettings();
 
-        boolean first = true;
         long offset = dataTransferOptions.getOffset();
         long limit = dataTransferOptions.getLimit();
-
-        for (var script : scriptElements) {
-            if (!(script instanceof SQLQuery q)) {
-                log.debug("Skip non-query script element: " + script.getText());
-                continue;
-            }
-
-            try (
-                var out = outputFile == null ? new ByteArrayOutputStream() : new BufferedOutputStream(
-                    Files.newOutputStream(
-                        outputFile,
-                        first ? StandardOpenOption.CREATE : StandardOpenOption.APPEND
-                    ))
-            ) {
-                first = false;
+        try (
+            var out = outputFile == null
+                ? new ByteArrayOutputStream()
+                : new BufferedOutputStream(Files.newOutputStream(outputFile))
+        ) {
+            for (var script : scriptElements) {
+                if (!(script instanceof SQLQuery q)) {
+                    log.debug("Skip non-query script element: " + script.getText());
+                    continue;
+                }
                 StreamTransferConsumer consumer = new StreamTransferConsumer();
                 SQLQueryDataContainer sqlQueryDataContainer = new SQLQueryDataContainer(
                     dataSourceContextProvider, q, scriptContext, log
@@ -212,7 +245,7 @@ public class SQLParameterHandler extends CommandLineWithAuth {
                     ),
                     streamDataExporter,
                     processorProperties,
-                    dataSourceContainer.getProject()
+                    dataSource.getContainer().getProject()
                 );
 
                 SQLScriptProcessor scriptProcessor = new SQLScriptProcessor(
@@ -243,11 +276,11 @@ public class SQLParameterHandler extends CommandLineWithAuth {
                     String result = byteArrayOutputStream.toString(settings.getOutputEncoding());
                     context().addResult(result);
                 }
-            } catch (Exception e) {
-                throw new CLIException("Failed to execute script", e, CLIConstants.EXIT_CODE_ERROR);
-            }
-        }
 
+            }
+        } catch (Exception e) {
+            throw new CLIException("Failed to execute script", e, CLIConstants.EXIT_CODE_ERROR);
+        }
     }
 
     private StreamConsumerSettings prepareSettings() {

@@ -5,17 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.dbvr.ce</groupId>
-        <artifactId>main</artifactId>
+        <artifactId>tests</artifactId>
         <version>1.0.0-SNAPSHOT</version>
         <relativePath>../</relativePath>
     </parent>
-    <artifactId>features</artifactId>
-    <packaging>pom</packaging>
-
-    <modules>
-        <module>org.dbvr.app.ce.feature</module>
-        <module>org.dbvr.app.ce.test.feature</module>
-        <module>org.dbvr.cli.feature</module>
-    </modules>
+    <artifactId>org.dbvr.test.platform</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>eclipse-test-plugin</packaging>
 
 </project>

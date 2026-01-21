@@ -9,8 +9,8 @@
         <version>1.0.0-SNAPSHOT</version>
         <relativePath>../</relativePath>
     </parent>
-    <artifactId>org.dbvr.app.ce.feature</artifactId>
-    <version>25.3.4-SNAPSHOT</version>
+    <artifactId>org.dbvr.app.ce.test.feature</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
     <packaging>eclipse-feature</packaging>
 
     <build>

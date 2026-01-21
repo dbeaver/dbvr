@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Base for standalone applications. Includes minimum set of plugins -->
+<feature
+    id="org.dbvr.app.ce.test.feature"
+    label="DBeaver CLI Test"
+    version="1.0.0.qualifier"
+    provider-name="DBeaver Corp"
+    plugin="org.dbvr.app.test">
+
+    <description>DBeaver command line application</description>
+
+    <copyright>DBeaver Corp and others</copyright>
+
+    <includes id="org.dbvr.app.ce.feature" version="0.0.0"/>
+
+    <plugin id="org.dbvr.test.platform" version="0.0.0"/>
+
+</feature>
