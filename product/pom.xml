@@ -12,8 +12,13 @@
     <artifactId>product</artifactId>
     <packaging>pom</packaging>
 
-    <modules>
-        <module>community</module>
-    </modules>
+    <profiles>
+        <profile>
+            <id>product-dbvr-ce</id>
+            <modules>
+                <module>community</module>
+            </modules>
+        </profile>
+    </profiles>
 
 </project>

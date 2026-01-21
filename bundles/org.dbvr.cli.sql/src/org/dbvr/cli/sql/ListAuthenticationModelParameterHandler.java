@@ -19,7 +19,7 @@ package org.dbvr.cli.sql;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.access.DBAAuthCredentials;
 import org.jkiss.dbeaver.model.access.DBAAuthModel;
-import org.jkiss.dbeaver.model.cli.AbstractCommandLineParameterHandler;
+import org.jkiss.dbeaver.model.cli.AbstractRootCommandLineParameterHandler;
 import org.jkiss.dbeaver.model.cli.CLIProcessResult;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceAuthModelDescriptor;
@@ -31,7 +31,7 @@ import picocli.CommandLine;
 import java.util.List;
 
 @CommandLine.Command(name = "auth-models", description = "List available database authentication models")
-public class ListAuthenticationModelParameterHandler extends AbstractCommandLineParameterHandler {
+public class ListAuthenticationModelParameterHandler extends AbstractRootCommandLineParameterHandler {
     // provider/driver/connection filter
     @Override
     public void run() {

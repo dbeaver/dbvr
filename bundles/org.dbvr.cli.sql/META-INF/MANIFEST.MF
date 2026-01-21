@@ -3,13 +3,14 @@ Bundle-ManifestVersion: 2
 Bundle-Vendor: DBeaver Corp
 Bundle-Name: DBeaver CLI SQL
 Bundle-SymbolicName: org.dbvr.cli.sql;singleton:=true
-Bundle-Version: 1.0.2.qualifier
-Bundle-Release-Date: 20251222
+Bundle-Version: 1.0.5.qualifier
+Bundle-Release-Date: 20260202
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-21
 Require-Bundle: org.jkiss.dbeaver.model.sql,
  org.jkiss.dbeaver.data.transfer,
  org.jkiss.dbeaver.registry,
  org.jkiss.dbeaver.model.cli,
+ org.dbvr.cli,
  com.google.gson
 Automatic-Module-Name: org.dbvr.cli.sql

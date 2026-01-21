@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.dbvr.ce</groupId>
+        <artifactId>main</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+        <relativePath>../</relativePath>
+    </parent>
+    <artifactId>tests</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>org.dbvr.test.platform</module>
+    </modules>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.eclipse.tycho</groupId>
+                <artifactId>tycho-surefire-plugin</artifactId>
+                <version>${tycho-version}</version>
+                <configuration>
+                    <useUIHarness>false</useUIHarness>
+                    <useUIThread>false</useUIThread>
+                    <testClass>org.dbvr.test.DBVRTestSuite</testClass>
+                    <application>org.dbvr.app.ce.application</application>
+                    <product>org.dbvr.app.test.product</product>
+                    <testRuntime>default</testRuntime>
+                    <!--                    <argLine>-agentlib:jdwp=transport=dt_socket,server=y,address=localhost:15001,suspend=y</argLine>-->
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+
+</project>

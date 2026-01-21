@@ -3,7 +3,7 @@
 <feature
         id="org.dbvr.cli.feature"
         label="DBeaver CLI Model"
-        version="1.0.2.qualifier"
+        version="1.0.5.qualifier"
         provider-name="DBeaver Corp"
         plugin="org.dbvr.app.ce">
 
@@ -16,9 +16,7 @@
     </requires>
 
     <includes id="org.jkiss.dbeaver.db.feature" version="0.0.0"/>
-
     <plugin id="org.jkiss.dbeaver.slf4j" version="0.0.0" />
-    <plugin id="org.apache.commons.cli" version="0.0.0" />
 
     <plugin id="org.dbvr.cli" version="0.0.0" />
     <plugin id="org.dbvr.cli.sql" version="0.0.0" />

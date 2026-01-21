@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?pde version="3.5"?>
 
-<product name="dbvr" uid="org.dbvr.app.ce.product" id="org.dbvr.app.ce.product"
-    application="org.dbvr.app.ce.application" version="25.3.4.qualifier" useFeatures="true"
+<product name="dbvr-test" uid="org.dbvr.app.test.product" id="org.dbvr.app.test.product"
+    application="org.dbvr.app.test.application" version="1.0.0.qualifier" useFeatures="true"
     includeLaunchers="true">
 
     <configIni use="default">
@@ -47,42 +47,18 @@
         <vmArgsMac>-XstartOnFirstThread</vmArgsMac>
     </launcherArgs>
 
-    <launcher name="dbvr">
-        <linux icon="/icons/dbvr.xpm"/>
-        <macosx icon="/icons/dbvr.icns"/>
-        <win useIco="true">
-            <ico path="icons/dbvr.ico"/>
-        </win>
-    </launcher>
-
     <vm>
     </vm>
 
     <license>
         <url>https://dbvr.prg/about/</url>
-        <text>
-            dbvr - Universal Database Manager CLI
-            Copyright (C) 2010-2025 DBeaver Corp and others
-
-            Licensed under the Apache License, Version 2.0 (the "License");
-            you may not use this file except in compliance with the License.
-            You may obtain a copy of the License at
-
-            http://www.apache.org/licenses/LICENSE-2.0
-
-            Unless required by applicable law or agreed to in writing, software
-            distributed under the License is distributed on an "AS IS" BASIS,
-            WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-            See the License for the specific language governing permissions and
-            limitations under the License.
-        </text>
     </license>
 
     <plugins>
     </plugins>
 
     <features>
-        <feature id="org.dbvr.app.ce.feature"/>
+        <feature id="org.dbvr.app.ce.test.feature"/>
     </features>
 
     <configurations>

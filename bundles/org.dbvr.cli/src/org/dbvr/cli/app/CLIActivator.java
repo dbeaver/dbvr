@@ -16,15 +16,30 @@
  */
 package org.dbvr.cli.app;
 
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
+import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.ModelPreferences;
+import org.jkiss.dbeaver.model.cli.command.AbstractTopLevelCommand;
+import org.jkiss.dbeaver.model.impl.preferences.BundlePreferenceStore;
+import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
+import org.jkiss.utils.ArrayUtils;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleEvent;
+import org.osgi.framework.hooks.bundle.EventHook;
 
 /**
  * The activator class controls the plug-in life cycle
  */
 public class CLIActivator extends Plugin {
 
+    private static final Log log = Log.getLog(CLIActivator.class);
+
     private static CLIActivator instance;
+
+    private DBPPreferenceStore preferences;
 
     public static CLIActivator getInstance() {
         return instance;
@@ -33,7 +48,37 @@ public class CLIActivator extends Plugin {
     @Override
     public void start(BundleContext context) throws Exception {
         instance = this;
+        this.preferences = new BundlePreferenceStore(this.getBundle()) {
+            @Override
+            public void save() {
+
+            }
+        };
+        ModelPreferences.setMainBundle(getBundle());
+        checkTraceLogging(context);
+
         super.start(context);
+    }
+
+    private static void checkTraceLogging(BundleContext context) {
+        if (ArrayUtils.contains(Platform.getApplicationArgs(), AbstractTopLevelCommand.TRACE_LOGS_OPTION) && !Log.isQuietMode()) {
+            Log.enableTraceLogs(true);
+            context.registerService(
+                EventHook.class,
+                (event, contexts) -> {
+                    String message = null;
+                    Bundle bundle = event.getBundle();
+                    if (event.getType() == BundleEvent.STARTED) {
+                        if (bundle.getState() == Bundle.ACTIVE) {
+                            message = "Start bundle " + bundle.getSymbolicName();
+                        }
+                    }
+                    if (message != null) {
+                        log.trace(message);
+                    }
+                },
+                null);
+        }
     }
 
     @Override
@@ -42,4 +87,8 @@ public class CLIActivator extends Plugin {
         instance = null;
     }
 
+    @NotNull
+    public DBPPreferenceStore getPreferenceStore() {
+        return preferences;
+    }
 }
