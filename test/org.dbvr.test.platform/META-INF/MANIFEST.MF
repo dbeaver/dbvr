@@ -19,5 +19,6 @@ Require-Bundle: org.eclipse.core.runtime,
  org.jkiss.dbeaver.registry,
  org.jkiss.dbeaver.osgi.test.runner;visibility:=reexport,
  org.dbvr.cli;visibility:=reexport,
+ org.jkiss.dbeaver.net.ssh,
  org.jkiss.dbeaver.ext.h2,
  org.dbvr.cli.sql
