@@ -20,6 +20,7 @@ import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPProject;
+import org.jkiss.dbeaver.model.cli.CLIConstants;
 import org.jkiss.dbeaver.model.cli.CLIProcessResult;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
@@ -56,6 +57,9 @@ public class DataSourceManagementTest extends DBVRTest {
         CLIProcessResult result = cmd.executeCommandLineCommands(null, false, false, args);
         Assert.assertNotNull(result.getOutput());
         Assert.assertEquals(1, result.getOutput().size());
+        if (result.getExitCode() == CLIConstants.EXIT_CODE_ERROR) {
+            Assert.fail("Error during datasource creation: " + String.join("\n", result.getOutput()));
+        }
         Assert.assertTrue(result.getOutput().get(0).contains(uniqName));
 
         DBPProject project = DBWorkbench.getPlatform().getWorkspace().getActiveProject();
