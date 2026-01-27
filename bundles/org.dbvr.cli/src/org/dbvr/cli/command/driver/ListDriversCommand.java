@@ -37,6 +37,9 @@ public class ListDriversCommand extends AbstractCommandLineParameterHandler {
     @CommandLine.Option(names = {"--provider"}, description = "Filter by provider ID")
     private String providerId;
 
+    @CommandLine.Option(names = {"--show-disabled"}, description = "Show disabled drivers")
+    private boolean showDisabled;
+
     @Override
     public void run() throws CLIException {
         List<DriverDescriptor> drivers = getSupportedDBInstances();
@@ -65,8 +68,9 @@ public class ListDriversCommand extends AbstractCommandLineParameterHandler {
                     description = driver.getName();
                 }
                 outBuilder.append(String.format(
-                    "  Driver ID: %s, Description: %s%n",
+                    "  Driver ID: %s, Status: %s, Description: %s%n",
                     driver.getId(),
+                    driver.isDisabled() ? "Disabled" : "Enabled",
                     description
                 ));
             }
@@ -87,7 +91,7 @@ public class ListDriversCommand extends AbstractCommandLineParameterHandler {
                 continue;
             }
             for (DriverDescriptor driver : providerDescriptor.getDrivers()) {
-                if (!driver.isDisabled() && driver.getReplacedBy() == null) {
+                if ((showDisabled || !driver.isDisabled()) && driver.getReplacedBy() == null) {
                     supportedDataBases.add(driver);
                 }
             }
