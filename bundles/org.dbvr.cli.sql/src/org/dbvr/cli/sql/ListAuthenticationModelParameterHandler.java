@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,58 +17,129 @@
 package org.dbvr.cli.sql;
 
 import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.access.DBAAuthCredentials;
-import org.jkiss.dbeaver.model.access.DBAAuthModel;
-import org.jkiss.dbeaver.model.cli.AbstractRootCommandLineParameterHandler;
-import org.jkiss.dbeaver.model.cli.CLIProcessResult;
+import org.jkiss.dbeaver.model.cli.*;
+import org.jkiss.dbeaver.model.cli.model.option.ProjectOption;
+import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceAuthModelDescriptor;
+import org.jkiss.dbeaver.registry.DataSourceProviderDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.runtime.properties.PropertyCollector;
 import org.jkiss.utils.CommonUtils;
 import picocli.CommandLine;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @CommandLine.Command(name = "auth-models", description = "List available database authentication models")
 public class ListAuthenticationModelParameterHandler extends AbstractRootCommandLineParameterHandler {
-    // provider/driver/connection filter
-    @Override
-    public void run() {
-        List<DataSourceAuthModelDescriptor> authModels = DataSourceProviderRegistry.getInstance().getAllAuthModels();
 
+    @CommandLine.Mixin
+    protected ProjectOption projectOption;
+
+    @CommandLine.Option(names = {"--provider"}, description = "Filter by provider ID")
+    protected String providerId;
+
+    @CommandLine.Option(names = {"--driver"}, description = "Filter by driver ID")
+    protected String driverId;
+
+    @CommandLine.Option(names = {"--connection"}, description = "Filter by connection ID or name")
+    protected String connectionId;
+
+    @Override
+    public void run() throws CLIException {
+        List<DataSourceAuthModelDescriptor> authModels = DataSourceProviderRegistry.getInstance().getAllAuthModels();
+        List<DBPDriver> applicableDrivers = new ArrayList<>();
+
+        if (CommonUtils.isNotEmpty(connectionId)) {
+            DBPDataSourceContainer dataSource = CLIUtils.findDataSource(
+                CLIUtils.findProject(projectOption.getProjectIdOrName(), context()),
+                connectionId
+            );
+            DBPDriver driver = dataSource.getDriver();
+            applicableDrivers.add(driver);
+            authModels = authModels.stream()
+                .filter(am -> am.isApplicableTo(driver))
+                .toList();
+        } else if (CommonUtils.isNotEmpty(driverId)) {
+            DBPDriver driver = DataSourceProviderRegistry.getInstance().findDriver(driverId);
+            if (driver != null) {
+                applicableDrivers.add(driver);
+                authModels = authModels.stream()
+                    .filter(am -> am.isApplicableTo(driver))
+                    .toList();
+            } else {
+                authModels = Collections.emptyList();
+            }
+        } else if (CommonUtils.isNotEmpty(providerId)) {
+            DataSourceProviderDescriptor provider = DataSourceProviderRegistry.getInstance().getDataSourceProvider(providerId);
+            if (provider != null) {
+                applicableDrivers.addAll(provider.getEnabledDrivers());
+                authModels = authModels.stream()
+                    .filter(am ->
+                        applicableDrivers.stream()
+                            .anyMatch(am::isApplicableTo)
+                    )
+                    .toList();
+            } else {
+                authModels = Collections.emptyList();
+            }
+        }
+
+        try (CommandLineContext context = context()) {
+            context.addResult(getConsoleOutput(authModels, applicableDrivers));
+            context.setPostAction(CLIProcessResult.PostAction.SHUTDOWN);
+        }
+
+    }
+
+    @NotNull
+    private static String getConsoleOutput(List<DataSourceAuthModelDescriptor> authModels, List<DBPDriver> applicableDrivers) {
         StringBuilder outBuilder = new StringBuilder();
         for (DataSourceAuthModelDescriptor authModel : authModels) {
-            DBAAuthModel<?> modelInstance = authModel.getInstance();
             outBuilder.append(String.format(
-                "Auth Model ID: %s, Name: %s, Description: %s, Parameters:\n",
+                "Auth Model ID: %s, Name: %s, Description: %s%n",
                 authModel.getId(),
                 authModel.getName(),
                 authModel.getDescription()
             ));
-            DBAAuthCredentials credentials = modelInstance.createCredentials();
+
+            String drivers = applicableDrivers.stream()
+                .filter(authModel::isApplicableTo)
+                .map(DBPDriver::getFullName)
+                .collect(Collectors.joining(", "));
+            if (!CommonUtils.isEmpty(drivers)) {
+                outBuilder.append("Applicable Drivers: ").append(drivers).append("\n");
+            }
+
+            outBuilder.append("Parameters:\n");
+            DBAAuthCredentials credentials = authModel.getInstance().createCredentials();
             PropertyCollector propertyCollector = new PropertyCollector(credentials, true);
             propertyCollector.collectProperties();
             for (DBPPropertyDescriptor property : propertyCollector.getProperties()) {
                 String helpText = getHelpText(property);
                 outBuilder.append(helpText);
             }
+            outBuilder.append("\n");
         }
-        context().addResult(outBuilder.toString());
-        context().setPostAction(CLIProcessResult.PostAction.SHUTDOWN);
+        return outBuilder.toString();
     }
 
     private static @NotNull String getHelpText(DBPPropertyDescriptor property) {
         String displayName = property.getDisplayName();
-        String description = property.getDisplayName();
+        String description = property.getDescription();
         String helpText;
-        if (CommonUtils.equalObjects(displayName, description)) {
-            helpText = "  - %s: %s\n".formatted(
+        if (CommonUtils.equalObjects(displayName, description) || CommonUtils.isEmpty(description)) {
+            helpText = "  - %s = %s%n".formatted(
                 property.getId(),
-                property.getDescription()
+                CommonUtils.notEmpty(displayName)
             );
         } else {
-            helpText = "  - %s (%s): %s\n".formatted(
+            helpText = "  - %s (%s) = %s%n".formatted(
                 property.getId(),
                 property.getDisplayName(),
                 property.getDescription()
