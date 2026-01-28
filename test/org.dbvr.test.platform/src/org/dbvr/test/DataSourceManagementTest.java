@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,12 +49,13 @@ public class DataSourceManagementTest extends DBVRTest {
         CLIProcessResult result = cmd.executeCommandLineCommands(null, false, false, args);
         Assert.assertNotNull(result.getOutput());
         Assert.assertEquals(1, result.getOutput().size());
-        Assert.assertTrue(result.getOutput().get(0).contains(uniqName));
+        String createdId = result.getOutput().getFirst();
 
         DBPProject project = DBWorkbench.getPlatform().getWorkspace().getActiveProject();
         Assert.assertNotNull(project);
-        DBPDataSourceContainer ds = project.getDataSourceRegistry().findDataSourceByName(uniqName);
+        DBPDataSourceContainer ds = project.getDataSourceRegistry().getDataSource(createdId);
         Assert.assertNotNull(ds);
+        Assert.assertEquals(uniqName, ds.getName());
         project.getDataSourceRegistry().removeDataSource(ds);
     }
 
@@ -78,6 +79,7 @@ public class DataSourceManagementTest extends DBVRTest {
         Assert.assertNull(registry.findDataSourceByName(uniqName));
     }
 
+    @Test
     public void testUpdate() throws Exception {
         String uniqName = "test_update" + UUID.randomUUID();
 
@@ -90,20 +92,41 @@ public class DataSourceManagementTest extends DBVRTest {
         Assert.assertNotEquals(newRandomHost, ds.getConnectionConfiguration().getHostName());
         var args = new String[] {
             "datasource",
-            "update",
+            "update", ds.getId(),
             "--host=" + newRandomHost,
         };
         CLIProcessResult result = cmd.executeCommandLineCommands(null, false, false, args);
 
-        ds = registry.findDataSourceByName(uniqName);
+        ds = registry.getDataSource(ds.getId());
 
         Assert.assertNotNull(ds);
         Assert.assertEquals(newRandomHost, ds.getConnectionConfiguration().getHostName());
 
         Assert.assertNotNull(result.getOutput());
         Assert.assertEquals(1, result.getOutput().size());
-        Assert.assertTrue(result.getOutput().get(0).contains(uniqName));
+        String output = result.getOutput().getFirst();
+        Assert.assertTrue(output.contains(newRandomHost));
+        Assert.assertTrue(output.contains(uniqName));
 
+        registry.removeDataSource(ds);
+    }
+
+    @Test
+    public void testView() throws Exception {
+        String uniqName = "test_view" + UUID.randomUUID();
+        DBPDataSourceContainer ds = createFakeDataSource(uniqName);
+        var cmd = DBVRTestSuite.getApplication().createCommandLine();
+        var args = new String[] {
+            "datasource", "view", ds.getId()
+        };
+        CLIProcessResult result = cmd.executeCommandLineCommands(null, false, false, args);
+        Assert.assertNotNull(result.getOutput());
+        Assert.assertEquals(1, result.getOutput().size());
+        String output = result.getOutput().getFirst();
+        Assert.assertTrue(output.contains(uniqName));
+
+        var registry = DBWorkbench.getPlatform().getWorkspace().getActiveProject()
+            .getDataSourceRegistry();
         registry.removeDataSource(ds);
     }
 
