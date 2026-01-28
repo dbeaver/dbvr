@@ -21,15 +21,19 @@ import org.jkiss.dbeaver.model.cli.CLIProcessResult;
 import org.jkiss.dbeaver.model.cli.CommandLineContext;
 import picocli.CommandLine;
 
-@CommandLine.Command(name = "list", description = "View datasources")
-public class ListDataSource extends AbstractDataSourceCommand {
+@CommandLine.Command(name = "view", description = "View datasource details")
+public class ViewDataSource extends AbstractDataSourceCommand {
+
+    @CommandLine.Parameters(index = "0", description = "Datasource ID")
+    private String id;
+
     @Override
     public void run() throws CLIException {
         super.run();
         var project = getProject();
-        try (CommandLineContext context = context()) {
+        try (CommandLineContext context = context();) {
             context.setPostAction(CLIProcessResult.PostAction.SHUTDOWN);
-            context.addResult(serializeDataSourceList(project));
+            context.addResult(serializeDataSourceToJson(project, id).trim());
         }
     }
 }

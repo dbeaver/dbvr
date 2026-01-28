@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,9 +26,19 @@ import picocli.CommandLine;
         CreateDatasource.class,
         UpdateDataSource.class,
         DeleteDataSource.class,
-        ListDataSource.class
+        ListDataSource.class,
+        ViewDataSource.class
     }
 )
 public class DataSourceManagementHandler extends CommandLineWithAuth {
+    @CommandLine.Spec
+    CommandLine.Model.CommandSpec spec;
 
+    @Override
+    public void run() throws org.jkiss.dbeaver.model.cli.CLIException {
+        super.run();
+        if (spec.commandLine().getParseResult().subcommand() == null) {
+            spec.commandLine().usage(System.out);
+        }
+    }
 }

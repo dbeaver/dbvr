@@ -18,10 +18,7 @@ package org.dbvr.cli.command.datasource;
 
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPProject;
-import org.jkiss.dbeaver.model.cli.CLIConstants;
-import org.jkiss.dbeaver.model.cli.CLIException;
-import org.jkiss.dbeaver.model.cli.CLIProcessResult;
-import org.jkiss.dbeaver.model.cli.CLIUtils;
+import org.jkiss.dbeaver.model.cli.*;
 import org.jkiss.dbeaver.model.cli.model.option.DataSourceAuthOptions;
 import org.jkiss.dbeaver.model.cli.model.option.DataSourceOptions;
 import picocli.CommandLine;
@@ -67,7 +64,9 @@ public class UpdateDataSource extends AbstractDataSourceCommand {
             );
         }
 
-        context().setPostAction(CLIProcessResult.PostAction.SHUTDOWN);
-        context().addResult(serializeDataSources(project, dataSourceContainer.getId()));
+        try (CommandLineContext context = context()) {
+            context.setPostAction(CLIProcessResult.PostAction.SHUTDOWN);
+            context.addResult(serializeDataSourceToJson(project, dataSourceContainer.getId()).trim());
+        }
     }
 }

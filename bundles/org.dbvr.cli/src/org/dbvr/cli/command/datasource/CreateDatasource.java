@@ -21,6 +21,7 @@ import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.cli.CLIException;
 import org.jkiss.dbeaver.model.cli.CLIProcessResult;
 import org.jkiss.dbeaver.model.cli.CLIUtils;
+import org.jkiss.dbeaver.model.cli.CommandLineContext;
 import org.jkiss.dbeaver.model.cli.model.option.CreateDataSourceOptions;
 import org.jkiss.dbeaver.model.cli.model.option.DataSourceAuthOptions;
 import picocli.CommandLine;
@@ -43,8 +44,9 @@ public class CreateDatasource extends AbstractDataSourceCommand {
             authOptions,
             false
         );
-
-        context().setPostAction(CLIProcessResult.PostAction.SHUTDOWN);
-        context().addResult(serializeDataSources(project, dataSourceContainer.getId()));
+        try (CommandLineContext context = context()) {
+            context.setPostAction(CLIProcessResult.PostAction.SHUTDOWN);
+            context.addResult(dataSourceContainer.getId());
+        }
     }
 }

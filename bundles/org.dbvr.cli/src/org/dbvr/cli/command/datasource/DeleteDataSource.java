@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.cli.CLIException;
 import org.jkiss.dbeaver.model.cli.CLIProcessResult;
 import org.jkiss.dbeaver.model.cli.CLIUtils;
+import org.jkiss.dbeaver.model.cli.CommandLineContext;
 import picocli.CommandLine;
 
 @CommandLine.Command(name = "delete", description = "Delete datasource")
@@ -37,9 +38,11 @@ public class DeleteDataSource extends AbstractDataSourceCommand {
         project.getDataSourceRegistry().removeDataSource(
             dataSourceContainer
         );
-        context().setPostAction(CLIProcessResult.PostAction.SHUTDOWN);
-        context().addResult(
-            "Connection " + dataSourceContainer.getName() + "[" + dataSourceContainer.getId() + "] has been deleted"
-        );
+        try (CommandLineContext context = context()) {
+            context.setPostAction(CLIProcessResult.PostAction.SHUTDOWN);
+            context.addResult(
+                "Connection " + dataSourceContainer.getName() + "[" + dataSourceContainer.getId() + "] has been deleted"
+            );
+        }
     }
 }

@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,18 +16,26 @@
  */
 package org.dbvr.cli.command.datasource;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.cli.*;
 import org.jkiss.dbeaver.model.cli.model.option.ProjectOption;
+import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.registry.DataSourceConfigurationManagerBuffer;
 import org.jkiss.dbeaver.registry.DataSourceRegistry;
 import picocli.CommandLine;
 
+import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public abstract class AbstractDataSourceCommand extends AbstractCommandLineParameterHandler {
     @CommandLine.Mixin
@@ -42,9 +50,57 @@ public abstract class AbstractDataSourceCommand extends AbstractCommandLineParam
         return CLIUtils.findProject(projectOption.getProjectIdOrName(), context());
     }
 
+    @NotNull
+    protected String serializeDataSourceList(@NotNull DBPProject project) throws CLIException {
+        String allData = serializeDataSources(project, null);
+        try {
+            Map<String, Object> map = JSONUtils.parseMap(new Gson(), new StringReader(allData));
+            Map<String, Object> connections = JSONUtils.deserializeProperties(map, "connections");
+            List<Map<String, String>> tableData = new ArrayList<>();
+            if (connections != null) {
+                for (Map.Entry<String, Object> entry : connections.entrySet()) {
+                    if (entry.getValue() instanceof Map<?, ?> dataSourceMap) {
+                        Map<String, String> row = new LinkedHashMap<>();
+                        row.put("ID", entry.getKey());
+                        row.put("NAME", String.valueOf(dataSourceMap.get("name")));
+                        row.put("DRIVER", String.valueOf(dataSourceMap.get("driver")));
+                        tableData.add(row);
+                    }
+                }
+            }
+            return CLIUtils.formatAsTable(tableData);
+        } catch (Exception e) {
+            throw new CLIException("Error parsing datasources: " + e.getMessage(), e, CLIConstants.EXIT_CODE_ERROR);
+        }
+    }
 
     @NotNull
-    protected String serializeDataSources(@NotNull DBPProject project, @Nullable String dsId) throws CLIException {
+    protected String serializeDataSourceToJson(@NotNull DBPProject project, @NotNull String dsId) throws CLIException {
+        String allData = serializeDataSources(project, dsId);
+        try {
+            Map<String, Object> map = JSONUtils.parseMap(new Gson(), new StringReader(allData));
+            Map<String, Object> connections = JSONUtils.deserializeProperties(map, "connections");
+            Object dsData = connections != null ? connections.get(dsId) : null;
+            if (dsData instanceof Map) {
+                return new GsonBuilder().setPrettyPrinting().create().toJson(dsData);
+            }
+            throw new CLIException("Datasource with id " + dsId + " is not found in serialized data", CLIConstants.EXIT_CODE_ERROR);
+        } catch (Exception e) {
+            throw new CLIException("Error parsing datasource JSON: " + e.getMessage(), e, CLIConstants.EXIT_CODE_ERROR);
+        }
+    }
+
+    @Override
+    public void run() throws CLIException {
+
+    }
+
+    @NotNull
+    protected CommandLineContext context() {
+        return parent.context();
+    }
+
+    private String serializeDataSources(@NotNull DBPProject project, @Nullable String dsId) throws CLIException {
         DataSourceConfigurationManagerBuffer buffer = new DataSourceConfigurationManagerBuffer();
         DBPDataSourceRegistry registry = project.getDataSourceRegistry();
         if (!(registry instanceof DataSourceRegistry<?> dataSourceRegistry)) {
@@ -66,15 +122,5 @@ public abstract class AbstractDataSourceCommand extends AbstractCommandLineParam
         }
 
         return new String(buffer.getData(), StandardCharsets.UTF_8);
-    }
-
-    @Override
-    public void run() throws CLIException {
-        
-    }
-
-    @NotNull
-    protected CommandLineContext context() {
-        return parent.context();
     }
 }
