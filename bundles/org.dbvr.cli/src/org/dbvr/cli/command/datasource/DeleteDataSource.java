@@ -21,7 +21,6 @@ import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.cli.CLIException;
 import org.jkiss.dbeaver.model.cli.CLIProcessResult;
 import org.jkiss.dbeaver.model.cli.CLIUtils;
-import org.jkiss.dbeaver.model.cli.CommandLineContext;
 import picocli.CommandLine;
 
 @CommandLine.Command(name = "delete", description = "Delete datasource")
@@ -38,11 +37,9 @@ public class DeleteDataSource extends AbstractDataSourceCommand {
         project.getDataSourceRegistry().removeDataSource(
             dataSourceContainer
         );
-        try (CommandLineContext context = context()) {
-            context.setPostAction(CLIProcessResult.PostAction.SHUTDOWN);
-            context.addResult(
-                "Connection " + dataSourceContainer.getName() + "[" + dataSourceContainer.getId() + "] has been deleted"
-            );
-        }
+        context().setPostAction(CLIProcessResult.PostAction.SHUTDOWN);
+        context().addResult(
+            "Connection " + dataSourceContainer.getName() + "[" + dataSourceContainer.getId() + "] has been deleted"
+        );
     }
 }

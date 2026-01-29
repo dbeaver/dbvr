@@ -130,6 +130,22 @@ public class DataSourceManagementTest extends DBVRTest {
         registry.removeDataSource(ds);
     }
 
+    @Test
+    public void testHelpWhenWhenCommandWithNoParams() throws Exception {
+        var cmd = DBVRTestSuite.getApplication().createCommandLine();
+        var args = new String[] {
+            "datasource"
+        };
+        CLIProcessResult result = cmd.executeCommandLineCommands(null, false, false, args);
+        Assert.assertNotNull(result.getOutput());
+        Assert.assertFalse(result.getOutput().isEmpty());
+        String output = result.getOutput().getFirst();
+        Assert.assertTrue(output.contains("Usage: dbvr datasource"));
+        Assert.assertTrue(output.contains("Commands:"));
+        Assert.assertTrue(output.contains("create"));
+        Assert.assertTrue(output.contains("list"));
+    }
+
     @NotNull
     private static DBPDataSourceContainer createFakeDataSource(@NotNull String uniqName) throws DBException {
         DBPDriver driver = DBWorkbench.getPlatform().getDataSourceProviderRegistry()

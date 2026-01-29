@@ -20,6 +20,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.cli.*;
@@ -51,27 +52,16 @@ public abstract class AbstractDataSourceCommand extends AbstractCommandLineParam
     }
 
     @NotNull
-    protected String serializeDataSourceList(@NotNull DBPProject project) throws CLIException {
-        String allData = serializeDataSources(project, null);
-        try {
-            Map<String, Object> map = JSONUtils.parseMap(new Gson(), new StringReader(allData));
-            Map<String, Object> connections = JSONUtils.deserializeProperties(map, "connections");
-            List<Map<String, String>> tableData = new ArrayList<>();
-            if (connections != null) {
-                for (Map.Entry<String, Object> entry : connections.entrySet()) {
-                    if (entry.getValue() instanceof Map<?, ?> dataSourceMap) {
-                        Map<String, String> row = new LinkedHashMap<>();
-                        row.put("ID", entry.getKey());
-                        row.put("NAME", String.valueOf(dataSourceMap.get("name")));
-                        row.put("DRIVER", String.valueOf(dataSourceMap.get("driver")));
-                        tableData.add(row);
-                    }
-                }
-            }
-            return CLIUtils.formatAsTable(tableData);
-        } catch (Exception e) {
-            throw new CLIException("Error parsing datasources: " + e.getMessage(), e, CLIConstants.EXIT_CODE_ERROR);
+    protected String serializeDataSourceList(@NotNull DBPProject project) {
+        List<Map<String, String>> tableData = new ArrayList<>();
+        for (DBPDataSourceContainer dataSource : project.getDataSourceRegistry().getDataSources()) {
+            Map<String, String> row = new LinkedHashMap<>();
+            row.put("ID", dataSource.getId());
+            row.put("NAME", dataSource.getName());
+            row.put("DRIVER", dataSource.getDriver().getId());
+            tableData.add(row);
         }
+        return CLIUtils.formatAsTable(tableData);
     }
 
     @NotNull

@@ -18,22 +18,21 @@ package org.dbvr.cli.command.datasource;
 
 import org.jkiss.dbeaver.model.cli.CLIException;
 import org.jkiss.dbeaver.model.cli.CLIProcessResult;
-import org.jkiss.dbeaver.model.cli.CommandLineContext;
+import org.jkiss.dbeaver.model.cli.CLIUtils;
 import picocli.CommandLine;
 
 @CommandLine.Command(name = "view", description = "View datasource details")
 public class ViewDataSource extends AbstractDataSourceCommand {
 
-    @CommandLine.Parameters(index = "0", description = "Datasource ID")
+    @CommandLine.Parameters(index = "0", description = "Datasource ID or name",  arity = "1")
     private String id;
 
     @Override
     public void run() throws CLIException {
         super.run();
         var project = getProject();
-        try (CommandLineContext context = context();) {
-            context.setPostAction(CLIProcessResult.PostAction.SHUTDOWN);
-            context.addResult(serializeDataSourceToJson(project, id).trim());
-        }
+        var dataSourceContainer = CLIUtils.findDataSource(project, id);
+        context().setPostAction(CLIProcessResult.PostAction.SHUTDOWN);
+        context().addResult(serializeDataSourceToJson(project, dataSourceContainer.getId()).trim());
     }
 }

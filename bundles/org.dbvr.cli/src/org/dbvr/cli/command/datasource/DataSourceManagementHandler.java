@@ -16,8 +16,12 @@
  */
 package org.dbvr.cli.command.datasource;
 
+import org.jkiss.dbeaver.model.cli.CLIException;
 import org.jkiss.dbeaver.model.cli.model.CommandLineWithAuth;
 import picocli.CommandLine;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 @CommandLine.Command(
     name = "datasource",
@@ -35,10 +39,12 @@ public class DataSourceManagementHandler extends CommandLineWithAuth {
     CommandLine.Model.CommandSpec spec;
 
     @Override
-    public void run() throws org.jkiss.dbeaver.model.cli.CLIException {
+    public void run() throws CLIException {
         super.run();
         if (spec.commandLine().getParseResult().subcommand() == null) {
-            spec.commandLine().usage(System.out);
+            StringWriter writer = new StringWriter();
+            spec.commandLine().usage(new PrintWriter(writer));
+            context().addResult(writer.toString());
         }
     }
 }
