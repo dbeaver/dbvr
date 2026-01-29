@@ -17,7 +17,12 @@
 package org.dbvr.cli.command.driver;
 
 import org.jkiss.dbeaver.model.cli.AbstractRootCommandLineParameterHandler;
+import org.jkiss.dbeaver.model.cli.CLIException;
+import org.jkiss.dbeaver.model.cli.CLIProcessResult;
 import picocli.CommandLine;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 @CommandLine.Command(
     name = "driver",
@@ -28,7 +33,16 @@ import picocli.CommandLine;
 )
 public class DriverManagerHandler extends AbstractRootCommandLineParameterHandler {
 
+    @CommandLine.Spec
+    CommandLine.Model.CommandSpec spec;
+
     @Override
-    public void run() {
+    public void run() throws CLIException {
+        if (spec.commandLine().getParseResult().subcommand() == null) {
+            StringWriter writer = new StringWriter();
+            spec.commandLine().usage(new PrintWriter(writer));
+            context().addResult(writer.toString());
+            context().setPostAction(CLIProcessResult.PostAction.SHUTDOWN);
+        }
     }
 }

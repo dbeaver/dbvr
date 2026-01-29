@@ -76,10 +76,8 @@ public class ListDriversCommand extends AbstractCommandLineParameterHandler {
             }
             outBuilder.append(System.lineSeparator());
         }
-        try (CommandLineContext context = context()) {
-            context.setPostAction(CLIProcessResult.PostAction.SHUTDOWN);
-            context.addResult(outBuilder.toString());
-        }
+        context().setPostAction(CLIProcessResult.PostAction.SHUTDOWN);
+        context().addResult(outBuilder.toString());
     }
 
     private List<DriverDescriptor> getSupportedDBInstances() {
