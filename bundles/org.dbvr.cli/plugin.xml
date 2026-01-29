@@ -5,5 +5,8 @@
         <parameter
             exitAfterExecute="true"
             handler="org.dbvr.cli.command.datasource.DataSourceManagementHandler"/>
+        <parameter
+            exitAfterExecute="true"
+            handler="org.dbvr.cli.command.driver.DriverManagerHandler"/>
     </extension>
 </plugin>
