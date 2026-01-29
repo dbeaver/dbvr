@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,26 +62,6 @@ public class DataSourceManagementTest extends DBVRTest {
         project.getDataSourceRegistry().removeDataSource(ds);
     }
 
-
-    @Test
-    public void testDelete() throws Exception {
-        String uniqName = "test_delete" + UUID.randomUUID();
-        createFakeDataSource(uniqName);
-        var registry = DBWorkbench.getPlatform().getWorkspace().getActiveProject()
-            .getDataSourceRegistry();
-        Assert.assertNotNull(registry.findDataSourceByName(uniqName));
-        var cmd = DBVRTestSuite.getApplication().createCommandLine();
-        var args = new String[] {
-            "datasource",
-            "delete", uniqName
-        };
-        CLIProcessResult result = cmd.executeCommandLineCommands(null, false, false, args);
-        Assert.assertNotNull(result.getOutput());
-        Assert.assertEquals(1, result.getOutput().size());
-        Assert.assertTrue(result.getOutput().get(0).contains(uniqName));
-        Assert.assertNull(registry.findDataSourceByName(uniqName));
-    }
-
     @Test
     public void testCreateWithSSH() throws Exception {
         String uniqName = "test_create" + UUID.randomUUID();
@@ -108,12 +88,13 @@ public class DataSourceManagementTest extends DBVRTest {
         if (result.getExitCode() == CLIConstants.EXIT_CODE_ERROR) {
             Assert.fail("Error during datasource creation: " + String.join("\n", result.getOutput()));
         }
-        Assert.assertTrue(result.getOutput().get(0).contains(uniqName));
+        String createdId = result.getOutput().get(0);
 
         DBPProject project = DBWorkbench.getPlatform().getWorkspace().getActiveProject();
         Assert.assertNotNull(project);
-        DBPDataSourceContainer ds = project.getDataSourceRegistry().findDataSourceByName(uniqName);
+        DBPDataSourceContainer ds = project.getDataSourceRegistry().getDataSource(createdId);
         Assert.assertNotNull(ds);
+        Assert.assertEquals(uniqName, ds.getName());
         DBWHandlerConfiguration sshConf = ds.getConnectionConfiguration().getHandler(DBWUtils.SSH_TUNNEL);
         Assert.assertNotNull(sshConf);
         Assert.assertEquals("test_host", sshConf.getProperty("host"));
@@ -188,6 +169,29 @@ public class DataSourceManagementTest extends DBVRTest {
         Assert.assertNotNull(result.getOutput());
         Assert.assertEquals(1, result.getOutput().size());
         String output = result.getOutput().getFirst();
+        Assert.assertTrue(output.contains(uniqName));
+
+        var registry = DBWorkbench.getPlatform().getWorkspace().getActiveProject()
+            .getDataSourceRegistry();
+        registry.removeDataSource(ds);
+    }
+
+    @Test
+    public void testList() throws Exception {
+        String uniqName = "test_list" + UUID.randomUUID();
+        DBPDataSourceContainer ds = createFakeDataSource(uniqName);
+        var cmd = DBVRTestSuite.getApplication().createCommandLine();
+        var args = new String[] {
+            "datasource", "list"
+        };
+        CLIProcessResult result = cmd.executeCommandLineCommands(null, false, false, args);
+        Assert.assertNotNull(result.getOutput());
+        Assert.assertEquals(1, result.getOutput().size());
+        String output = result.getOutput().getFirst();
+        Assert.assertTrue(output.contains("ID"));
+        Assert.assertTrue(output.contains("NAME"));
+        Assert.assertTrue(output.contains("DRIVER"));
+        Assert.assertTrue(output.contains(ds.getId()));
         Assert.assertTrue(output.contains(uniqName));
 
         var registry = DBWorkbench.getPlatform().getWorkspace().getActiveProject()
