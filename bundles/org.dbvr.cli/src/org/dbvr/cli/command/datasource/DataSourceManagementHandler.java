@@ -17,6 +17,7 @@
 package org.dbvr.cli.command.datasource;
 
 import org.jkiss.dbeaver.model.cli.CLIException;
+import org.jkiss.dbeaver.model.cli.CLIProcessResult;
 import org.jkiss.dbeaver.model.cli.model.CommandLineWithAuth;
 import picocli.CommandLine;
 
@@ -45,6 +46,7 @@ public class DataSourceManagementHandler extends CommandLineWithAuth {
             StringWriter writer = new StringWriter();
             spec.commandLine().usage(new PrintWriter(writer));
             context().addResult(writer.toString());
+            context().setPostAction(CLIProcessResult.PostAction.SHUTDOWN);
         }
     }
 }
