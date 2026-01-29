@@ -85,12 +85,12 @@ public class AuthModelsTest extends DBVRTest {
 
     @Test
     public void testFilterByConnection() throws Exception {
-        String uniqueName = "connection_" + UUID.randomUUID();
+        String uniqueName = "datasource_" + UUID.randomUUID();
         DBPDataSourceContainer ds = createFakeDataSource(uniqueName);
         try {
             var args = new String[] {
                 AUTH_MODELS_ARG,
-                "--connection=" + uniqueName
+                "--datasource=" + uniqueName
             };
 
             var cmd = DBVRTestSuite.getApplication().createCommandLine();
