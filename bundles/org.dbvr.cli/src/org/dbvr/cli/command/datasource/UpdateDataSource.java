@@ -24,7 +24,10 @@ import org.jkiss.dbeaver.model.cli.CLIProcessResult;
 import org.jkiss.dbeaver.model.cli.CLIUtils;
 import org.jkiss.dbeaver.model.cli.model.option.DataSourceAuthOptions;
 import org.jkiss.dbeaver.model.cli.model.option.DataSourceOptions;
+import org.jkiss.utils.CommonUtils;
 import picocli.CommandLine;
+
+import java.util.List;
 
 @CommandLine.Command(name = "update", description = "Update datasource")
 public class UpdateDataSource extends AbstractDataSourceCommand {
@@ -35,6 +38,14 @@ public class UpdateDataSource extends AbstractDataSourceCommand {
     private DataSourceOptions dataSourceOptions;
     @CommandLine.Mixin
     private DataSourceAuthOptions authOptions;
+
+
+    @CommandLine.Option(
+        names = {"-net-delete", "--network-handler-delete"},
+        arity = "1",
+        description = "Network handler id for deletion."
+    )
+    private List<String> handlersToDelete;
 
     @Override
     public void run() throws CLIException {
@@ -55,6 +66,12 @@ public class UpdateDataSource extends AbstractDataSourceCommand {
             dataSourceContainer.getConnectionConfiguration()
         );
 
+        if (!CommonUtils.isEmpty(handlersToDelete)) {
+            var connectionConfig = dataSourceContainer.getConnectionConfiguration();
+            for (String handlerId : handlersToDelete) {
+                connectionConfig.removeHandler(handlerId);
+            }
+        }
         try {
             var registry = project.getDataSourceRegistry();
             registry.updateDataSource(dataSourceContainer);

@@ -6,8 +6,5 @@
         <parameter
             exitAfterExecute="true"
             handler="org.dbvr.cli.sql.SQLParameterHandler"/>
-        <parameter
-            exitAfterExecute="true"
-            handler="org.dbvr.cli.sql.ListAuthenticationModelParameterHandler"/>
     </extension>
 </plugin>
