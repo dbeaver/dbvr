@@ -18,9 +18,9 @@ package org.dbvr.cli.command.driver;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.cli.AbstractCommandLineParameterHandler;
+import org.jkiss.dbeaver.model.cli.CLIContext;
 import org.jkiss.dbeaver.model.cli.CLIException;
 import org.jkiss.dbeaver.model.cli.CLIProcessResult;
-import org.jkiss.dbeaver.model.cli.CommandLineContext;
 import org.jkiss.dbeaver.registry.DataSourceProviderDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.registry.driver.DriverDescriptor;
@@ -101,7 +101,7 @@ public class ListDriversCommand extends AbstractCommandLineParameterHandler {
 
     @NotNull
     @Override
-    protected CommandLineContext context() {
+    protected CLIContext context() {
         return parent.context();
     }
 }
