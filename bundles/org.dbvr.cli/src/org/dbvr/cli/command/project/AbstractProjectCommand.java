@@ -29,6 +29,7 @@ import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.model.rm.RMControllerProvider;
 import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
+import org.jkiss.utils.CommonUtils;
 import picocli.CommandLine;
 
 import java.util.ArrayList;
@@ -86,9 +87,7 @@ public abstract class AbstractProjectCommand extends AbstractCommandLineParamete
         Map<String, String> row = new LinkedHashMap<>();
         row.put("ID", id);
         row.put("NAME", name);
-        if (description != null) {
-            row.put("DESCRIPTION", description);
-        }
+        row.put("DESCRIPTION", CommonUtils.notNull(description, ""));
         return row;
     }
 }
