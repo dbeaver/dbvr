@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.dbvr.cli.app;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.model.app.DBPProject;
@@ -64,7 +65,63 @@ public class CLIWorkspace extends BaseWorkspaceImpl {
     @NotNull
     @Override
     public List<? extends DBPProject> getProjects() {
-        return List.of();
+        return projects;
+    }
+
+    @NotNull
+    @Override
+    public DBPProject createProject(@NotNull String name, @Nullable String description) throws DBException {
+        Path projectPath = getAbsolutePath().resolve(name);
+        if (Files.exists(projectPath)) {
+            throw new DBException("Project '" + name + "' already exists");
+        }
+        try {
+            Files.createDirectories(projectPath);
+            LocalProjectImpl project = createProject(projectPath);
+            project.getMetadataFolder(true);
+            project.updateProject(null, description);
+            projects.add(project);
+            return project;
+        } catch (IOException e) {
+            throw new DBException("Error creating project directory", e);
+        }
+    }
+
+    @Override
+    public void deleteProject(@NotNull DBPProject project) throws DBException {
+        if (!projects.contains(project)) {
+            throw new DBException("Project '" + project.getName() + "' not found in workspace");
+        }
+        try {
+            projects.remove(project);
+            Path projectPath = project.getAbsolutePath();
+            if (Files.exists(projectPath)) {
+                if (!org.jkiss.dbeaver.utils.ContentUtils.deleteFileRecursive(projectPath)) {
+                    throw new IOException("Can't delete directory " + projectPath);
+                }
+            }
+        } catch (IOException e) {
+            throw new DBException("Error deleting project directory", e);
+        }
+    }
+
+    @Override
+    public void renameProject(@NotNull DBPProject project, @NotNull String newName) throws DBException {
+        if (!projects.contains(project)) {
+            throw new DBException("Project '" + project.getName() + "' not found in workspace");
+        }
+        Path oldPath = project.getAbsolutePath();
+        Path newPath = oldPath.getParent().resolve(newName);
+        if (Files.exists(newPath)) {
+            throw new DBException("Project '" + newName + "' already exists");
+        }
+        try {
+            Files.move(oldPath, newPath);
+            ((LocalProjectImpl) project).setAbsolutePath(newPath);
+            project.getMetadataFolder(true);
+        } catch (IOException e) {
+            throw new DBException("Error renaming project directory", e);
+        }
     }
 
     @Nullable
