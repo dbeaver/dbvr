@@ -119,13 +119,11 @@ public class ProjectManagementTest extends DBVRTest {
 
         Assert.assertNotNull(result.getOutput());
         boolean found = false;
-        for (String line : result.getOutput()) {
-            if (line.contains(name)) {
-                found = true;
-                break;
-            }
+        String allOutput = String.join("\n", result.getOutput());
+        if (allOutput.contains(name)) {
+            found = true;
         }
-        Assert.assertTrue(found);
+        Assert.assertTrue("Project " + name + " not found in output: " + result.getOutput(), found);
     }
 
     @Test
@@ -143,12 +141,10 @@ public class ProjectManagementTest extends DBVRTest {
 
         Assert.assertNotNull(result.getOutput());
         boolean found = false;
-        for (String line : result.getOutput()) {
-            if (line.contains(name)) {
-                found = true;
-                break;
-            }
+        String allOutput = String.join("\n", result.getOutput());
+        if (allOutput.contains(name)) {
+            found = true;
         }
-        Assert.assertTrue(found);
+        Assert.assertTrue("Project " + name + " (no desc) not found in output: " + result.getOutput(), found);
     }
 }
