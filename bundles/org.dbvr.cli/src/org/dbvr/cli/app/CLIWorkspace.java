@@ -26,6 +26,7 @@ import org.jkiss.dbeaver.model.impl.app.BaseProjectImpl;
 import org.jkiss.dbeaver.model.impl.app.BaseWorkspaceImpl;
 import org.jkiss.dbeaver.registry.project.LocalProjectImpl;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
+import org.jkiss.dbeaver.utils.ContentUtils;
 import org.jkiss.utils.CommonUtils;
 
 import java.io.IOException;
@@ -96,7 +97,7 @@ public class CLIWorkspace extends BaseWorkspaceImpl {
             projects.remove(project);
             Path projectPath = project.getAbsolutePath();
             if (Files.exists(projectPath)) {
-                if (!org.jkiss.dbeaver.utils.ContentUtils.deleteFileRecursive(projectPath)) {
+                if (!ContentUtils.deleteFileRecursive(projectPath)) {
                     throw new IOException("Can't delete directory " + projectPath);
                 }
             }
