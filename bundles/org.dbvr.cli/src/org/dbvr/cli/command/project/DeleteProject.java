@@ -16,11 +16,11 @@
  */
 package org.dbvr.cli.command.project;
 
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.cli.CLIConstants;
 import org.jkiss.dbeaver.model.cli.CLIException;
 import org.jkiss.dbeaver.model.cli.CLIUtils;
-import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import picocli.CommandLine;
 
@@ -33,16 +33,10 @@ public class DeleteProject extends AbstractProjectCommand {
     @Override
     public void run() throws CLIException {
         try {
-            DBPProject defaultProject = DBWorkbench.getPlatform().getWorkspace().getActiveProject();
-            RMController rmController = defaultProject == null ? null : getRMController(defaultProject);
-            if (rmController != null) {
-                rmController.deleteProject(projectId);
-            } else {
-                DBPProject project = CLIUtils.findProject(projectId, context());
-                DBWorkbench.getPlatform().getWorkspace().deleteProject(project);
-            }
+            DBPProject project = CLIUtils.findProject(projectId, context());
+            DBWorkbench.getPlatform().getWorkspace().deleteProject(project);
             context().addResult("Project '" + projectId + "' deleted.");
-        } catch (Exception e) {
+        } catch (DBException e) {
             throw new CLIException("Error deleting project: " + e.getMessage(), e, CLIConstants.EXIT_CODE_ERROR);
         }
     }

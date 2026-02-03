@@ -17,17 +17,10 @@
 package org.dbvr.cli.command.project;
 
 import org.jkiss.code.NotNull;
-import org.jkiss.code.Nullable;
-import org.jkiss.dbeaver.DBException;
-import org.jkiss.dbeaver.model.DBUtils;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.cli.AbstractCommandLineParameterHandler;
-import org.jkiss.dbeaver.model.cli.CLIException;
 import org.jkiss.dbeaver.model.cli.CLIUtils;
 import org.jkiss.dbeaver.model.cli.CommandLineContext;
-import org.jkiss.dbeaver.model.rm.RMController;
-import org.jkiss.dbeaver.model.rm.RMControllerProvider;
-import org.jkiss.dbeaver.model.rm.RMProject;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 import picocli.CommandLine;
@@ -48,37 +41,11 @@ public abstract class AbstractProjectCommand extends AbstractCommandLineParamete
         return parent.context();
     }
 
-    @Nullable
-    protected RMController getRMController(@NotNull DBPProject project) throws CLIException {
-        RMControllerProvider rmControllerProvider = DBUtils.getAdapter(RMControllerProvider.class, project.getWorkspace());
-        if (rmControllerProvider == null) {
-            rmControllerProvider = DBUtils.getAdapter(RMControllerProvider.class, project);
-        }
-        if (rmControllerProvider == null) {
-            return null;
-        }
-        return rmControllerProvider.getResourceController();
-    }
-
     @NotNull
-    protected String serializeProjectList() throws DBException {
-        RMController rmController = null;
-        DBPProject activeProject = DBWorkbench.getPlatform().getWorkspace().getActiveProject();
-        if (activeProject != null) {
-            rmController = getRMController(activeProject);
-        }
-
+    protected String serializeProjectList() {
         List<Map<String, String>> projectData = new ArrayList<>();
-
-        if (rmController != null) {
-            RMProject[] projects = rmController.listAccessibleProjects();
-            for (RMProject project : projects) {
-                projectData.add(collectProjectData(project.getId(), project.getName(), project.getDescription()));
-            }
-        } else {
-            for (DBPProject project : DBWorkbench.getPlatform().getWorkspace().getProjects()) {
-                projectData.add(collectProjectData(project.getId(), project.getName(), project.getDescription()));
-            }
+        for (DBPProject project : DBWorkbench.getPlatform().getWorkspace().getProjects()) {
+            projectData.add(collectProjectData(project.getId(), project.getName(), project.getDescription()));
         }
         return CLIUtils.formatAsTable(projectData);
     }

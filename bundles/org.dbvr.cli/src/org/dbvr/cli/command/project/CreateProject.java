@@ -16,10 +16,8 @@
  */
 package org.dbvr.cli.command.project;
 
-import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.cli.CLIConstants;
 import org.jkiss.dbeaver.model.cli.CLIException;
-import org.jkiss.dbeaver.model.rm.RMController;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import picocli.CommandLine;
 
@@ -35,13 +33,7 @@ public class CreateProject extends AbstractProjectCommand {
     @Override
     public void run() throws CLIException {
         try {
-            DBPProject defaultProject = DBWorkbench.getPlatform().getWorkspace().getActiveProject();
-            RMController rmController = defaultProject == null ? null : getRMController(defaultProject);
-            if (rmController != null) {
-                rmController.createProject(name, description);
-            } else {
-                DBWorkbench.getPlatform().getWorkspace().createProject(name, description);
-            }
+            DBWorkbench.getPlatform().getWorkspace().createProject(name, description);
             context().addResult("Project '" + name + "' created.");
         } catch (Exception e) {
             throw new CLIException("Error creating project: " + e.getMessage(), e, CLIConstants.EXIT_CODE_ERROR);

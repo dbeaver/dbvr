@@ -20,8 +20,6 @@ import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.cli.CLIConstants;
 import org.jkiss.dbeaver.model.cli.CLIException;
 import org.jkiss.dbeaver.model.cli.CLIUtils;
-import org.jkiss.dbeaver.model.rm.RMController;
-import org.jkiss.dbeaver.model.rm.RMProjectInfo;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import picocli.CommandLine;
 
@@ -40,16 +38,10 @@ public class RenameProject extends AbstractProjectCommand {
     @Override
     public void run() throws CLIException {
         try {
-            DBPProject defaultProject = DBWorkbench.getPlatform().getWorkspace().getActiveProject();
-            RMController rmController = defaultProject == null ? null : getRMController(defaultProject);
-            if (rmController != null) {
-                rmController.updateProject(projectId, new RMProjectInfo(newName, description));
-            } else {
-                DBPProject project = CLIUtils.findProject(projectId, context());
-                DBWorkbench.getPlatform().getWorkspace().renameProject(project, newName);
-                if (description != null) {
-                    project.updateProject(null, description);
-                }
+            DBPProject project = CLIUtils.findProject(projectId, context());
+            DBWorkbench.getPlatform().getWorkspace().renameProject(project, newName);
+            if (description != null) {
+                project.updateProject(null, description);
             }
             context().addResult("Project '" + projectId + "' renamed to '" + newName + "'.");
         } catch (Exception e) {
