@@ -17,10 +17,8 @@
 package org.dbvr.cli.command.driver;
 
 import org.jkiss.code.NotNull;
-import org.jkiss.dbeaver.model.cli.AbstractCommandLineParameterHandler;
-import org.jkiss.dbeaver.model.cli.CLIException;
-import org.jkiss.dbeaver.model.cli.CLIProcessResult;
-import org.jkiss.dbeaver.model.cli.CommandLineContext;
+import org.jkiss.dbeaver.model.cli.*;
+import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceProviderDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.registry.driver.DriverDescriptor;
@@ -39,6 +37,9 @@ public class ListDriversCommand extends AbstractCommandLineParameterHandler {
 
     @CommandLine.Option(names = {"--show-disabled"}, description = "Show disabled drivers")
     private boolean showDisabled;
+
+    @CommandLine.Option(names = {"--show-properties"}, description = "Show driver properties")
+    private boolean showProperties;
 
     @Override
     public void run() throws CLIException {
@@ -62,6 +63,7 @@ public class ListDriversCommand extends AbstractCommandLineParameterHandler {
             providerDrivers.sort(Comparator.comparing(DriverDescriptor::getName));
 
             outBuilder.append(String.format("Provider: %s (%s)%n", provider.getName(), provider.getId()));
+
             for (DriverDescriptor driver : providerDrivers) {
                 String description = driver.getDescription();
                 if (CommonUtils.isEmpty(description)) {
@@ -73,6 +75,20 @@ public class ListDriversCommand extends AbstractCommandLineParameterHandler {
                     driver.isDisabled() ? "Disabled" : "Enabled",
                     description
                 ));
+
+                if (showProperties) {
+                    Map<String, DBPPropertyDescriptor> allProperties = new LinkedHashMap<>();
+                    for (DBPPropertyDescriptor prop : provider.getDriverProperties()) {
+                        allProperties.put(prop.getId(), prop);
+                    }
+
+                    if (!allProperties.isEmpty()) {
+                        outBuilder.append("    Properties:").append(System.lineSeparator());
+                        for (DBPPropertyDescriptor prop : allProperties.values()) {
+                            outBuilder.append("    ").append(CLIUtils.getPropertyHelpText(prop));
+                        }
+                    }
+                }
             }
             outBuilder.append(System.lineSeparator());
         }
