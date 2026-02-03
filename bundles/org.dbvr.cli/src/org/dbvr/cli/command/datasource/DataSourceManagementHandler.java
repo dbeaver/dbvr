@@ -37,7 +37,7 @@ import java.io.StringWriter;
 )
 public class DataSourceManagementHandler extends CommandLineWithAuth {
     @CommandLine.Spec
-    CommandLine.Model.CommandSpec spec;
+    private CommandLine.Model.CommandSpec spec;
 
     @Override
     public void run() throws CLIException {
