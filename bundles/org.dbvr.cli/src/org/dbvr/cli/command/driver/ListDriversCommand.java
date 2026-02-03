@@ -81,7 +81,9 @@ public class ListDriversCommand extends AbstractCommandLineParameterHandler {
                     for (DBPPropertyDescriptor prop : provider.getDriverProperties()) {
                         allProperties.put(prop.getId(), prop);
                     }
-
+                    for (DBPPropertyDescriptor prop : driver.getProviderPropertyDescriptors()) {
+                        allProperties.put(prop.getId(), prop);
+                    }
                     if (!allProperties.isEmpty()) {
                         outBuilder.append("    Properties:").append(System.lineSeparator());
                         for (DBPPropertyDescriptor prop : allProperties.values()) {
