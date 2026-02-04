@@ -39,7 +39,7 @@ public class CLIConnectionUtils {
         @Nullable String connectionSpec,
         @NotNull DataSourceAuthOptions authOptions,
         @Nullable String projectIdOrName,
-        @NotNull CommandLineContext context,
+        @NotNull CLIContext context,
         @NotNull Log parentLog
     )
     throws CLIException {
@@ -112,7 +112,7 @@ public class CLIConnectionUtils {
         @Nullable String projectIdOrName,
         @NotNull String connectionIdOrName,
 
-        @NotNull CommandLineContext context
+        @NotNull CLIContextImpl context
     ) throws CLIException {
         DBPProject project = CLIUtils.findProject(projectIdOrName, context);
         return CLIUtils.findDataSource(
