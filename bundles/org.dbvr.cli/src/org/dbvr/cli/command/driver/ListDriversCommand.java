@@ -117,7 +117,7 @@ public class ListDriversCommand extends AbstractCommandLineParameterHandler {
 
     @NotNull
     @Override
-    protected CommandLineContext context() {
+    protected CLIContext context() {
         return parent.context();
     }
 }

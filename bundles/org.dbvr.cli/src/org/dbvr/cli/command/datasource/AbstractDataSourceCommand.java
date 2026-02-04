@@ -80,16 +80,6 @@ public abstract class AbstractDataSourceCommand extends AbstractCommandLineParam
         }
     }
 
-    @Override
-    public void run() throws CLIException {
-
-    }
-
-    @NotNull
-    protected CommandLineContext context() {
-        return parent.context();
-    }
-
     private String serializeDataSources(@NotNull DBPProject project, @Nullable String dsId) throws CLIException {
         DataSourceConfigurationManagerBuffer buffer = new DataSourceConfigurationManagerBuffer();
         DBPDataSourceRegistry registry = project.getDataSourceRegistry();
@@ -112,5 +102,15 @@ public abstract class AbstractDataSourceCommand extends AbstractCommandLineParam
         }
 
         return new String(buffer.getData(), StandardCharsets.UTF_8);
+    }
+
+    @Override
+    public void run() throws CLIException {
+        
+    }
+
+    @NotNull
+    protected CLIContext context() {
+        return parent.context();
     }
 }
