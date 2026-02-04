@@ -18,23 +18,21 @@ package org.dbvr.cli.command.datasource;
 
 import org.jkiss.dbeaver.model.cli.CLIException;
 import org.jkiss.dbeaver.model.cli.CLIProcessResult;
+import org.jkiss.dbeaver.model.cli.CLIUtils;
 import org.jkiss.dbeaver.model.cli.model.CommandLineWithAuth;
 import picocli.CommandLine;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
-@CommandLine.Command(
-    name = "datasource",
-    description = "Datasource management",
-    subcommands = {
-        CreateDatasource.class,
-        UpdateDataSource.class,
-        DeleteDataSource.class,
-        ListDataSource.class,
-        ViewDataSource.class
-    }
-)
+//@CommandLine.Command(
+//    name = "datasource",
+//    description = "Datasource management",
+//    subcommands = {
+//        CreateDatasource.class,
+//        UpdateDataSource.class,
+//        DeleteDataSource.class,
+//        ListDataSource.class,
+//        ViewDataSource.class
+//    }
+//)
 public class DataSourceManagementHandler extends CommandLineWithAuth {
     @CommandLine.Spec
     private CommandLine.Model.CommandSpec spec;
@@ -43,9 +41,8 @@ public class DataSourceManagementHandler extends CommandLineWithAuth {
     public void run() throws CLIException {
         super.run();
         if (spec.commandLine().getParseResult().subcommand() == null) {
-            StringWriter writer = new StringWriter();
-            spec.commandLine().usage(new PrintWriter(writer));
-            context().addResult(writer.toString());
+            String helpMessage = CLIUtils.getHelpFromCommand(spec);
+            context().addResult(helpMessage);
             context().setPostAction(CLIProcessResult.PostAction.SHUTDOWN);
         }
     }

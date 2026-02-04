@@ -107,7 +107,7 @@ public class SQLParameterHandler extends CommandLineWithAuth {
             connectionOptions.existConnectionIdOrName,
             connectionOptions.tempDataSourceOptions,
             connectionOptions.connectionSpec,
-            authOptions,
+            List.of(),
             projectOption.getProjectIdOrName(),
             context(),
             log

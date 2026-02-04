@@ -24,12 +24,13 @@ import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.cli.*;
 import org.jkiss.dbeaver.model.cli.model.option.CreateDataSourceOptions;
-import org.jkiss.dbeaver.model.cli.model.option.DataSourceAuthOptions;
 import org.jkiss.dbeaver.model.runtime.LoggingProgressMonitor;
 import org.jkiss.dbeaver.utils.DataSourceUtils;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.dbeaver.utils.SystemVariablesResolver;
 import org.jkiss.utils.CommonUtils;
+
+import java.util.List;
 
 public class CLIConnectionUtils {
 
@@ -37,7 +38,7 @@ public class CLIConnectionUtils {
         @Nullable String existConnectionIdOrName,
         @Nullable CreateDataSourceOptions tempDataSourceOptions,
         @Nullable String connectionSpec,
-        @NotNull DataSourceAuthOptions authOptions,
+        List<CLIUtils.DataSourceUpdater> updaters,
         @Nullable String projectIdOrName,
         @NotNull CLIContext context,
         @NotNull Log parentLog
@@ -51,13 +52,13 @@ public class CLIConnectionUtils {
                 project,
                 existConnectionIdOrName
             );
-            CLIUtils.processDataSourceAuthOptions(dataSourceContainer, authOptions);
+            CLIUtils.updateDataSource(dataSourceContainer, updaters);
         } else if (tempDataSourceOptions != null) {
             dataSourceContainer = CLIUtils.createTempDataSource(
                 project,
                 tempDataSourceOptions.getDriver(),
                 tempDataSourceOptions.getDataSourceOptions(),
-                authOptions
+                updaters
             );
         } else if (CommonUtils.isNotEmpty(connectionSpec)) {
             var instanceConnectionParameters = new ApplicationInstanceServer.InstanceConnectionParameters();
@@ -111,7 +112,6 @@ public class CLIConnectionUtils {
     public static DBPDataSourceContainer findDataSource(
         @Nullable String projectIdOrName,
         @NotNull String connectionIdOrName,
-
         @NotNull CLIContextImpl context
     ) throws CLIException {
         DBPProject project = CLIUtils.findProject(projectIdOrName, context);
