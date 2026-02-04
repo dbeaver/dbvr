@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,13 @@
  */
 package org.dbvr.cli.command.datasource;
 
+import org.jkiss.dbeaver.model.cli.CLIException;
+import org.jkiss.dbeaver.model.cli.CLIProcessResult;
 import org.jkiss.dbeaver.model.cli.model.CommandLineWithAuth;
 import picocli.CommandLine;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 @CommandLine.Command(
     name = "datasource",
@@ -26,9 +31,22 @@ import picocli.CommandLine;
         CreateDatasource.class,
         UpdateDataSource.class,
         DeleteDataSource.class,
-        ListDataSource.class
+        ListDataSource.class,
+        ViewDataSource.class
     }
 )
 public class DataSourceManagementHandler extends CommandLineWithAuth {
+    @CommandLine.Spec
+    CommandLine.Model.CommandSpec spec;
 
+    @Override
+    public void run() throws CLIException {
+        super.run();
+        if (spec.commandLine().getParseResult().subcommand() == null) {
+            StringWriter writer = new StringWriter();
+            spec.commandLine().usage(new PrintWriter(writer));
+            context().addResult(writer.toString());
+            context().setPostAction(CLIProcessResult.PostAction.SHUTDOWN);
+        }
+    }
 }

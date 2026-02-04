@@ -85,6 +85,6 @@ public class UpdateDataSource extends AbstractDataSourceCommand {
         }
 
         context().setPostAction(CLIProcessResult.PostAction.SHUTDOWN);
-        context().addResult(serializeDataSources(project, dataSourceContainer.getId()));
+        context().addResult(serializeDataSourceToJson(project, dataSourceContainer.getId()).trim());
     }
 }

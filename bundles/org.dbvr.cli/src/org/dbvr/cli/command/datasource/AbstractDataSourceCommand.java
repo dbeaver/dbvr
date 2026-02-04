@@ -16,18 +16,27 @@
  */
 package org.dbvr.cli.command.datasource;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.cli.*;
 import org.jkiss.dbeaver.model.cli.model.option.ProjectOption;
+import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.registry.DataSourceConfigurationManagerBuffer;
 import org.jkiss.dbeaver.registry.DataSourceRegistry;
 import picocli.CommandLine;
 
+import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 public abstract class AbstractDataSourceCommand extends AbstractCommandLineParameterHandler {
     @CommandLine.Mixin
@@ -42,9 +51,36 @@ public abstract class AbstractDataSourceCommand extends AbstractCommandLineParam
         return CLIUtils.findProject(projectOption.getProjectIdOrName(), context());
     }
 
+    @NotNull
+    protected String serializeDataSourceList(@NotNull DBPProject project) {
+        List<Map<String, String>> tableData = new ArrayList<>();
+        for (DBPDataSourceContainer dataSource : project.getDataSourceRegistry().getDataSources()) {
+            Map<String, String> row = new LinkedHashMap<>();
+            row.put("ID", dataSource.getId());
+            row.put("NAME", dataSource.getName());
+            row.put("DRIVER", dataSource.getDriver().getId());
+            tableData.add(row);
+        }
+        return CLIUtils.formatAsTable(tableData);
+    }
 
     @NotNull
-    protected String serializeDataSources(@NotNull DBPProject project, @Nullable String dsId) throws CLIException {
+    protected String serializeDataSourceToJson(@NotNull DBPProject project, @NotNull String dsId) throws CLIException {
+        String allData = serializeDataSources(project, dsId);
+        try {
+            Map<String, Object> map = JSONUtils.parseMap(new Gson(), new StringReader(allData));
+            Map<String, Object> connections = JSONUtils.deserializeProperties(map, "connections");
+            Object dsData = connections != null ? connections.get(dsId) : null;
+            if (dsData instanceof Map) {
+                return new GsonBuilder().setPrettyPrinting().create().toJson(dsData);
+            }
+            throw new CLIException("Datasource with id " + dsId + " is not found in serialized data", CLIConstants.EXIT_CODE_ERROR);
+        } catch (Exception e) {
+            throw new CLIException("Error parsing datasource JSON: " + e.getMessage(), e, CLIConstants.EXIT_CODE_ERROR);
+        }
+    }
+
+    private String serializeDataSources(@NotNull DBPProject project, @Nullable String dsId) throws CLIException {
         DataSourceConfigurationManagerBuffer buffer = new DataSourceConfigurationManagerBuffer();
         DBPDataSourceRegistry registry = project.getDataSourceRegistry();
         if (!(registry instanceof DataSourceRegistry<?> dataSourceRegistry)) {

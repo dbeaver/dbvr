@@ -44,6 +44,34 @@ public class DataSourceManagementTest extends DBVRTest {
             "--host=localhost",
             "--name=" + uniqName,
             "-u", "postgres",
+            "-p", "postgres"
+        };
+
+        var cmd = DBVRTestSuite.getApplication().createCommandLine();
+
+        CLIProcessResult result = cmd.executeCommandLineCommands(null, false, false, args);
+        Assert.assertNotNull(result.getOutput());
+        Assert.assertEquals(1, result.getOutput().size());
+        String createdId = result.getOutput().getFirst();
+
+        DBPProject project = DBWorkbench.getPlatform().getWorkspace().getActiveProject();
+        Assert.assertNotNull(project);
+        DBPDataSourceContainer ds = project.getDataSourceRegistry().getDataSource(createdId);
+        Assert.assertNotNull(ds);
+        Assert.assertEquals(uniqName, ds.getName());
+        project.getDataSourceRegistry().removeDataSource(ds);
+    }
+
+    @Test
+    public void testCreateWithSSH() throws Exception {
+        String uniqName = "test_create" + UUID.randomUUID();
+        var args = new String[] {
+            "datasource", "create",
+            "--driver=h2_embedded_v2",
+            "--database=cloudbeaver",
+            "--host=localhost",
+            "--name=" + uniqName,
+            "-u", "postgres",
             "-p", "postgres",
             "-net", "ssh.host=test_host",
             "-net", "ssh.authType=PUBLIC_KEY",
@@ -60,12 +88,13 @@ public class DataSourceManagementTest extends DBVRTest {
         if (result.getExitCode() == CLIConstants.EXIT_CODE_ERROR) {
             Assert.fail("Error during datasource creation: " + String.join("\n", result.getOutput()));
         }
-        Assert.assertTrue(result.getOutput().get(0).contains(uniqName));
+        String createdId = result.getOutput().get(0);
 
         DBPProject project = DBWorkbench.getPlatform().getWorkspace().getActiveProject();
         Assert.assertNotNull(project);
-        DBPDataSourceContainer ds = project.getDataSourceRegistry().findDataSourceByName(uniqName);
+        DBPDataSourceContainer ds = project.getDataSourceRegistry().getDataSource(createdId);
         Assert.assertNotNull(ds);
+        Assert.assertEquals(uniqName, ds.getName());
         DBWHandlerConfiguration sshConf = ds.getConnectionConfiguration().getHandler(DBWUtils.SSH_TUNNEL);
         Assert.assertNotNull(sshConf);
         Assert.assertEquals("test_host", sshConf.getProperty("host"));
@@ -96,6 +125,7 @@ public class DataSourceManagementTest extends DBVRTest {
         Assert.assertNull(registry.findDataSourceByName(uniqName));
     }
 
+    @Test
     public void testUpdate() throws Exception {
         String uniqName = "test_update" + UUID.randomUUID();
 
@@ -108,7 +138,7 @@ public class DataSourceManagementTest extends DBVRTest {
         Assert.assertNotEquals(newRandomHost, ds.getConnectionConfiguration().getHostName());
         var args = new String[] {
             "datasource",
-            "update",
+            "update", ds.getId(),
             "--host=" + newRandomHost,
         };
         CLIProcessResult result = cmd.executeCommandLineCommands(null, false, false, args);
@@ -120,9 +150,69 @@ public class DataSourceManagementTest extends DBVRTest {
 
         Assert.assertNotNull(result.getOutput());
         Assert.assertEquals(1, result.getOutput().size());
-        Assert.assertTrue(result.getOutput().get(0).contains(uniqName));
+        String output = result.getOutput().getFirst();
+        Assert.assertTrue(output.contains(newRandomHost));
+        Assert.assertTrue(output.contains(uniqName));
 
         registry.removeDataSource(ds);
+    }
+
+    @Test
+    public void testView() throws Exception {
+        String uniqName = "test_view" + UUID.randomUUID();
+        DBPDataSourceContainer ds = createFakeDataSource(uniqName);
+        var cmd = DBVRTestSuite.getApplication().createCommandLine();
+        var args = new String[] {
+            "datasource", "view", ds.getId()
+        };
+        CLIProcessResult result = cmd.executeCommandLineCommands(null, false, false, args);
+        Assert.assertNotNull(result.getOutput());
+        Assert.assertEquals(1, result.getOutput().size());
+        String output = result.getOutput().getFirst();
+        Assert.assertTrue(output.contains(uniqName));
+
+        var registry = DBWorkbench.getPlatform().getWorkspace().getActiveProject()
+            .getDataSourceRegistry();
+        registry.removeDataSource(ds);
+    }
+
+    @Test
+    public void testList() throws Exception {
+        String uniqName = "test_list" + UUID.randomUUID();
+        DBPDataSourceContainer ds = createFakeDataSource(uniqName);
+        var cmd = DBVRTestSuite.getApplication().createCommandLine();
+        var args = new String[] {
+            "datasource", "list"
+        };
+        CLIProcessResult result = cmd.executeCommandLineCommands(null, false, false, args);
+        Assert.assertNotNull(result.getOutput());
+        Assert.assertEquals(1, result.getOutput().size());
+        String output = result.getOutput().getFirst();
+        Assert.assertTrue(output.contains("ID"));
+        Assert.assertTrue(output.contains("NAME"));
+        Assert.assertTrue(output.contains("DRIVER"));
+        Assert.assertTrue(output.contains(ds.getId()));
+        Assert.assertTrue(output.contains(uniqName));
+
+        var registry = DBWorkbench.getPlatform().getWorkspace().getActiveProject()
+            .getDataSourceRegistry();
+        registry.removeDataSource(ds);
+    }
+
+    @Test
+    public void testHelpWhenWhenCommandWithNoParams() throws Exception {
+        var cmd = DBVRTestSuite.getApplication().createCommandLine();
+        var args = new String[] {
+            "datasource"
+        };
+        CLIProcessResult result = cmd.executeCommandLineCommands(null, false, false, args);
+        Assert.assertNotNull(result.getOutput());
+        Assert.assertFalse(result.getOutput().isEmpty());
+        String output = result.getOutput().getFirst();
+        Assert.assertTrue(output.contains("Usage: dbvr datasource"));
+        Assert.assertTrue(output.contains("Commands:"));
+        Assert.assertTrue(output.contains("create"));
+        Assert.assertTrue(output.contains("list"));
     }
 
     @NotNull

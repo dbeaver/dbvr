@@ -31,6 +31,7 @@ import org.jkiss.dbeaver.model.exec.DBCExecutionContext;
 import org.jkiss.dbeaver.model.exec.DBCStatistics;
 import org.jkiss.dbeaver.model.exec.output.DBCOutputSeverity;
 import org.jkiss.dbeaver.model.exec.output.DBCOutputWriter;
+import org.jkiss.dbeaver.model.fs.DBFPath;
 import org.jkiss.dbeaver.model.impl.DataSourceContextProvider;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
@@ -55,7 +56,6 @@ import picocli.CommandLine;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.*;
 
 @CommandLine.Command(name = "sql", description = "Execute SQL script")
@@ -214,17 +214,15 @@ public class SQLParameterHandler extends CommandLineWithAuth {
             }
         }
 
-        Path outputFile = outputFileOption.getOutputFile();
-
         DataSourceContextProvider dataSourceContextProvider = new DataSourceContextProvider(dataSource);
         StreamConsumerSettings settings = prepareSettings();
 
         long offset = dataTransferOptions.getOffset();
         long limit = dataTransferOptions.getLimit();
-        try (
+        try (DBFPath outputFile = outputFileOption.getOutputFile();
             var out = outputFile == null
                 ? new ByteArrayOutputStream()
-                : new BufferedOutputStream(Files.newOutputStream(outputFile))
+                : new BufferedOutputStream(Files.newOutputStream(outputFile.path()))
         ) {
             for (var script : scriptElements) {
                 if (!(script instanceof SQLQuery q)) {

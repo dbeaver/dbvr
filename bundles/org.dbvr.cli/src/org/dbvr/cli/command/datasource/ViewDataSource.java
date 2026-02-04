@@ -16,34 +16,23 @@
  */
 package org.dbvr.cli.command.datasource;
 
-import org.jkiss.dbeaver.model.DBPDataSourceContainer;
-import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.cli.CLIException;
 import org.jkiss.dbeaver.model.cli.CLIProcessResult;
 import org.jkiss.dbeaver.model.cli.CLIUtils;
-import org.jkiss.dbeaver.model.cli.model.option.CreateDataSourceOptions;
-import org.jkiss.dbeaver.model.cli.model.option.DataSourceAuthOptions;
 import picocli.CommandLine;
 
-@CommandLine.Command(name = "create", description = "Create datasource")
-public class CreateDatasource extends AbstractDataSourceCommand {
-    @CommandLine.Mixin
-    private CreateDataSourceOptions createOptions;
-    @CommandLine.Mixin
-    private DataSourceAuthOptions authOptions;
+@CommandLine.Command(name = "view", description = "View datasource details")
+public class ViewDataSource extends AbstractDataSourceCommand {
+
+    @CommandLine.Parameters(index = "0", description = "Datasource ID or name",  arity = "1")
+    private String id;
 
     @Override
     public void run() throws CLIException {
         super.run();
-        DBPProject project = getProject();
-        DBPDataSourceContainer dataSourceContainer = CLIUtils.createDataSource(
-            project,
-            createOptions.getDriver(),
-            createOptions.getDataSourceOptions(),
-            authOptions,
-            false
-        );
+        var project = getProject();
+        var dataSourceContainer = CLIUtils.findDataSource(project, id);
         context().setPostAction(CLIProcessResult.PostAction.SHUTDOWN);
-        context().addResult(dataSourceContainer.getId());
+        context().addResult(serializeDataSourceToJson(project, dataSourceContainer.getId()).trim());
     }
 }
