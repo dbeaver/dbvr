@@ -78,9 +78,6 @@ public class ListDriversCommand extends AbstractCommandLineParameterHandler {
 
                 if (showProperties) {
                     Map<String, DBPPropertyDescriptor> allProperties = new LinkedHashMap<>();
-                    for (DBPPropertyDescriptor prop : provider.getDriverProperties()) {
-                        allProperties.put(prop.getId(), prop);
-                    }
                     for (DBPPropertyDescriptor prop : driver.getProviderPropertyDescriptors()) {
                         allProperties.put(prop.getId(), prop);
                     }
