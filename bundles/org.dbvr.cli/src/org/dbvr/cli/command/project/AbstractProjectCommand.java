@@ -19,8 +19,8 @@ package org.dbvr.cli.command.project;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.cli.AbstractCommandLineParameterHandler;
+import org.jkiss.dbeaver.model.cli.CLIContext;
 import org.jkiss.dbeaver.model.cli.CLIUtils;
-import org.jkiss.dbeaver.model.cli.CommandLineContext;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 import picocli.CommandLine;
@@ -34,12 +34,6 @@ public abstract class AbstractProjectCommand extends AbstractCommandLineParamete
 
     @CommandLine.ParentCommand
     private ProjectManagementHandler parent;
-
-    @NotNull
-    @Override
-    protected CommandLineContext context() {
-        return parent.context();
-    }
 
     @NotNull
     protected String serializeProjectList() {
@@ -56,5 +50,10 @@ public abstract class AbstractProjectCommand extends AbstractCommandLineParamete
         row.put("NAME", name);
         row.put("DESCRIPTION", CommonUtils.notNull(description, ""));
         return row;
+    }
+
+    @NotNull
+    protected CLIContext context() {
+        return parent.context();
     }
 }
