@@ -53,7 +53,7 @@ public class ProjectManagementTest extends DBVRTest {
         String name = "test_prj_" + UUID.randomUUID();
         String desc = "Test description";
         String[] args = {
-            "project", "create", name, "-d", desc
+            "project", "create", "-n", name, "-d", desc
         };
 
         var cmd = DBVRTestSuite.getApplication().createCommandLine();

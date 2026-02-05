@@ -24,7 +24,7 @@ import picocli.CommandLine;
 @CommandLine.Command(name = "create", description = "Create new project")
 public class CreateProject extends AbstractProjectCommand {
 
-    @CommandLine.Parameters(index = "0", description = "Project name")
+    @CommandLine.Option(names = {"-n", "--name"}, description = "Project name", required = true)
     private String name;
 
     @CommandLine.Option(names = {"-d", "--description"}, description = "Project description")
