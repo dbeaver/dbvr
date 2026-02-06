@@ -19,6 +19,7 @@ package org.dbvr.cli.command.datasource;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.cli.CLIUtils;
 import org.jkiss.dbeaver.model.cli.model.option.DataSourceAuthOptions;
+import org.jkiss.utils.CommonUtils;
 import picocli.CommandLine;
 
 import java.util.ArrayList;
@@ -28,6 +29,8 @@ public abstract class AbstractDataSourceEditCommand extends AbstractDataSourceCo
     @CommandLine.Mixin
     protected DataSourceAuthOptions authOptions;
 
+    @CommandLine.Spec
+    private CommandLine.Model.CommandSpec spec;
 
     /**
      * @return - mutable list of updaters.
@@ -35,7 +38,13 @@ public abstract class AbstractDataSourceEditCommand extends AbstractDataSourceCo
     @NotNull
     protected List<CLIUtils.DataSourceUpdater> getDataSourceUpdaters() {
         List<CLIUtils.DataSourceUpdater> updaters = new ArrayList<>();
-        updaters.add(new CLIUtils.DataSourceAuthUpdater(authOptions));
+        if (!CommonUtils.isEmpty(spec.mixins())) {
+            for (CommandLine.Model.CommandSpec mixin : spec.mixins().values()) {
+                if (mixin.userObject() instanceof CLIUtils.DataSourceUpdater mixinUpdater) {
+                    updaters.add(mixinUpdater);
+                }
+            }
+        }
         return updaters;
     }
 }

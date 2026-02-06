@@ -84,7 +84,6 @@ public class UpdateDataSource extends AbstractDataSourceEditCommand {
     @Override
     protected List<CLIUtils.DataSourceUpdater> getDataSourceUpdaters() {
         var updaters = super.getDataSourceUpdaters();
-        updaters.add(new CLIUtils.DataSourceRootUpdater(dataSourceOptions));
         updaters.add(dataSource -> CLIUtils.updateConnectionConfiguration(
             dataSourceOptions,
             dataSource.getConnectionConfiguration()

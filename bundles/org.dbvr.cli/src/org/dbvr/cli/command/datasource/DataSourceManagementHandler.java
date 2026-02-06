@@ -22,17 +22,17 @@ import org.jkiss.dbeaver.model.cli.CLIUtils;
 import org.jkiss.dbeaver.model.cli.model.CommandLineWithAuth;
 import picocli.CommandLine;
 
-//@CommandLine.Command(
-//    name = "datasource",
-//    description = "Datasource management",
-//    subcommands = {
-//        CreateDatasource.class,
-//        UpdateDataSource.class,
-//        DeleteDataSource.class,
-//        ListDataSource.class,
-//        ViewDataSource.class
-//    }
-//)
+@CommandLine.Command(
+    name = "datasource",
+    description = "Datasource management",
+    subcommands = {
+        CreateDatasource.class,
+        UpdateDataSource.class,
+        DeleteDataSource.class,
+        ListDataSource.class,
+        ViewDataSource.class
+    }
+)
 public class DataSourceManagementHandler extends CommandLineWithAuth {
     @CommandLine.Spec
     private CommandLine.Model.CommandSpec spec;

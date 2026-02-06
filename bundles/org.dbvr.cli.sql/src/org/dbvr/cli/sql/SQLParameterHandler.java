@@ -87,6 +87,9 @@ public class SQLParameterHandler extends CommandLineWithAuth {
     @CommandLine.ArgGroup(exclusive = true, multiplicity = "1")
     private CreateOrFindConnection connectionOptions;
 
+    @CommandLine.Spec
+    private CommandLine.Model.CommandSpec spec;
+
     private static class CreateOrFindConnection {
         @CommandLine.ArgGroup(
             exclusive = false
@@ -107,7 +110,7 @@ public class SQLParameterHandler extends CommandLineWithAuth {
             connectionOptions.existConnectionIdOrName,
             connectionOptions.tempDataSourceOptions,
             connectionOptions.connectionSpec,
-            List.of(),
+            getDataSourceUpdaters(),
             projectOption.getProjectIdOrName(),
             context(),
             log
@@ -300,6 +303,22 @@ public class SQLParameterHandler extends CommandLineWithAuth {
         public void flush() {
 
         }
+    }
+
+    @NotNull
+    protected List<CLIUtils.DataSourceUpdater> getDataSourceUpdaters() {
+        List<CLIUtils.DataSourceUpdater> updaters = new ArrayList<>();
+        if (!CommonUtils.isEmpty(spec.mixins())) {
+            for (CommandLine.Model.CommandSpec mixin : spec.mixins().values()) {
+                if (mixin.userObject() instanceof CLIUtils.DataSourceUpdater mixinUpdater) {
+                    updaters.add(mixinUpdater);
+                }
+            }
+        }
+        if (connectionOptions.tempDataSourceOptions != null) {
+            updaters.add(connectionOptions.tempDataSourceOptions);
+        }
+        return updaters;
     }
 
 
