@@ -93,7 +93,7 @@ public class SQLParameterHandler extends CommandLineWithAuth {
         )
         private CreateDataSourceOptions tempDataSourceOptions;
 
-        @CommandLine.Option(names = "--connection", arity = "1", description = "Connection ID or name")
+        @CommandLine.Option(names = {"-ds", "--datasource"}, arity = "1", description = "DataSource ID or name")
         private String existConnectionIdOrName;
 
         @CommandLine.Option(names = "--connection-spec", arity = "1", description = "Connection specification")
