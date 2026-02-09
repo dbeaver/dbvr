@@ -19,11 +19,14 @@ package org.dbvr.test;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.cli.CLIProcessResult;
+import org.jkiss.dbeaver.model.impl.app.BaseProjectImpl;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -146,5 +149,40 @@ public class ProjectManagementTest extends DBVRTest {
             found = true;
         }
         Assert.assertTrue("Project " + name + " (no desc) not found in output: " + result.getOutput(), found);
+    }
+
+    @Test
+    public void testCreateHiddenProjectForbidden() throws Exception {
+        String name = ".test_prj_hidden";
+        String[] args = {
+            "project", "create", "-n", name
+        };
+
+        var cmd = DBVRTestSuite.getApplication().createCommandLine();
+        CLIProcessResult result = cmd.executeCommandLineCommands(null, false, false, args);
+
+        Assert.assertTrue("Error message expected for hidden project creation",
+            String.join("\n", result.getOutput()).contains("Project name must not start with '.'"));
+    }
+
+    @Test
+    public void testProjectFileCreation() throws Exception {
+        String name = "test_prj_file_" + UUID.randomUUID();
+        DBPProject project = DBWorkbench.getPlatform().getWorkspace().createProject(name, null);
+        projectsToDelete.add(project);
+
+        Path projectFile = project.getAbsolutePath().resolve(BaseProjectImpl.PROJECT_FILE);
+        Assert.assertTrue("Project file must exist", Files.exists(projectFile));
+        String content = Files.readString(projectFile);
+        Assert.assertTrue("Project file must contain project name", content.contains("<name>" + name + "</name>"));
+        Assert.assertTrue("Project file must contain DBeaver nature", content.contains("org.jkiss.dbeaver.DBeaverNature"));
+
+        // Test rename
+        String newName = name + "_ren";
+        DBWorkbench.getPlatform().getWorkspace().renameProject(project, newName);
+        Path newProjectFile = project.getAbsolutePath().resolve(BaseProjectImpl.PROJECT_FILE);
+        Assert.assertTrue("Project file must exist after rename", Files.exists(newProjectFile));
+        String newContent = Files.readString(newProjectFile);
+        Assert.assertTrue("Project file must contain new project name", newContent.contains("<name>" + newName + "</name>"));
     }
 }

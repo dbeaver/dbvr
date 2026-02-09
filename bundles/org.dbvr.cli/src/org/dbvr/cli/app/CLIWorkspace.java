@@ -44,6 +44,20 @@ import java.util.List;
 public class CLIWorkspace extends BaseWorkspaceImpl {
     private static final Log log = Log.getLog(CLIWorkspace.class);
 
+    private static final String EMPTY_PROJECT_TEMPLATE = """
+        <?xml version="1.0" encoding="UTF-8"?>
+        <projectDescription>
+        <name>${project-name}</name>
+        <comment></comment>
+        <projects>
+        </projects>
+        <buildSpec>
+        </buildSpec>
+        <natures>
+            <nature>org.jkiss.dbeaver.DBeaverNature</nature>
+        </natures>
+        </projectDescription>""";
+
     private final List<DBPProject> projects = new ArrayList<>();
 
     public CLIWorkspace(@NotNull DBPPlatform platform, @NotNull Path workspacePath) {
@@ -72,6 +86,9 @@ public class CLIWorkspace extends BaseWorkspaceImpl {
     @NotNull
     @Override
     public DBPProject createProject(@NotNull String name, @Nullable String description) throws DBException {
+        if (name.startsWith(".")) {
+            throw new DBException("Project name must not start with '.'");
+        }
         Path projectPath = getAbsolutePath().resolve(name);
         if (Files.exists(projectPath)) {
             throw new DBException("Project '" + name + "' already exists");
@@ -81,6 +98,12 @@ public class CLIWorkspace extends BaseWorkspaceImpl {
             LocalProjectImpl project = createProject(projectPath);
             project.getMetadataFolder(true);
             project.updateProject(null, description);
+
+            Path projectFile = projectPath.resolve(BaseProjectImpl.PROJECT_FILE);
+            if (!Files.exists(projectFile)) {
+                Files.writeString(projectFile, EMPTY_PROJECT_TEMPLATE.replace("${project-name}", name));
+            }
+
             projects.add(project);
             return project;
         } catch (IOException e) {
@@ -111,6 +134,9 @@ public class CLIWorkspace extends BaseWorkspaceImpl {
         if (!projects.contains(project)) {
             throw new DBException("Project '" + project.getName() + "' not found in workspace");
         }
+        if (newName.startsWith(".")) {
+            throw new DBException("Project name must not start with '.'");
+        }
         Path oldPath = project.getAbsolutePath();
         Path newPath = oldPath.getParent().resolve(newName);
         if (Files.exists(newPath)) {
@@ -120,6 +146,20 @@ public class CLIWorkspace extends BaseWorkspaceImpl {
             Files.move(oldPath, newPath);
             ((LocalProjectImpl) project).setAbsolutePath(newPath);
             project.getMetadataFolder(true);
+
+            Path projectFile = newPath.resolve(BaseProjectImpl.PROJECT_FILE);
+            if (Files.exists(projectFile)) {
+                String content = Files.readString(projectFile);
+                String oldNameTag = "<name>" + project.getName() + "</name>";
+                String newNameTag = "<name>" + newName + "</name>";
+                if (content.contains(oldNameTag)) {
+                    Files.writeString(projectFile, content.replace(oldNameTag, newNameTag));
+                } else {
+                    Files.writeString(projectFile, EMPTY_PROJECT_TEMPLATE.replace("${project-name}", newName));
+                }
+            } else {
+                Files.writeString(projectFile, EMPTY_PROJECT_TEMPLATE.replace("${project-name}", newName));
+            }
         } catch (IOException e) {
             throw new DBException("Error renaming project directory", e);
         }
@@ -161,6 +201,11 @@ public class CLIWorkspace extends BaseWorkspaceImpl {
                 @Override
                 public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
                     if (attrs.isSymbolicLink()) {
+                        return FileVisitResult.SKIP_SUBTREE;
+                    }
+
+                    Path fileName = dir.getFileName();
+                    if (fileName != null && fileName.toString().startsWith(".")) {
                         return FileVisitResult.SKIP_SUBTREE;
                     }
 

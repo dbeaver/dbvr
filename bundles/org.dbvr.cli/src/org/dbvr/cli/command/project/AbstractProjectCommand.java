@@ -39,7 +39,11 @@ public abstract class AbstractProjectCommand extends AbstractCommandLineParamete
     protected String serializeProjectList() {
         List<Map<String, String>> projectData = new ArrayList<>();
         for (DBPProject project : DBWorkbench.getPlatform().getWorkspace().getProjects()) {
-            projectData.add(collectProjectData(project.getId(), project.getName(), project.getDescription()));
+            String name = project.getName();
+            if (name.startsWith(".")) { // skip hidden projects
+                continue;
+            }
+            projectData.add(collectProjectData(project.getId(), name, project.getDescription()));
         }
         return CLIUtils.formatAsTable(projectData);
     }
