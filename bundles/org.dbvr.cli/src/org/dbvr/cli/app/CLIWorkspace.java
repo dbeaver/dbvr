@@ -27,6 +27,7 @@ import org.jkiss.dbeaver.model.impl.app.BaseWorkspaceImpl;
 import org.jkiss.dbeaver.registry.project.LocalProjectImpl;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.utils.ContentUtils;
+import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.CommonUtils;
 
 import java.io.IOException;
@@ -72,9 +73,7 @@ public class CLIWorkspace extends BaseWorkspaceImpl {
     @NotNull
     @Override
     public DBPProject createProject(@NotNull String name, @Nullable String description) throws DBException {
-        if (BaseProjectImpl.isHiddenProjectName(name)) {
-            throw new DBException("Project name must not start with '.'");
-        }
+        GeneralUtils.validateResourceNameUnconditionally(name);
         Path projectPath = getAbsolutePath().resolve(name);
         if (Files.exists(projectPath)) {
             throw new DBException("Project '" + name + "' already exists");
@@ -118,9 +117,7 @@ public class CLIWorkspace extends BaseWorkspaceImpl {
         if (!projects.contains(project)) {
             throw new DBException("Project '" + project.getName() + "' not found in workspace");
         }
-        if (BaseProjectImpl.isHiddenProjectName(newName)) {
-            throw new DBException("Project name must not start with '.'");
-        }
+        GeneralUtils.validateResourceNameUnconditionally(newName);
         Path oldPath = project.getAbsolutePath();
         Path newPath = oldPath.getParent().resolve(newName);
         if (Files.exists(newPath)) {

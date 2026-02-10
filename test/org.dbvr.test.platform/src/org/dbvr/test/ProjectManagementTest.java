@@ -162,7 +162,7 @@ public class ProjectManagementTest extends DBVRTest {
         CLIProcessResult result = cmd.executeCommandLineCommands(null, false, false, args);
 
         Assert.assertTrue("Error message expected for hidden project creation",
-            String.join("\n", result.getOutput()).contains("Project name must not start with '.'"));
+            String.join("\n", result.getOutput()).contains("Resource name '.test_prj_hidden' can't start with dot"));
     }
 
     @Test
