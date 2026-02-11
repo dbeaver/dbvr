@@ -8,5 +8,8 @@
         <parameter
             exitAfterExecute="true"
             handler="org.dbvr.cli.command.driver.DriverManagerHandler"/>
+        <parameter
+            exitAfterExecute="true"
+            handler="org.dbvr.cli.command.project.ProjectManagementHandler"/>
     </extension>
 </plugin>

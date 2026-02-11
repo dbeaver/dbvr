@@ -29,6 +29,8 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
     HelpArgTest.class,
     DataSourceManagementTest.class,
+    ProjectManagementTest.class,
+    DataSourceManagementTest.class,
     AuthModelsTest.class
 })
 public class DBVRTestSuite {
