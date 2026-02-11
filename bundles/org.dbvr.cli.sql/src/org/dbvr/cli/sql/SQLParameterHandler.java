@@ -37,6 +37,7 @@ import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.LoggingProgressMonitor;
 import org.jkiss.dbeaver.model.sql.SQLQuery;
+import org.jkiss.dbeaver.model.sql.SQLQueryType;
 import org.jkiss.dbeaver.model.sql.SQLScriptContext;
 import org.jkiss.dbeaver.model.sql.SQLScriptElement;
 import org.jkiss.dbeaver.model.sql.data.SQLQueryDataContainer;
@@ -264,15 +265,20 @@ public class SQLParameterHandler extends CommandLineWithAuth {
                 consumer.finishTransfer(monitor, false);
                 DBCStatistics statistics = scriptProcessor.getTotalStatistics();
 
-                if (statistics.getRowsFetched() <= 0 && statistics.getRowsUpdated() > 0) {
-                    out.write(("Rows updated: " + statistics.getRowsUpdated() + "\n").getBytes(settings.getOutputEncoding()));
-                } else if (statistics.getRowsFetched() <= 0 && statistics.getRowsUpdated() <= 0) {
-                    out.write("Success\n".getBytes(settings.getOutputEncoding()));
+                if (q.getType() == SQLQueryType.SELECT) {
+                    out.write(("Rows read: " + statistics.getRowsFetched() + ", time: " + statistics.getTotalTime() + "ms\n").getBytes(settings.getOutputEncoding()));
+                } else {
+                    if (statistics.getRowsUpdated() > 0) {
+                        out.write(("Rows updated: " + statistics.getRowsUpdated() + ", time" + " (" + statistics.getTotalTime() + "ms)\n").getBytes(settings.getOutputEncoding()));
+                    } else {
+                        out.write(("Success, time: (" + statistics.getTotalTime() + "ms)\n").getBytes(settings.getOutputEncoding()));
+                    }
                 }
 
                 if (out instanceof ByteArrayOutputStream byteArrayOutputStream) {
                     String result = byteArrayOutputStream.toString(settings.getOutputEncoding());
                     context().addResult(result);
+                    byteArrayOutputStream.reset();
                 }
 
             }
