@@ -23,6 +23,7 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.cli.*;
+import org.jkiss.dbeaver.model.cli.model.DataSourceUpdater;
 import org.jkiss.dbeaver.model.cli.model.option.CreateDataSourceOptions;
 import org.jkiss.dbeaver.model.runtime.LoggingProgressMonitor;
 import org.jkiss.dbeaver.utils.DataSourceUtils;
@@ -38,7 +39,7 @@ public class CLIConnectionUtils {
         @Nullable String existConnectionIdOrName,
         @Nullable CreateDataSourceOptions tempDataSourceOptions,
         @Nullable String connectionSpec,
-        List<CLIUtils.DataSourceUpdater> updaters,
+        List<DataSourceUpdater> updaters,
         @Nullable String projectIdOrName,
         @NotNull CLIContext context,
         @NotNull Log parentLog

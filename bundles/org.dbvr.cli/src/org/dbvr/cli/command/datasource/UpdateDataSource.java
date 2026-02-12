@@ -23,6 +23,7 @@ import org.jkiss.dbeaver.model.cli.CLIConstants;
 import org.jkiss.dbeaver.model.cli.CLIException;
 import org.jkiss.dbeaver.model.cli.CLIProcessResult;
 import org.jkiss.dbeaver.model.cli.CLIUtils;
+import org.jkiss.dbeaver.model.cli.model.DataSourceUpdater;
 import org.jkiss.dbeaver.model.cli.model.option.DataSourceOptions;
 import org.jkiss.utils.CommonUtils;
 import picocli.CommandLine;
@@ -82,7 +83,7 @@ public class UpdateDataSource extends AbstractDataSourceEditCommand {
 
     @NotNull
     @Override
-    protected List<CLIUtils.DataSourceUpdater> getDataSourceUpdaters() {
+    protected List<DataSourceUpdater> getDataSourceUpdaters() {
         var updaters = super.getDataSourceUpdaters();
         updaters.add(dataSource -> CLIUtils.updateConnectionConfiguration(
             dataSourceOptions,
