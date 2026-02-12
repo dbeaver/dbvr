@@ -30,7 +30,6 @@ import org.jkiss.dbeaver.model.cli.CLIConstants;
 import org.jkiss.dbeaver.model.cli.CLIProcessResult;
 import org.jkiss.dbeaver.model.cli.command.AbstractTopLevelCommand;
 import org.jkiss.dbeaver.model.impl.app.BaseApplicationImpl;
-import org.jkiss.dbeaver.model.impl.preferences.SimplePreferenceStore;
 import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
 import org.jkiss.dbeaver.registry.BasePlatformImpl;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
@@ -51,14 +50,6 @@ public class CLIApplicationBase extends BaseApplicationImpl {
     protected final Path WORKSPACE_DIR_CURRENT;
     private boolean started = false;
     private static final String[] DEFAULT_ARGS = new String[] {AbstractTopLevelCommand.HELP_OPTION};
-    private static final String ECLIPSE_EXIT_DATA = "eclipse.exitdata";
-
-    private final DBPPreferenceStore preferenceStore = new SimplePreferenceStore() {
-        @Override
-        public void save() {
-
-        }
-    };
 
     protected CLIApplicationBase() {
 
@@ -117,7 +108,7 @@ public class CLIApplicationBase extends BaseApplicationImpl {
         }
         if (!EXIT_OK.equals(exitCode)) {
             // hide standard Eclipse exit message if exit code is not OK (otherwise it may be confusing)
-            System.setProperty(ECLIPSE_EXIT_DATA, "");
+            System.setProperty(DBConstants.ECLIPSE_EXIT_DATA, "");
         }
         return exitCode;
     }

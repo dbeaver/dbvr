@@ -42,7 +42,6 @@
             --add-opens=java.desktop/java.awt=ALL-UNNAMED
             --add-opens=java.desktop/java.awt.peer=ALL-UNNAMED
             --add-opens=java.sql/java.sql=ALL-UNNAMED
-            --launcher.suppressErrors
             -Xms64m
             -Xmx1024m</vmArgs>
         <vmArgsMac>-XstartOnFirstThread</vmArgsMac>
