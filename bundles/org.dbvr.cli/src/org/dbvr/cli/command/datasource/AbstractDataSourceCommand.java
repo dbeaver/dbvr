@@ -72,11 +72,27 @@ public abstract class AbstractDataSourceCommand extends AbstractCommandLineParam
             Map<String, Object> connections = JSONUtils.deserializeProperties(map, "connections");
             Object dsData = connections != null ? connections.get(dsId) : null;
             if (dsData instanceof Map) {
+                removeCredentials((Map<String, Object>) dsData);
                 return new GsonBuilder().setPrettyPrinting().create().toJson(dsData);
             }
             throw new CLIException("Datasource with id " + dsId + " is not found in serialized data", CLIConstants.EXIT_CODE_ERROR);
         } catch (Exception e) {
             throw new CLIException("Error parsing datasource JSON: " + e.getMessage(), e, CLIConstants.EXIT_CODE_ERROR);
+        }
+    }
+
+    private void removeCredentials(@NotNull Map<String, Object> map) {
+        map.remove("credentials");
+        for (Object value : map.values()) {
+            if (value instanceof Map mapValue) {
+                removeCredentials(mapValue);
+            } else if (value instanceof List list) {
+                for (Object item : list) {
+                    if (item instanceof Map mapItem) {
+                        removeCredentials(mapItem);
+                    }
+                }
+            }
         }
     }
 
