@@ -27,9 +27,8 @@ import org.jkiss.dbeaver.model.impl.app.DefaultCertificateStorage;
 import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
 import org.jkiss.dbeaver.model.qm.QMRegistry;
 import org.jkiss.dbeaver.model.qm.QMUtils;
-import org.jkiss.dbeaver.registry.BaseLocalPlatform;
+import org.jkiss.dbeaver.registry.BasePlatformImpl;
 import org.jkiss.dbeaver.runtime.qm.QMRegistryImpl;
-import org.jkiss.dbeaver.utils.ContentUtils;
 import org.jkiss.dbeaver.utils.RuntimeUtils;
 
 import java.io.IOException;
@@ -38,7 +37,7 @@ import java.nio.file.Path;
 /**
  * Base CLI platform
  */
-public class CLIPlatform extends BaseLocalPlatform {
+public class CLIPlatform extends BasePlatformImpl {
 
     public static final String PLUGIN_ID = "org.dbvr.cli"; //$NON-NLS-1$
 
@@ -87,14 +86,6 @@ public class CLIPlatform extends BaseLocalPlatform {
         isClosing = true;
         super.dispose();
         workspace.dispose();
-
-        // Remove temp folder
-        if (tempFolder != null) {
-            if (!ContentUtils.deleteFileRecursive(tempFolder)) {
-                log.warn("Can't delete temp folder '" + tempFolder + "'");
-            }
-            tempFolder = null;
-        }
 
         CLIPlatform.instance = null;
     }
