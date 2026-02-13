@@ -72,6 +72,8 @@ public class CLIApplicationBase extends BaseApplicationImpl {
     @NotNull
     @Override
     public Object start(IApplicationContext context) throws Exception {
+        // hide standard Eclipse exit message if exit code is not OK (otherwise it may be confusing)
+        System.setProperty(ECLIPSE_EXIT_DATA, "");
         // Register core components
         initializeApplicationServices();
 
@@ -108,7 +110,7 @@ public class CLIApplicationBase extends BaseApplicationImpl {
         }
         if (!EXIT_OK.equals(exitCode)) {
             // hide standard Eclipse exit message if exit code is not OK (otherwise it may be confusing)
-            System.setProperty(DBConstants.ECLIPSE_EXIT_DATA, "");
+            System.setProperty(ECLIPSE_EXIT_DATA, "");
         }
         return exitCode;
     }
