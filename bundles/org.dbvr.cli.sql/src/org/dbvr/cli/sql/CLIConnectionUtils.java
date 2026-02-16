@@ -34,7 +34,7 @@ import org.jkiss.utils.CommonUtils;
 public class CLIConnectionUtils {
 
     public static void connect(
-        @Nullable String existConnectionIdOrName,
+        @Nullable String existDataSourceIdOrName,
         @Nullable CreateDataSourceOptions tempDataSourceOptions,
         @Nullable String connectionSpec,
         @NotNull DataSourceAuthOptions authOptions,
@@ -46,10 +46,10 @@ public class CLIConnectionUtils {
         var monitor = new LoggingProgressMonitor(parentLog);
         DBPDataSourceContainer dataSourceContainer;
         DBPProject project = CLIUtils.findProject(projectIdOrName, context);
-        if (CommonUtils.isNotEmpty(existConnectionIdOrName)) {
+        if (CommonUtils.isNotEmpty(existDataSourceIdOrName)) {
             dataSourceContainer = CLIUtils.findDataSource(
                 project,
-                existConnectionIdOrName
+                existDataSourceIdOrName
             );
             CLIUtils.processDataSourceAuthOptions(dataSourceContainer, authOptions);
         } else if (tempDataSourceOptions != null) {
@@ -69,11 +69,11 @@ public class CLIConnectionUtils {
                 instanceConnectionParameters.isCreateNewConnection()
             );
         } else {
-            throw new CLIException("No connection options provided", CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS);
+            throw new CLIException("No datasource options provided", CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS);
         }
 
         if (dataSourceContainer == null) {
-            throw new CLIException("Can't find or create connection", CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS);
+            throw new CLIException("Can't find or create datasource", CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS);
         }
 
         connectDatasource(dataSourceContainer, parentLog);
