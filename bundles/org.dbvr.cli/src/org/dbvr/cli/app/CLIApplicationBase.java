@@ -29,7 +29,6 @@ import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.model.cli.CLIProcessResult;
 import org.jkiss.dbeaver.model.cli.command.AbstractTopLevelCommand;
 import org.jkiss.dbeaver.model.impl.app.BaseApplicationImpl;
-import org.jkiss.dbeaver.model.impl.preferences.SimplePreferenceStore;
 import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
 import org.jkiss.dbeaver.registry.BasePlatformImpl;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
@@ -47,16 +46,9 @@ import java.nio.file.Path;
  */
 public class CLIApplicationBase extends BaseApplicationImpl {
     private static final Log log = Log.getLog(CLIApplicationBase.class);
-    protected final Path WORKSPACE_DIR_CURRENT;
+    protected Path workspaceDirCurrent;
     private boolean started = false;
     private static final String[] DEFAULT_ARGS = new String[] {AbstractTopLevelCommand.HELP_OPTION};
-
-    private final DBPPreferenceStore preferenceStore = new SimplePreferenceStore() {
-        @Override
-        public void save() {
-
-        }
-    };
 
     protected CLIApplicationBase() {
 
@@ -72,7 +64,7 @@ public class CLIApplicationBase extends BaseApplicationImpl {
         String workingDirectory = RuntimeUtils.getWorkingDirectory(BasePlatformImpl.DBEAVER_DATA_DIR);
 
         // Workspace dir
-        WORKSPACE_DIR_CURRENT = Path.of(workingDirectory, DEFAULT_WORKSPACE_FOLDER);
+        workspaceDirCurrent = Path.of(workingDirectory, DEFAULT_WORKSPACE_FOLDER);
         Log.setLogHandler(new VoidLogHandler());
     }
 
@@ -84,12 +76,14 @@ public class CLIApplicationBase extends BaseApplicationImpl {
 
         Location instanceLoc = Platform.getInstanceLocation();
         try {
-            if (!instanceLoc.isSet()) { // always false?
-                URL wsLocationURL = WORKSPACE_DIR_CURRENT.toUri().toURL();
+            if (!instanceLoc.isSet()) { // true if -data not provided
+                URL wsLocationURL = workspaceDirCurrent.toUri().toURL();
                 instanceLoc.set(wsLocationURL, false);
+            } else {
+                workspaceDirCurrent = Path.of(instanceLoc.getURL().toURI());
             }
         } catch (Exception e) {
-            log.error("Error setting workspace location to " + WORKSPACE_DIR_CURRENT, e);
+            log.error("Error setting workspace location to " + workspaceDirCurrent, e);
             throw e;
         }
         DBWorkbench.getPlatform();
@@ -154,7 +148,7 @@ public class CLIApplicationBase extends BaseApplicationImpl {
     @Nullable
     @Override
     public Path getDefaultWorkingFolder() {
-        return WORKSPACE_DIR_CURRENT;
+        return workspaceDirCurrent;
     }
 
     @NotNull
@@ -185,7 +179,7 @@ public class CLIApplicationBase extends BaseApplicationImpl {
 
     @NotNull
     public CLIWorkspace createWorkspace(@NotNull CLIPlatform cliPlatform) {
-        return new CLIWorkspace(cliPlatform, WORKSPACE_DIR_CURRENT);
+        return new CLIWorkspace(cliPlatform, workspaceDirCurrent);
     }
 
     public synchronized boolean isStarted() {
