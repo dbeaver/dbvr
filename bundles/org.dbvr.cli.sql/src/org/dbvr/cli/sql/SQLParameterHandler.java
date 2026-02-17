@@ -85,18 +85,18 @@ public class SQLParameterHandler extends CommandLineWithAuth {
     private DataSourceAuthOptions authOptions;
 
     @CommandLine.ArgGroup(exclusive = true, multiplicity = "1")
-    private CreateOrFindConnection connectionOptions;
+    private CreateOrFindDataSource dataSourceOptions;
 
-    private static class CreateOrFindConnection {
+    private static class CreateOrFindDataSource {
         @CommandLine.ArgGroup(
             exclusive = false
         )
         private CreateDataSourceOptions tempDataSourceOptions;
 
-        @CommandLine.Option(names = "--connection", arity = "1", description = "Connection ID or name")
-        private String existConnectionIdOrName;
+        @CommandLine.Option(names = {"-ds", "--datasource"}, arity = "1", description = "DataSource ID or name")
+        private String existDataSourceIdOrName;
 
-        @CommandLine.Option(names = "--connection-spec", arity = "1", description = "Connection specification")
+        @CommandLine.Option(names = {"-con", "-connect", "-ds-spec", "--datasource-specification"}, arity = "1")
         private String connectionSpec;
     }
 
@@ -104,9 +104,9 @@ public class SQLParameterHandler extends CommandLineWithAuth {
     public void run() throws CLIException {
         super.run();
         CLIConnectionUtils.connect(
-            connectionOptions.existConnectionIdOrName,
-            connectionOptions.tempDataSourceOptions,
-            connectionOptions.connectionSpec,
+            dataSourceOptions.existDataSourceIdOrName,
+            dataSourceOptions.tempDataSourceOptions,
+            dataSourceOptions.connectionSpec,
             authOptions,
             projectOption.getProjectIdOrName(),
             context(),
@@ -124,7 +124,7 @@ public class SQLParameterHandler extends CommandLineWithAuth {
         DBPDataSourceContainer dataSourceContainer = context().getContextParameter(DBPDataSourceContainer.class.getName());
         if (dataSourceContainer == null) {
             throw new CLIException(
-                "No connection specified",
+                "No datasource specified",
                 CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS
             );
         }

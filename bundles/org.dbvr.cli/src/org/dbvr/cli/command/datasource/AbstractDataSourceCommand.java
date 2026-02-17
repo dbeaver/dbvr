@@ -98,7 +98,7 @@ public abstract class AbstractDataSourceCommand extends AbstractCommandLineParam
         try {
             dataSourceRegistry.checkForErrors();
         } catch (Exception e) {
-            throw new CLIException("Error reading connections: " + e.getMessage(), e, CLIConstants.EXIT_CODE_ERROR);
+            throw new CLIException("Error reading datasources: " + e.getMessage(), e, CLIConstants.EXIT_CODE_ERROR);
         }
 
         return new String(buffer.getData(), StandardCharsets.UTF_8);
