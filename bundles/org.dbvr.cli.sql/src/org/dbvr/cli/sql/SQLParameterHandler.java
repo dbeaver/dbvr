@@ -37,7 +37,6 @@ import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.runtime.LoggingProgressMonitor;
 import org.jkiss.dbeaver.model.sql.SQLQuery;
-import org.jkiss.dbeaver.model.sql.SQLQueryType;
 import org.jkiss.dbeaver.model.sql.SQLScriptContext;
 import org.jkiss.dbeaver.model.sql.SQLScriptElement;
 import org.jkiss.dbeaver.model.sql.data.SQLQueryDataContainer;
@@ -265,13 +264,24 @@ public class SQLParameterHandler extends CommandLineWithAuth {
                 consumer.finishTransfer(monitor, false);
                 DBCStatistics statistics = scriptProcessor.getTotalStatistics();
 
-                if (q.getType() == SQLQueryType.SELECT) {
-                    out.write(("Rows read: " + statistics.getRowsFetched() + ", time: " + statistics.getTotalTime() + "ms\n").getBytes(settings.getOutputEncoding()));
+                String statusMessage;
+                if (statistics.getRowsFetched() > 0) {
+                    statusMessage = "Rows read: " + statistics.getRowsFetched() + ", (" + statistics.getTotalTime() + "ms)\n";
+                } else if (statistics.getRowsUpdated() > 0) {
+                    statusMessage = "Rows updated: " + statistics.getRowsUpdated() + " (" + statistics.getTotalTime() + "ms)\n";
                 } else {
-                    if (statistics.getRowsUpdated() > 0) {
-                        out.write(("Rows updated: " + statistics.getRowsUpdated() + ", time" + " (" + statistics.getTotalTime() + "ms)\n").getBytes(settings.getOutputEncoding()));
-                    } else {
-                        out.write(("Success, time: (" + statistics.getTotalTime() + "ms)\n").getBytes(settings.getOutputEncoding()));
+                    statusMessage = "OK\n";
+                }
+
+                if (outputFile == null) {
+                    out.write(statusMessage.getBytes(settings.getOutputEncoding()));
+                } else {
+                    if (statistics.getRowsFetched() <= 0) {
+                        if (statistics.getRowsUpdated() > 0) {
+                            out.write((statistics.getRowsUpdated() + "\n").getBytes(settings.getOutputEncoding()));
+                        } else {
+                            out.write("OK\n".getBytes(settings.getOutputEncoding()));
+                        }
                     }
                 }
 
