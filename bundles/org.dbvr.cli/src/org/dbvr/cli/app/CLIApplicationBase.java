@@ -26,6 +26,7 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
+import org.jkiss.dbeaver.model.cli.CLIConstants;
 import org.jkiss.dbeaver.model.cli.CLIProcessResult;
 import org.jkiss.dbeaver.model.cli.command.AbstractTopLevelCommand;
 import org.jkiss.dbeaver.model.impl.app.BaseApplicationImpl;
@@ -71,6 +72,8 @@ public class CLIApplicationBase extends BaseApplicationImpl {
     @NotNull
     @Override
     public Object start(IApplicationContext context) throws Exception {
+        // hide standard Eclipse exit message if exit code is not OK (otherwise it may be confusing)
+        System.setProperty(ECLIPSE_EXIT_DATA, "");
         // Register core components
         initializeApplicationServices();
 
@@ -91,11 +94,13 @@ public class CLIApplicationBase extends BaseApplicationImpl {
         configureApplication();
         started = true;
 
+        int exitCode;
         try {
             CLIProcessResult processResult = executeCommandLine(Platform.getApplicationArgs());
             var out = processResult.getPostAction() == CLIProcessResult.PostAction.ERROR
                 ? System.err
                 : System.out;
+            exitCode = processResult.getExitCode();
             if (!CommonUtils.isEmpty(processResult.getOutput())) {
                 for (String res : processResult.getOutput()) {
                     out.println(res);
@@ -103,8 +108,13 @@ public class CLIApplicationBase extends BaseApplicationImpl {
             }
         } catch (DBException e) {
             System.err.println("Error: " + e.getMessage());
+            exitCode = CLIConstants.EXIT_CODE_ERROR;
         }
-        return EXIT_OK;
+        if (!EXIT_OK.equals(exitCode)) {
+            // hide standard Eclipse exit message if exit code is not OK (otherwise it may be confusing)
+            System.setProperty(ECLIPSE_EXIT_DATA, "");
+        }
+        return exitCode;
     }
 
     public CLIProcessResult executeCommandLine(@NotNull String[] args) throws DBException {
