@@ -17,6 +17,7 @@
 package org.dbvr.test;
 
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPProject;
@@ -25,7 +26,9 @@ import org.jkiss.dbeaver.model.cli.CLIProcessResult;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
+import org.jkiss.dbeaver.model.net.DBWHandlerDescriptor;
 import org.jkiss.dbeaver.model.net.DBWUtils;
+import org.jkiss.dbeaver.registry.network.NetworkHandlerRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.junit.Assert;
 import org.junit.Test;
@@ -64,7 +67,9 @@ public class DataSourceManagementTest extends DBVRTest {
 
     @Test
     public void testCreateWithSSH() throws Exception {
-        String uniqName = "test_create" + UUID.randomUUID();
+        String uniqName = "test_create_ssh" + UUID.randomUUID();
+        String uniqPwd = "test_ssh_pwd" + UUID.randomUUID();
+        String uniqUser = "test_ssh_username" + UUID.randomUUID();
         var args = new String[] {
             "datasource", "create",
             "--driver=h2_embedded_v2",
@@ -75,9 +80,9 @@ public class DataSourceManagementTest extends DBVRTest {
             "-p", "postgres",
             "-net", "ssh.host=test_host",
             "-net", "ssh.authType=PUBLIC_KEY",
-            "-net", "ssh.user=test_user",
+            "-net", "ssh.user=" + uniqUser,
             "-net", "ssh.keyPath=/opt/test/path",
-            "-net", "ssh.password=dsdas123"
+            "-net", "ssh.password=" + uniqPwd
         };
 
         var cmd = DBVRTestSuite.getApplication().createCommandLine();
@@ -99,8 +104,8 @@ public class DataSourceManagementTest extends DBVRTest {
         Assert.assertNotNull(sshConf);
         Assert.assertEquals("test_host", sshConf.getProperty("host"));
         Assert.assertEquals("/opt/test/path", sshConf.getProperty("keyPath"));
-        Assert.assertEquals("test_user", sshConf.getUserName());
-        Assert.assertEquals("dsdas123", sshConf.getPassword());
+        Assert.assertEquals(uniqUser, sshConf.getUserName());
+        Assert.assertEquals(uniqPwd, sshConf.getPassword());
         Assert.assertEquals("PUBLIC_KEY", sshConf.getProperty("authType"));
         project.getDataSourceRegistry().removeDataSource(ds);
     }
@@ -160,16 +165,36 @@ public class DataSourceManagementTest extends DBVRTest {
     @Test
     public void testView() throws Exception {
         String uniqName = "test_view" + UUID.randomUUID();
-        DBPDataSourceContainer ds = createFakeDataSource(uniqName);
+        String uniqUser = "user" + UUID.randomUUID();
+        String uniqPwd = "password" + UUID.randomUUID();
+        DBPDataSourceContainer ds = createFakeDataSource(uniqName, uniqUser, uniqPwd);
         var cmd = DBVRTestSuite.getApplication().createCommandLine();
         var args = new String[] {
             "datasource", "view", ds.getId()
         };
         CLIProcessResult result = cmd.executeCommandLineCommands(null, false, false, args);
         Assert.assertNotNull(result.getOutput());
+        Assert.assertEquals(uniqUser, ds.getConnectionConfiguration().getUserName());
+        Assert.assertEquals(uniqPwd, ds.getConnectionConfiguration().getUserPassword());
         Assert.assertEquals(1, result.getOutput().size());
+
         String output = result.getOutput().getFirst();
         Assert.assertTrue(output.contains(uniqName));
+        Assert.assertFalse(output.contains(uniqUser));
+        Assert.assertFalse(output.contains(uniqPwd));
+
+        var sshConf = ds.getConnectionConfiguration().getHandler(DBWUtils.SSH_TUNNEL);
+        Assert.assertNotNull(sshConf);
+        Assert.assertNotNull(sshConf.getPassword());
+        Assert.assertNotNull(sshConf.getUserName());
+
+        Assert.assertFalse(output.contains(sshConf.getPassword()));
+        Assert.assertFalse(output.contains(sshConf.getUserName()));
+        Assert.assertFalse(output.contains("turbo_secure_prop"));
+
+        Assert.assertNotNull(sshConf.getSecureProperty("turbo_secure_prop"));
+        Assert.assertFalse(output.contains(sshConf.getSecureProperty("turbo_secure_prop")));
+
 
         var registry = DBWorkbench.getPlatform().getWorkspace().getActiveProject()
             .getDataSourceRegistry();
@@ -216,7 +241,18 @@ public class DataSourceManagementTest extends DBVRTest {
     }
 
     @NotNull
-    private static DBPDataSourceContainer createFakeDataSource(@NotNull String uniqName) throws DBException {
+    private static DBPDataSourceContainer createFakeDataSource(
+        @NotNull String uniqName
+    ) throws DBException {
+        return createFakeDataSource(uniqName, null, null);
+    }
+
+    @NotNull
+    private static DBPDataSourceContainer createFakeDataSource(
+        @NotNull String uniqName,
+        @Nullable String username,
+        @Nullable String password
+    ) throws DBException {
         DBPDriver driver = DBWorkbench.getPlatform().getDataSourceProviderRegistry()
             .findDriver("h2_embedded_v2");
         var connectionConfiguration = new DBPConnectionConfiguration();
@@ -225,11 +261,26 @@ public class DataSourceManagementTest extends DBVRTest {
         connectionConfiguration.setHostPort("123");
         connectionConfiguration.setServerName("test_delete");
         connectionConfiguration.setDatabaseName("test_delete");
+        connectionConfiguration.setDatabaseName("test_delete");
+        if (username != null) {
+            connectionConfiguration.setUserName(username);
+        }
+        if (password != null) {
+            connectionConfiguration.setUserPassword(password);
+        }
+
         var registry = DBWorkbench.getPlatform().getWorkspace().getActiveProject()
             .getDataSourceRegistry();
 
         var ds = registry.createDataSource(driver, connectionConfiguration);
         ds.setName(uniqName);
+        DBWHandlerDescriptor sshDesc = NetworkHandlerRegistry.getInstance().getDescriptor(DBWUtils.SSH_TUNNEL);
+        DBWHandlerConfiguration sshConfig = new DBWHandlerConfiguration(sshDesc, ds);
+        sshConfig.setSavePassword(true);
+        sshConfig.setUserName("ssh_user " + UUID.randomUUID());
+        sshConfig.setPassword("ssh_pwd " + UUID.randomUUID());
+        sshConfig.setSecureProperty("turbo_secure_prop", "secure_value" + UUID.randomUUID());
+        connectionConfiguration.updateHandler(sshConfig);
         registry.addDataSource(ds);
         return ds;
     }
