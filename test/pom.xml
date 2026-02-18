@@ -30,6 +30,7 @@
                     <application>org.dbvr.app.ce.application</application>
                     <product>org.dbvr.app.test.product</product>
                     <testRuntime>default</testRuntime>
+                    <osgiDataDirectory>./target/workspace</osgiDataDirectory>
                     <!--                    <argLine>-agentlib:jdwp=transport=dt_socket,server=y,address=localhost:15001,suspend=y</argLine>-->
                 </configuration>
             </plugin>

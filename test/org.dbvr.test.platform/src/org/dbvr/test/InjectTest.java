@@ -16,23 +16,21 @@
  */
 package org.dbvr.test;
 
-import org.jkiss.junit.osgi.OSGITestRunner;
-import org.jkiss.junit.osgi.annotation.RunWithApplication;
-import org.jkiss.junit.osgi.annotation.RunWithProduct;
-import org.jkiss.junit.osgi.annotation.RunnerProxy;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.dbvr.cli.app.ce.command.TestCommand;
+import org.dbvr.cli.app.ce.command.TestTransformer;
+import org.jkiss.utils.CommonUtils;
+import org.junit.Assert;
+import org.junit.Test;
 
-@RunWithProduct("dbvr-unittest.product")
-@RunnerProxy(MockitoJUnitRunner.class)
-@RunWith(OSGITestRunner.class)
-@RunWithApplication(
-    bundleName = "org.dbvr.app.ce",
-    registryName = "org.dbvr.app.ce.application",
-    properties = {
-        @RunWithApplication.Property(name = "osgi.instance.area", value = "./target/workpsace")
+public class InjectTest extends DBVRTest {
+    @Test
+    public void testThatParamInjected() throws Exception {
+        var args = new String[] {
+            TestCommand.TEST_COMMAND_NAME, "--help"
+        };
+
+        var result = DBVRTestSuite.getApplication().executeCommandLine(args);
+        Assert.assertFalse(CommonUtils.isEmpty(result.getOutput()));
+        Assert.assertTrue(result.getOutput().getFirst().contains(TestTransformer.RANDOM_PARAM_NAME));
     }
-)
-public abstract class DBVRTest {
-
 }

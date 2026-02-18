@@ -14,22 +14,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.dbvr.cli.command.project;
+package org.dbvr.cli.app.ce.command;
 
-import org.jkiss.dbeaver.model.cli.CLIConstants;
-import org.jkiss.dbeaver.model.cli.CLIException;
 import picocli.CommandLine;
 
-@CommandLine.Command(name = "list", description = "List all projects")
-public class ListProjects extends AbstractProjectCommand {
+import java.util.UUID;
+
+public class TestTransformer implements CommandLine.IModelTransformer {
+    public static final String RANDOM_PARAM_NAME = "--" + UUID.randomUUID();
+    private boolean initialized = false;
 
     @Override
-    public void run() throws CLIException {
-        super.run();
-        try {
-            context().addResult(serializeProjectList());
-        } catch (Exception e) {
-            throw new CLIException("Error listing projects: " + e.getMessage(), e, CLIConstants.EXIT_CODE_ERROR);
+    public CommandLine.Model.CommandSpec transform(CommandLine.Model.CommandSpec commandSpec) {
+        if (initialized) {
+            return commandSpec;
         }
+        commandSpec.addOption(CommandLine.Model.OptionSpec.builder(RANDOM_PARAM_NAME)
+            .description("A random parameter added by the transformer")
+            .required(false)
+            .build());
+        initialized = true;
+        return commandSpec;
     }
 }

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.2"?>
+<plugin>
+
+    <extension point="org.jkiss.dbeaver.commandLine">
+        <parameter
+            exitAfterExecute="true"
+            handler="org.dbvr.cli.app.ce.command.TestCommand"/>
+        <transformer
+            transformer="org.dbvr.cli.app.ce.command.TestTransformer"
+            command="org.dbvr.cli.app.ce.command.TestCommand"
+        />
+    </extension>
+
+</plugin>
