@@ -25,7 +25,6 @@ public class ListProjects extends AbstractProjectCommand {
 
     @Override
     public void run() throws CLIException {
-        super.run();
         try {
             context().addResult(serializeProjectList());
         } catch (Exception e) {

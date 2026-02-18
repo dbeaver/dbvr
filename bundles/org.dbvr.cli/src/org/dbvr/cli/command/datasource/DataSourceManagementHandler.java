@@ -41,7 +41,6 @@ public class DataSourceManagementHandler extends AbstractRootCommandLineParamete
 
     @Override
     public void run() throws CLIException {
-        super.run();
         if (spec.commandLine().getParseResult().subcommand() == null) {
             StringWriter writer = new StringWriter();
             spec.commandLine().usage(new PrintWriter(writer));

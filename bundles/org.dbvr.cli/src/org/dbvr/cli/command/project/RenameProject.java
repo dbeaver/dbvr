@@ -37,7 +37,6 @@ public class RenameProject extends AbstractProjectCommand {
 
     @Override
     public void run() throws CLIException {
-        super.run();
         try {
             DBPProject project = CLIUtils.findProject(projectId, context());
             DBWorkbench.getPlatform().getWorkspace().renameProject(project, newName);

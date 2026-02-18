@@ -32,7 +32,6 @@ public class CreateProject extends AbstractProjectCommand {
 
     @Override
     public void run() throws CLIException {
-        super.run();
         try {
             DBWorkbench.getPlatform().getWorkspace().createProject(name, description);
             context().addResult("Project '" + name + "' created.");
