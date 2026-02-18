@@ -33,6 +33,7 @@ public class ViewDataSource extends AbstractDataSourceCommand {
         var project = getProject();
         var dataSourceContainer = CLIUtils.findDataSource(project, id);
         context().setPostAction(CLIProcessResult.PostAction.SHUTDOWN);
-        context().addResult(serializeDataSourceToJson(project, dataSourceContainer.getId()).trim());
+        String data = serializeDataSourceToJson(project, dataSourceContainer.getId());
+        context().addResult(data.trim());
     }
 }
