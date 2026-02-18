@@ -19,26 +19,26 @@ package org.dbvr.cli.command.datasource;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.jkiss.code.NotNull;
-import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.cli.*;
 import org.jkiss.dbeaver.model.cli.model.option.ProjectOption;
+import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
+import org.jkiss.dbeaver.model.net.DBWHandlerConfiguration;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.registry.DataSourceConfigurationManagerBuffer;
+import org.jkiss.dbeaver.registry.DataSourceDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceRegistry;
 import picocli.CommandLine;
 
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public abstract class AbstractDataSourceCommand extends AbstractCommandLineParameterHandler {
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     @CommandLine.Mixin
     protected ProjectOption projectOption;
     /**
@@ -66,58 +66,60 @@ public abstract class AbstractDataSourceCommand extends AbstractCommandLineParam
 
     @NotNull
     protected String serializeDataSourceToJson(@NotNull DBPProject project, @NotNull String dsId) throws CLIException {
-        String allData = serializeDataSources(project, dsId);
-        try {
-            Map<String, Object> map = JSONUtils.parseMap(new Gson(), new StringReader(allData));
-            Map<String, Object> connections = JSONUtils.deserializeProperties(map, "connections");
-            Object dsData = connections != null ? connections.get(dsId) : null;
-            if (dsData instanceof Map) {
-                removeCredentials((Map<String, Object>) dsData);
-                return new GsonBuilder().setPrettyPrinting().create().toJson(dsData);
-            }
-            throw new CLIException("Datasource with id " + dsId + " is not found in serialized data", CLIConstants.EXIT_CODE_ERROR);
-        } catch (Exception e) {
-            throw new CLIException("Error parsing datasource JSON: " + e.getMessage(), e, CLIConstants.EXIT_CODE_ERROR);
-        }
-    }
-
-    private void removeCredentials(@NotNull Map<String, Object> map) {
-        map.remove("credentials");
-        for (Object value : map.values()) {
-            if (value instanceof Map mapValue) {
-                removeCredentials(mapValue);
-            } else if (value instanceof List list) {
-                for (Object item : list) {
-                    if (item instanceof Map mapItem) {
-                        removeCredentials(mapItem);
-                    }
-                }
-            }
-        }
-    }
-
-    private String serializeDataSources(@NotNull DBPProject project, @Nullable String dsId) throws CLIException {
-        DataSourceConfigurationManagerBuffer buffer = new DataSourceConfigurationManagerBuffer();
         DBPDataSourceRegistry registry = project.getDataSourceRegistry();
         if (!(registry instanceof DataSourceRegistry<?> dataSourceRegistry)) {
             throw new CLIException(
-                "Unsupported data source registry: " + registry.getClass().getName(),
+                "Incorrect data source registry: " + registry.getClass().getName(),
                 CLIConstants.EXIT_CODE_ERROR
             );
         }
-
-        dataSourceRegistry.saveConfigurationToManager(
-            new VoidProgressMonitor(),
-            buffer,
-            (container) -> dsId == null || container.getId().equals(dsId)
-        );
-        try {
-            dataSourceRegistry.checkForErrors();
-        } catch (Exception e) {
-            throw new CLIException("Error reading datasources: " + e.getMessage(), e, CLIConstants.EXIT_CODE_ERROR);
+        DBPDataSourceContainer dataSource = dataSourceRegistry.getDataSource(dsId);
+        if (!(dataSource instanceof DataSourceDescriptor dataSourceDescriptor)) {
+            throw new CLIException("Datasource with id " + dsId + " is not found", CLIConstants.EXIT_CODE_ERROR);
         }
 
-        return new String(buffer.getData(), StandardCharsets.UTF_8);
+        DataSourceDescriptor copy = (DataSourceDescriptor) dataSourceDescriptor.createCopy(dataSourceRegistry);
+        wipeCredentials(copy);
+
+        try {
+            dataSourceRegistry.addDataSourceToList(copy);
+            try {
+                DataSourceConfigurationManagerBuffer buffer = new DataSourceConfigurationManagerBuffer();
+                dataSourceRegistry.saveConfigurationToManager(
+                    new VoidProgressMonitor(),
+                    buffer,
+                    (container) -> container == copy || container.getId().equals(copy.getId())
+                );
+                String json = new String(buffer.getData(), StandardCharsets.UTF_8);
+                try (StringReader reader = new StringReader(json)) {
+                    Map<String, Object> map = JSONUtils.parseMap(GSON, reader);
+                    Map<String, Object> connections = JSONUtils.deserializeProperties(map, "connections");
+                    Object dsData = connections != null ? connections.get(copy.getId()) : null;
+
+                    if (dsData instanceof Map) {
+                        return GSON.toJson(dsData);
+                    }
+                }
+                throw new CLIException("Datasource data is not found in serialized output", CLIConstants.EXIT_CODE_ERROR);
+            } finally {
+                dataSourceRegistry.removeDataSourceFromList(copy);
+            }
+        } catch (Exception e) {
+            throw new CLIException("Error serializing datasource: " + e.getMessage(), e, CLIConstants.EXIT_CODE_ERROR);
+        }
+    }
+
+    private void wipeCredentials(@NotNull DataSourceDescriptor dataSource) {
+        DBPConnectionConfiguration connectionConfig = dataSource.getConnectionConfiguration();
+        connectionConfig.setUserName(null);
+        connectionConfig.setUserPassword(null);
+        connectionConfig.setAuthProperties(Collections.emptyMap());
+
+        for (DBWHandlerConfiguration handler : connectionConfig.getHandlers()) {
+            handler.setUserName(null);
+            handler.setPassword(null);
+            handler.setSecureProperties(Collections.emptyMap());
+        }
     }
 
     @Override
