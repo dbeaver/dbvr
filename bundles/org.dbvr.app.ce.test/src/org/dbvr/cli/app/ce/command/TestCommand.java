@@ -16,7 +16,7 @@
  */
 package org.dbvr.cli.app.ce.command;
 
-import org.jkiss.dbeaver.model.cli.AbstractRootCommandLineParameterHandler;
+import org.jkiss.dbeaver.model.cli.CLIAbstractSubcommand;
 import org.jkiss.dbeaver.model.cli.CLIProcessResult;
 import picocli.CommandLine;
 
@@ -26,7 +26,7 @@ import static org.dbvr.cli.app.ce.command.TestCommand.TEST_COMMAND_NAME;
     name = TEST_COMMAND_NAME,
     description = "A test command for testing purposes"
 )
-public class TestCommand extends AbstractRootCommandLineParameterHandler {
+public class TestCommand extends CLIAbstractSubcommand {
     public static final String TEST_COMMAND_NAME = "test-command";
     public static final String TEST_PARAM_NAME = "--test-parameter-value";
 

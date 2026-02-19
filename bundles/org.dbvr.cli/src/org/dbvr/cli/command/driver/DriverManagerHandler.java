@@ -16,7 +16,7 @@
  */
 package org.dbvr.cli.command.driver;
 
-import org.jkiss.dbeaver.model.cli.AbstractRootCommandLineParameterHandler;
+import org.jkiss.dbeaver.model.cli.CLIAbstractSubcommand;
 import org.jkiss.dbeaver.model.cli.CLIException;
 import org.jkiss.dbeaver.model.cli.CLIProcessResult;
 import picocli.CommandLine;
@@ -31,7 +31,7 @@ import java.io.StringWriter;
         ListDriversCommand.class
     }
 )
-public class DriverManagerHandler extends AbstractRootCommandLineParameterHandler {
+public class DriverManagerHandler extends CLIAbstractSubcommand {
 
     @CommandLine.Spec
     CommandLine.Model.CommandSpec spec;

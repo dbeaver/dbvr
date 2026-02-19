@@ -16,7 +16,7 @@
  */
 package org.dbvr.cli.command.datasource;
 
-import org.jkiss.dbeaver.model.cli.AbstractRootCommandLineParameterHandler;
+import org.jkiss.dbeaver.model.cli.CLIAbstractSubcommand;
 import org.jkiss.dbeaver.model.cli.CLIException;
 import org.jkiss.dbeaver.model.cli.CLIProcessResult;
 import picocli.CommandLine;
@@ -35,7 +35,7 @@ import java.io.StringWriter;
         ViewDataSource.class
     }
 )
-public class DataSourceManagementHandler extends AbstractRootCommandLineParameterHandler {
+public class DataSourceManagementHandler extends CLIAbstractSubcommand {
     @CommandLine.Spec
     CommandLine.Model.CommandSpec spec;
 
