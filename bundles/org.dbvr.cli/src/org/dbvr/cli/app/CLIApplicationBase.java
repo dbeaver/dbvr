@@ -78,12 +78,17 @@ public class CLIApplicationBase extends BaseApplicationImpl {
         initializeApplicationServices();
 
         Location instanceLoc = Platform.getInstanceLocation();
+        String[] args = Platform.getApplicationArgs();
         try {
             if (!instanceLoc.isSet()) { // true if -data not provided
                 URL wsLocationURL = workspaceDirCurrent.toUri().toURL();
                 instanceLoc.set(wsLocationURL, false);
             } else {
-                workspaceDirCurrent = Path.of(instanceLoc.getURL().toURI());
+                var installPath = Path.of(Platform.getInstallLocation().getURL().toURI());
+                var locationPath = Path.of(instanceLoc.getURL().toURI());
+                if (!installPath.equals(locationPath)) {
+                    workspaceDirCurrent = locationPath;
+                }
             }
         } catch (Exception e) {
             log.error("Error setting workspace location to " + workspaceDirCurrent, e);
