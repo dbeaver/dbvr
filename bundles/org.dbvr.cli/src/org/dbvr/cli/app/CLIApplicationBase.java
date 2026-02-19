@@ -41,6 +41,7 @@ import org.jkiss.utils.CommonUtils;
 
 import java.net.URL;
 import java.nio.file.Path;
+import java.util.Arrays;
 
 /**
  * Base CLI application
@@ -66,7 +67,7 @@ public class CLIApplicationBase extends BaseApplicationImpl {
 
         // Workspace dir
         workspaceDirCurrent = Path.of(workingDirectory, DEFAULT_WORKSPACE_FOLDER);
-        Log.setLogHandler(new VoidLogHandler());
+        //        Log.setLogHandler(new VoidLogHandler());
     }
 
     @NotNull
@@ -78,15 +79,20 @@ public class CLIApplicationBase extends BaseApplicationImpl {
         initializeApplicationServices();
 
         Location instanceLoc = Platform.getInstanceLocation();
-        String[] args = Platform.getApplicationArgs();
         try {
             if (!instanceLoc.isSet()) { // true if -data not provided
                 URL wsLocationURL = workspaceDirCurrent.toUri().toURL();
                 instanceLoc.set(wsLocationURL, false);
             } else {
-                var installPath = Path.of(Platform.getInstallLocation().getURL().toURI());
                 var locationPath = Path.of(instanceLoc.getURL().toURI());
-                if (!installPath.equals(locationPath)) {
+                //                var locationDefaultPath = Path.of(instanceLoc.getDefault().toURI());
+                Path defPath = instanceLoc.getDefault() == null ? null : Path.of(instanceLoc.getDefault().toURI());
+                System.out.println("AAAA Def path" + defPath);
+                System.out.println("AAAAA Location path" + locationPath);
+                //                System.out.println("Def location path eq " + locationDefaultPath.equals(locationPath));
+                System.out.println("args 1 " + Arrays.toString(Platform.getCommandLineArgs()));
+                System.out.println("args 2 " + Arrays.toString(Platform.getApplicationArgs()));
+                if (!locationPath.equals(defPath)) {
                     workspaceDirCurrent = locationPath;
                 }
             }
