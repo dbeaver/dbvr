@@ -68,6 +68,9 @@ public class CLIConnectionUtils {
                 false,
                 instanceConnectionParameters.isCreateNewConnection()
             );
+            if (dataSourceContainer != null) {
+                CLIUtils.processDataSourceAuthOptions(dataSourceContainer, authOptions);
+            }
         } else {
             throw new CLIException("No datasource options provided", CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS);
         }

@@ -24,6 +24,7 @@ import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.cli.CLIConstants;
 import org.jkiss.dbeaver.model.cli.CLIException;
+import org.jkiss.dbeaver.model.cli.CLIProcessResult;
 import org.jkiss.dbeaver.model.cli.CLIUtils;
 import org.jkiss.dbeaver.model.cli.model.CommandLineWithAuth;
 import org.jkiss.dbeaver.model.cli.model.option.*;
@@ -290,7 +291,7 @@ public class SQLParameterHandler extends CommandLineWithAuth {
                     context().addResult(result);
                     byteArrayOutputStream.reset();
                 }
-
+                context().setPostAction(CLIProcessResult.PostAction.SHUTDOWN);
             }
         } catch (Exception e) {
             throw new CLIException("Failed to execute script", e, CLIConstants.EXIT_CODE_ERROR);

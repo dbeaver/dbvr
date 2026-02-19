@@ -81,7 +81,12 @@ public abstract class AbstractDataSourceCommand extends AbstractCommandLineParam
     }
 
     private String serializeDataSources(@NotNull DBPProject project, @Nullable String dsId) throws CLIException {
-        DataSourceConfigurationManagerBuffer buffer = new DataSourceConfigurationManagerBuffer();
+        DataSourceConfigurationManagerBuffer buffer = new DataSourceConfigurationManagerBuffer() {
+            @Override
+            public boolean isTrusted() {
+                return false;
+            }
+        };
         DBPDataSourceRegistry registry = project.getDataSourceRegistry();
         if (!(registry instanceof DataSourceRegistry<?> dataSourceRegistry)) {
             throw new CLIException(
