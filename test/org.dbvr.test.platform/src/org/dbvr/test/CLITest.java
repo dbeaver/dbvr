@@ -21,7 +21,7 @@ import org.jkiss.dbeaver.model.cli.CLIProcessResult.PostAction;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class CLIHelpPruningTest extends DBVRTest {
+public class CLITest extends DBVRTest {
 
     @Test
     public void testHelpDoesNotContainRedundantCommands() throws Exception {
