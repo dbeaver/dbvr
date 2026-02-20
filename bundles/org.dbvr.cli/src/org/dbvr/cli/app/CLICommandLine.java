@@ -23,6 +23,7 @@ import org.jkiss.dbeaver.model.cli.ApplicationInstanceController;
 import org.jkiss.dbeaver.model.cli.CLIContextImpl;
 import org.jkiss.dbeaver.model.cli.CLIRunMeta;
 import org.jkiss.dbeaver.model.cli.command.AbstractTopLevelCommand;
+import picocli.CommandLine;
 
 public class CLICommandLine extends ApplicationCommandLine<ApplicationInstanceController> {
 
@@ -36,5 +37,22 @@ public class CLICommandLine extends ApplicationCommandLine<ApplicationInstanceCo
         @NotNull CLIRunMeta runMeta
     ) {
         return new CLITopLevelCommand(applicationInstanceController, context, runMeta);
+    }
+
+    @Override
+    protected CommandLine initCommandLine(
+        @Nullable ApplicationInstanceController applicationInstanceController,
+        @NotNull CLIContextImpl context,
+        @NotNull CLIRunMeta runMeta
+    ) {
+        CommandLine cmd = super.initCommandLine(applicationInstanceController, context, runMeta);
+        CommandLine.Model.CommandSpec spec = cmd.getCommandSpec();
+        spec.removeSubcommand("license");
+        spec.removeSubcommand("token");
+        CommandLine.Model.OptionSpec dumpOption = spec.findOption("-dump");
+        if (dumpOption != null) {
+            spec.remove(dumpOption);
+        }
+        return cmd;
     }
 }
