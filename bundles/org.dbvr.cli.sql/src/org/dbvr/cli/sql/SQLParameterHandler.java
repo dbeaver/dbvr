@@ -277,6 +277,7 @@ public class SQLParameterHandler extends CommandLineWithAuth {
                 if (outputFile == null) {
                     out.write(statusMessage.getBytes(settings.getOutputEncoding()));
                 } else {
+                    context().addResult(statusMessage);
                     if (statistics.getRowsFetched() <= 0) {
                         if (statistics.getRowsUpdated() > 0) {
                             out.write((statistics.getRowsUpdated() + "\n").getBytes(settings.getOutputEncoding()));
