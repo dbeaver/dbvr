@@ -47,7 +47,6 @@ public class CLICommandLine extends ApplicationCommandLine<ApplicationInstanceCo
     ) {
         CommandLine cmd = super.initCommandLine(applicationInstanceController, context, runMeta);
         CommandLine.Model.CommandSpec spec = cmd.getCommandSpec();
-        spec.removeSubcommand("license");
         spec.removeSubcommand("token");
         CommandLine.Model.OptionSpec dumpOption = spec.findOption("-dump");
         if (dumpOption != null) {

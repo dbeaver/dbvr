@@ -35,7 +35,6 @@ public class CLITest extends DBVRTest {
         Assert.assertEquals("Execution should be successful (PostAction.SHUTDOWN)",
             PostAction.SHUTDOWN, result.getPostAction());
 
-        Assert.assertFalse("Help should not contain 'license' command", helpOutput.contains("license"));
         Assert.assertFalse("Help should not contain 'token' command", helpOutput.contains("token"));
         Assert.assertFalse("Help should not contain '-dump' option", helpOutput.contains("-dump"));
     }
