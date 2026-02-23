@@ -14,5 +14,6 @@
     <includes id="org.dbvr.app.ce.feature" version="0.0.0"/>
 
     <plugin id="org.dbvr.test.platform" version="0.0.0"/>
+    <plugin id="org.dbvr.app.ce.test" version="0.0.0"/>
 
 </feature>

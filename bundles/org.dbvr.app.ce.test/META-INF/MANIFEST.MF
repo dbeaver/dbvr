@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Vendor: DBeaver Corp
+Bundle-Name: DBeaver CLI CE
+Bundle-SymbolicName: org.dbvr.app.ce.test;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Release-Date: 20260216
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-21
+Export-Package: org.dbvr.cli.app.ce.command
+Require-Bundle: org.dbvr.cli;visibility:=reexport
+Automatic-Module-Name: org.dbvr.app.ce.test

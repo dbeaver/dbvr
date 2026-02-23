@@ -23,7 +23,10 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
-import org.jkiss.dbeaver.model.cli.*;
+import org.jkiss.dbeaver.model.cli.CLIAbstractSubcommand;
+import org.jkiss.dbeaver.model.cli.CLIConstants;
+import org.jkiss.dbeaver.model.cli.CLIException;
+import org.jkiss.dbeaver.model.cli.CLIUtils;
 import org.jkiss.dbeaver.model.cli.model.option.ProjectOption;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
@@ -38,7 +41,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class AbstractDataSourceCommand extends AbstractCommandLineParameterHandler {
+public abstract class AbstractDataSourceCommand extends CLIAbstractSubcommand {
     @CommandLine.Mixin
     protected ProjectOption projectOption;
     /**
@@ -112,10 +115,5 @@ public abstract class AbstractDataSourceCommand extends AbstractCommandLineParam
     @Override
     public void run() throws CLIException {
         
-    }
-
-    @NotNull
-    protected CLIContext context() {
-        return parent.context();
     }
 }

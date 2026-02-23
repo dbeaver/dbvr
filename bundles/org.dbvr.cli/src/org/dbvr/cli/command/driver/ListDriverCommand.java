@@ -16,8 +16,10 @@
  */
 package org.dbvr.cli.command.driver;
 
-import org.jkiss.code.NotNull;
-import org.jkiss.dbeaver.model.cli.*;
+import org.jkiss.dbeaver.model.cli.CLIAbstractSubcommand;
+import org.jkiss.dbeaver.model.cli.CLIException;
+import org.jkiss.dbeaver.model.cli.CLIProcessResult;
+import org.jkiss.dbeaver.model.cli.CLIUtils;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceProviderDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
@@ -27,8 +29,7 @@ import picocli.CommandLine;
 import java.util.*;
 
 @CommandLine.Command(name = "list", description = "Show list of supported database drivers")
-public class ListDriverCommand extends AbstractCommandLineParameterHandler {
-
+public class ListDriverCommand extends CLIAbstractSubcommand {
     @CommandLine.ParentCommand
     private DriverManagerHandler parent;
 
@@ -105,10 +106,4 @@ public class ListDriverCommand extends AbstractCommandLineParameterHandler {
         return supportedDataBases;
     }
 
-
-    @NotNull
-    @Override
-    protected CLIContext context() {
-        return parent.context();
-    }
 }
