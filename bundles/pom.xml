@@ -14,6 +14,7 @@
 
     <modules>
         <module>org.dbvr.app.ce</module>
+        <module>org.dbvr.app.ce.test</module>
         <module>org.dbvr.cli</module>
         <module>org.dbvr.cli.sql</module>
     </modules>

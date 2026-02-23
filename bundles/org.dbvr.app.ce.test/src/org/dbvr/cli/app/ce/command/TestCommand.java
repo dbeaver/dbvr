@@ -14,35 +14,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.dbvr.cli.command.driver;
+package org.dbvr.cli.app.ce.command;
 
 import org.jkiss.dbeaver.model.cli.CLIAbstractSubcommand;
-import org.jkiss.dbeaver.model.cli.CLIException;
 import org.jkiss.dbeaver.model.cli.CLIProcessResult;
 import picocli.CommandLine;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
+import static org.dbvr.cli.app.ce.command.TestCommand.TEST_COMMAND_NAME;
 
 @CommandLine.Command(
-    name = "driver",
-    description = "Driver management",
-    subcommands = {
-        ListDriversCommand.class
-    }
+    name = TEST_COMMAND_NAME,
+    description = "A test command for testing purposes"
 )
-public class DriverManagerHandler extends CLIAbstractSubcommand {
+public class TestCommand extends CLIAbstractSubcommand {
+    public static final String TEST_COMMAND_NAME = "test-command";
+    public static final String TEST_PARAM_NAME = "--test-parameter-value";
 
-    @CommandLine.Spec
-    CommandLine.Model.CommandSpec spec;
+    @CommandLine.Option(names = {TEST_PARAM_NAME}, description = "A test parameter")
+    private String param;
 
     @Override
-    public void run() throws CLIException {
-        if (spec.commandLine().getParseResult().subcommand() == null) {
-            StringWriter writer = new StringWriter();
-            spec.commandLine().usage(new PrintWriter(writer));
-            context().addResult(writer.toString());
-            context().setPostAction(CLIProcessResult.PostAction.SHUTDOWN);
-        }
+    public void run() {
+        context().addResult("Test command executed with parameter: " + param);
+        context().setPostAction(CLIProcessResult.PostAction.SHUTDOWN);
     }
 }
