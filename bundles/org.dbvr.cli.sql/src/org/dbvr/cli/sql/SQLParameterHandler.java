@@ -106,9 +106,9 @@ public class SQLParameterHandler extends CommandLineWithAuth {
     public void run() throws CLIException {
         super.run();
         CLIConnectionUtils.connect(
-            connectionOptions.existConnectionIdOrName,
-            connectionOptions.tempDataSourceOptions,
-            connectionOptions.connectionSpec,
+            dataSourceOptions.existDataSourceIdOrName,
+            dataSourceOptions.tempDataSourceOptions,
+            dataSourceOptions.connectionSpec,
             getDataSourceUpdaters(),
             projectOption.getProjectIdOrName(),
             context(),
@@ -331,8 +331,8 @@ public class SQLParameterHandler extends CommandLineWithAuth {
                 }
             }
         }
-        if (connectionOptions.tempDataSourceOptions != null) {
-            updaters.add(connectionOptions.tempDataSourceOptions);
+        if (dataSourceOptions.tempDataSourceOptions != null) {
+            updaters.add(dataSourceOptions.tempDataSourceOptions);
         }
         return updaters;
     }

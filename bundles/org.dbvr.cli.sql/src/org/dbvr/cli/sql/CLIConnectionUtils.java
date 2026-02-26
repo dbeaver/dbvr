@@ -39,7 +39,7 @@ public class CLIConnectionUtils {
         @Nullable String existDataSourceIdOrName,
         @Nullable CreateDataSourceOptions tempDataSourceOptions,
         @Nullable String connectionSpec,
-        List<DataSourceUpdater> updaters,
+        @NotNull List<DataSourceUpdater> updaters,
         @Nullable String projectIdOrName,
         @NotNull CLIContext context,
         @NotNull Log parentLog
@@ -70,9 +70,6 @@ public class CLIConnectionUtils {
                 false,
                 instanceConnectionParameters.isCreateNewConnection()
             );
-            if (dataSourceContainer != null) {
-                CLIUtils.processDataSourceAuthOptions(dataSourceContainer, authOptions);
-            }
         } else {
             throw new CLIException("No datasource options provided", CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS);
         }
