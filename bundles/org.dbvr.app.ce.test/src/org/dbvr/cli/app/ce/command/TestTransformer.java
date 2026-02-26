@@ -22,13 +22,18 @@ import java.util.UUID;
 
 public class TestTransformer implements CommandLine.IModelTransformer {
     public static final String RANDOM_PARAM_NAME = "--" + UUID.randomUUID();
+    private boolean initialized = false;
 
     @Override
     public CommandLine.Model.CommandSpec transform(CommandLine.Model.CommandSpec commandSpec) {
+        if (initialized) {
+            return commandSpec;
+        }
         commandSpec.addOption(CommandLine.Model.OptionSpec.builder(RANDOM_PARAM_NAME)
             .description("A random parameter added by the transformer")
             .required(false)
             .build());
+        initialized = true;
         return commandSpec;
     }
 }

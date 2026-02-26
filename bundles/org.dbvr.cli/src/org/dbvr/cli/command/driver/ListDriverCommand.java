@@ -16,27 +16,26 @@
  */
 package org.dbvr.cli.command.driver;
 
-import org.jkiss.code.NotNull;
-import org.jkiss.dbeaver.model.cli.*;
+import org.jkiss.dbeaver.model.cli.CLIAbstractSubcommand;
+import org.jkiss.dbeaver.model.cli.CLIException;
+import org.jkiss.dbeaver.model.cli.CLIProcessResult;
+import org.jkiss.dbeaver.model.cli.CLIUtils;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceProviderDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
 import org.jkiss.dbeaver.registry.driver.DriverDescriptor;
-import org.jkiss.utils.CommonUtils;
 import picocli.CommandLine;
 
 import java.util.*;
 
 @CommandLine.Command(name = "list", description = "Show list of supported database drivers")
-public class ListDriversCommand extends AbstractCommandLineParameterHandler {
+public class ListDriverCommand extends CLIAbstractSubcommand {
     @CommandLine.ParentCommand
     private DriverManagerHandler parent;
 
     @CommandLine.Option(names = {"--provider"}, description = "Filter by provider ID")
     private String providerId;
 
-    @CommandLine.Option(names = {"--show-disabled"}, description = "Show disabled drivers")
-    private boolean showDisabled;
 
     @CommandLine.Option(names = {"--show-properties"}, description = "Show driver properties")
     private boolean showProperties;
@@ -62,18 +61,13 @@ public class ListDriversCommand extends AbstractCommandLineParameterHandler {
             List<DriverDescriptor> providerDrivers = entry.getValue();
             providerDrivers.sort(Comparator.comparing(DriverDescriptor::getName));
 
-            outBuilder.append(String.format("Provider: %s (%s)%n", provider.getName(), provider.getId()));
+            outBuilder.append(String.format("%s (%s)%n", provider.getId(), provider.getName()));
 
             for (DriverDescriptor driver : providerDrivers) {
-                String description = driver.getDescription();
-                if (CommonUtils.isEmpty(description)) {
-                    description = driver.getName();
-                }
-                outBuilder.append(String.format(
-                    "  Driver ID: %s, Status: %s, Description: %s%n",
+                outBuilder.append(String.format("    %s (%s)%s%n",
                     driver.getId(),
-                    driver.isDisabled() ? "Disabled" : "Enabled",
-                    description
+                    driver.getName(),
+                    driver.isDisabled() ? " [Disabled]" : ""
                 ));
 
                 if (showProperties) {
@@ -82,9 +76,8 @@ public class ListDriversCommand extends AbstractCommandLineParameterHandler {
                         allProperties.put(prop.getId(), prop);
                     }
                     if (!allProperties.isEmpty()) {
-                        outBuilder.append("    Properties:").append(System.lineSeparator());
                         for (DBPPropertyDescriptor prop : allProperties.values()) {
-                            outBuilder.append("    ").append(CLIUtils.getPropertyHelpText(prop));
+                            outBuilder.append("      ").append(CLIUtils.getPropertyHelpText(prop));
                         }
                     }
                 }
@@ -104,7 +97,7 @@ public class ListDriversCommand extends AbstractCommandLineParameterHandler {
                 continue;
             }
             for (DriverDescriptor driver : providerDescriptor.getDrivers()) {
-                if ((showDisabled || !driver.isDisabled()) && driver.getReplacedBy() == null) {
+                if (driver.getReplacedBy() == null) {
                     supportedDataBases.add(driver);
                 }
             }
@@ -113,10 +106,4 @@ public class ListDriversCommand extends AbstractCommandLineParameterHandler {
         return supportedDataBases;
     }
 
-
-    @NotNull
-    @Override
-    protected CLIContext context() {
-        return parent.context();
-    }
 }

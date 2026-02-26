@@ -18,8 +18,7 @@ package org.dbvr.cli.command.project;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.app.DBPProject;
-import org.jkiss.dbeaver.model.cli.AbstractCommandLineParameterHandler;
-import org.jkiss.dbeaver.model.cli.CLIContext;
+import org.jkiss.dbeaver.model.cli.CLIAbstractSubcommand;
 import org.jkiss.dbeaver.model.cli.CLIUtils;
 import org.jkiss.dbeaver.model.impl.app.BaseProjectImpl;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
@@ -31,7 +30,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class AbstractProjectCommand extends AbstractCommandLineParameterHandler {
+public abstract class AbstractProjectCommand extends CLIAbstractSubcommand {
 
     @CommandLine.ParentCommand
     private ProjectManagementHandler parent;
@@ -55,10 +54,5 @@ public abstract class AbstractProjectCommand extends AbstractCommandLineParamete
         row.put("NAME", name);
         row.put("DESCRIPTION", CommonUtils.notNull(description, ""));
         return row;
-    }
-
-    @NotNull
-    protected CLIContext context() {
-        return parent.context();
     }
 }

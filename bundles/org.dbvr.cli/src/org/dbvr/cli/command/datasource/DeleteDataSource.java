@@ -39,7 +39,7 @@ public class DeleteDataSource extends AbstractDataSourceCommand {
         );
         context().setPostAction(CLIProcessResult.PostAction.SHUTDOWN);
         context().addResult(
-            "Connection " + dataSourceContainer.getName() + "[" + dataSourceContainer.getId() + "] has been deleted"
+            "Datasource " + dataSourceContainer.getName() + "[" + dataSourceContainer.getId() + "] has been deleted"
         );
     }
 }

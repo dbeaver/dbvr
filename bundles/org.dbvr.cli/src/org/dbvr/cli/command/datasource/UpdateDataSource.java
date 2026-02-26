@@ -71,7 +71,7 @@ public class UpdateDataSource extends AbstractDataSourceEditCommand {
             registry.checkForErrors();
         } catch (Exception e) {
             throw new CLIException(
-                "Error updating connection: " + e.getMessage(),
+                "Error updating datasource: " + e.getMessage(),
                 e,
                 CLIConstants.EXIT_CODE_ERROR
             );

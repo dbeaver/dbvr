@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,10 +27,8 @@ import org.jkiss.dbeaver.model.impl.app.DefaultCertificateStorage;
 import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
 import org.jkiss.dbeaver.model.qm.QMRegistry;
 import org.jkiss.dbeaver.model.qm.QMUtils;
-import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.registry.BasePlatformImpl;
 import org.jkiss.dbeaver.runtime.qm.QMRegistryImpl;
-import org.jkiss.dbeaver.utils.ContentUtils;
 import org.jkiss.dbeaver.utils.RuntimeUtils;
 
 import java.io.IOException;
@@ -49,7 +47,6 @@ public class CLIPlatform extends BasePlatformImpl {
 
     private static volatile boolean isClosing = false;
 
-    private Path tempFolder;
     private CLIWorkspace workspace;
 
     private QMRegistryImpl qmController;
@@ -65,8 +62,9 @@ public class CLIPlatform extends BasePlatformImpl {
         try {
             Path installPath = RuntimeUtils.getLocalPathFromURL(Platform.getInstallLocation().getURL());
 
-            this.tempFolder = installPath.resolve("temp");
-            this.defaultCertificateStorage = new DefaultCertificateStorage(installPath.resolve(DBConstants.CERTIFICATE_STORAGE_FOLDER));
+            this.defaultCertificateStorage = new DefaultCertificateStorage(
+                this,
+                installPath.resolve(DBConstants.CERTIFICATE_STORAGE_FOLDER));
         } catch (IOException e) {
             log.debug(e);
         }
@@ -90,14 +88,6 @@ public class CLIPlatform extends BasePlatformImpl {
         isClosing = true;
         super.dispose();
         workspace.dispose();
-
-        // Remove temp folder
-        if (tempFolder != null) {
-            if (!ContentUtils.deleteFileRecursive(tempFolder)) {
-                log.warn("Can't delete temp folder '" + tempFolder + "'");
-            }
-            tempFolder = null;
-        }
 
         CLIPlatform.instance = null;
     }
@@ -129,11 +119,6 @@ public class CLIPlatform extends BasePlatformImpl {
     @Override
     public DBACertificateStorage getCertificateStorage() {
         return defaultCertificateStorage;
-    }
-
-    @NotNull
-    public Path getTempFolder(@NotNull DBRProgressMonitor monitor, @NotNull String name) {
-        return tempFolder.resolve(name);
     }
 
     @Override

@@ -16,7 +16,7 @@
  */
 package org.dbvr.cli.command.driver;
 
-import org.jkiss.dbeaver.model.cli.AbstractRootCommandLineParameterHandler;
+import org.jkiss.dbeaver.model.cli.CLIAbstractSubcommand;
 import org.jkiss.dbeaver.model.cli.CLIException;
 import org.jkiss.dbeaver.model.cli.CLIProcessResult;
 import org.jkiss.dbeaver.model.cli.CLIUtils;
@@ -26,10 +26,10 @@ import picocli.CommandLine;
     name = "driver",
     description = "Driver management",
     subcommands = {
-        ListDriversCommand.class
+        ListDriverCommand.class
     }
 )
-public class DriverManagerHandler extends AbstractRootCommandLineParameterHandler {
+public class DriverManagerHandler extends CLIAbstractSubcommand {
 
     @CommandLine.Spec
     CommandLine.Model.CommandSpec spec;

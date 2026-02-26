@@ -24,6 +24,7 @@ import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.cli.CLIConstants;
 import org.jkiss.dbeaver.model.cli.CLIException;
+import org.jkiss.dbeaver.model.cli.CLIProcessResult;
 import org.jkiss.dbeaver.model.cli.CLIUtils;
 import org.jkiss.dbeaver.model.cli.model.CommandLineWithAuth;
 import org.jkiss.dbeaver.model.cli.model.DataSourceUpdater;
@@ -86,21 +87,18 @@ public class SQLParameterHandler extends CommandLineWithAuth {
     private DataSourceAuthOptions authOptions;
 
     @CommandLine.ArgGroup(exclusive = true, multiplicity = "1")
-    private CreateOrFindConnection connectionOptions;
+    private CreateOrFindDataSource dataSourceOptions;
 
-    @CommandLine.Spec
-    private CommandLine.Model.CommandSpec spec;
-
-    private static class CreateOrFindConnection {
+    private static class CreateOrFindDataSource {
         @CommandLine.ArgGroup(
             exclusive = false
         )
         private CreateDataSourceOptions tempDataSourceOptions;
 
-        @CommandLine.Option(names = "--connection", arity = "1", description = "Connection ID or name")
-        private String existConnectionIdOrName;
+        @CommandLine.Option(names = {"-ds", "--datasource"}, arity = "1", description = "DataSource ID or name")
+        private String existDataSourceIdOrName;
 
-        @CommandLine.Option(names = "--connection-spec", arity = "1", description = "Connection specification")
+        @CommandLine.Option(names = {"-con", "-connect", "-ds-spec", "--datasource-specification"}, arity = "1")
         private String connectionSpec;
     }
 
@@ -128,7 +126,7 @@ public class SQLParameterHandler extends CommandLineWithAuth {
         DBPDataSourceContainer dataSourceContainer = context().getContextParameter(DBPDataSourceContainer.class.getName());
         if (dataSourceContainer == null) {
             throw new CLIException(
-                "No connection specified",
+                "No datasource specified",
                 CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS
             );
         }
@@ -268,17 +266,34 @@ public class SQLParameterHandler extends CommandLineWithAuth {
                 consumer.finishTransfer(monitor, false);
                 DBCStatistics statistics = scriptProcessor.getTotalStatistics();
 
-                if (statistics.getRowsFetched() <= 0 && statistics.getRowsUpdated() > 0) {
-                    out.write(("Rows updated: " + statistics.getRowsUpdated() + "\n").getBytes(settings.getOutputEncoding()));
-                } else if (statistics.getRowsFetched() <= 0 && statistics.getRowsUpdated() <= 0) {
-                    out.write("Success\n".getBytes(settings.getOutputEncoding()));
+                String statusMessage;
+                if (statistics.getRowsFetched() > 0) {
+                    statusMessage = "Rows read: " + statistics.getRowsFetched() + ", (" + statistics.getTotalTime() + "ms)\n";
+                } else if (statistics.getRowsUpdated() > 0) {
+                    statusMessage = "Rows updated: " + statistics.getRowsUpdated() + " (" + statistics.getTotalTime() + "ms)\n";
+                } else {
+                    statusMessage = "OK\n";
+                }
+
+                if (outputFile == null) {
+                    out.write(statusMessage.getBytes(settings.getOutputEncoding()));
+                } else {
+                    context().addResult(statusMessage);
+                    if (statistics.getRowsFetched() <= 0) {
+                        if (statistics.getRowsUpdated() > 0) {
+                            out.write((statistics.getRowsUpdated() + "\n").getBytes(settings.getOutputEncoding()));
+                        } else {
+                            out.write("OK\n".getBytes(settings.getOutputEncoding()));
+                        }
+                    }
                 }
 
                 if (out instanceof ByteArrayOutputStream byteArrayOutputStream) {
                     String result = byteArrayOutputStream.toString(settings.getOutputEncoding());
                     context().addResult(result);
+                    byteArrayOutputStream.reset();
                 }
-
+                context().setPostAction(CLIProcessResult.PostAction.SHUTDOWN);
             }
         } catch (Exception e) {
             throw new CLIException("Failed to execute script", e, CLIConstants.EXIT_CODE_ERROR);
