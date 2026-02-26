@@ -39,7 +39,7 @@ public class DataTransferOptions {
     @Nullable
     @CommandLine.Option(names = {"-op", "--output-format-parameters"},
         arity = "1",
-        description = "Parameters (exporter options as list of props prop1=value1,prop2=value2 coma and space are delimiters)")
+        description = "Parameters (exporter options as list of props prop1=value1,prop2=value2 coma and space are delimiters).")
     private String outputFormatParameters;
 
 
