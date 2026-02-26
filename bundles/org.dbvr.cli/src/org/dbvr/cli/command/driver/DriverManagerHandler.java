@@ -28,7 +28,7 @@ import java.io.StringWriter;
     name = "driver",
     description = "Driver management",
     subcommands = {
-        ListDriversCommand.class
+        ListDriverCommand.class
     }
 )
 public class DriverManagerHandler extends CLIAbstractSubcommand {

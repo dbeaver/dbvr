@@ -265,15 +265,32 @@ public class SQLParameterHandler extends CommandLineWithAuth {
                 consumer.finishTransfer(monitor, false);
                 DBCStatistics statistics = scriptProcessor.getTotalStatistics();
 
-                if (statistics.getRowsFetched() <= 0 && statistics.getRowsUpdated() > 0) {
-                    out.write(("Rows updated: " + statistics.getRowsUpdated() + "\n").getBytes(settings.getOutputEncoding()));
-                } else if (statistics.getRowsFetched() <= 0 && statistics.getRowsUpdated() <= 0) {
-                    out.write("Success\n".getBytes(settings.getOutputEncoding()));
+                String statusMessage;
+                if (statistics.getRowsFetched() > 0) {
+                    statusMessage = "Rows read: " + statistics.getRowsFetched() + ", (" + statistics.getTotalTime() + "ms)\n";
+                } else if (statistics.getRowsUpdated() > 0) {
+                    statusMessage = "Rows updated: " + statistics.getRowsUpdated() + " (" + statistics.getTotalTime() + "ms)\n";
+                } else {
+                    statusMessage = "OK\n";
+                }
+
+                if (outputFile == null) {
+                    out.write(statusMessage.getBytes(settings.getOutputEncoding()));
+                } else {
+                    context().addResult(statusMessage);
+                    if (statistics.getRowsFetched() <= 0) {
+                        if (statistics.getRowsUpdated() > 0) {
+                            out.write((statistics.getRowsUpdated() + "\n").getBytes(settings.getOutputEncoding()));
+                        } else {
+                            out.write("OK\n".getBytes(settings.getOutputEncoding()));
+                        }
+                    }
                 }
 
                 if (out instanceof ByteArrayOutputStream byteArrayOutputStream) {
                     String result = byteArrayOutputStream.toString(settings.getOutputEncoding());
                     context().addResult(result);
+                    byteArrayOutputStream.reset();
                 }
                 context().setPostAction(CLIProcessResult.PostAction.SHUTDOWN);
             }
