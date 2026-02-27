@@ -56,12 +56,13 @@ import picocli.CommandLine;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FilterOutputStream;
 import java.nio.file.Files;
 import java.util.*;
 
 @CommandLine.Command(name = "sql", description = "Execute SQL script")
-public class SQLParameterHandler extends CommandLineWithAuth {
-    private static final Log log = Log.getLog(SQLParameterHandler.class);
+public class SQLCommand extends CommandLineWithAuth {
+    private static final Log log = Log.getLog(SQLCommand.class);
 
     @CommandLine.Parameters(
         index = "0",
@@ -225,6 +226,13 @@ public class SQLParameterHandler extends CommandLineWithAuth {
                 ? new ByteArrayOutputStream()
                 : new BufferedOutputStream(Files.newOutputStream(outputFile.path()))
         ) {
+            var uncloseableOut = new FilterOutputStream(out) {
+                @Override
+                public void close() {
+                    // Don't close the stream because it may be reused for multiple queries
+                    // and third-party nio libraries may not support APPEND option, so we should reuse original stream
+                }
+            };
             for (var script : scriptElements) {
                 if (!(script instanceof SQLQuery q)) {
                     log.debug("Skip non-query script element: " + script.getText());
@@ -240,7 +248,7 @@ public class SQLParameterHandler extends CommandLineWithAuth {
                     new IDataTransferConsumer.TransferParameters(
                         processorDescriptor.isBinaryFormat(),
                         processorDescriptor.isHTMLFormat(),
-                        out
+                        uncloseableOut
                     ),
                     streamDataExporter,
                     processorProperties,
