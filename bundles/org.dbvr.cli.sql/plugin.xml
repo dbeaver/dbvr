@@ -5,6 +5,6 @@
     <extension point="org.jkiss.dbeaver.commandLine">
         <parameter
             exitAfterExecute="true"
-            handler="org.dbvr.cli.sql.SQLParameterHandler"/>
+            handler="org.dbvr.cli.sql.SQLCommand"/>
     </extension>
 </plugin>

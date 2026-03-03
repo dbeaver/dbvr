@@ -66,7 +66,7 @@ public class CLIApplicationBase extends BaseApplicationImpl {
 
         // Workspace dir
         workspaceDirCurrent = Path.of(workingDirectory, DEFAULT_WORKSPACE_FOLDER);
-        //        Log.setLogHandler(new VoidLogHandler());
+        Log.setLogHandler(new VoidLogHandler());
     }
 
     @NotNull
