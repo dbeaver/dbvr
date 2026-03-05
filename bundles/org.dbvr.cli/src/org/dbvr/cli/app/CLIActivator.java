@@ -1,6 +1,6 @@
 /*
  * DBeaver - Universal Database Manager
- * Copyright (C) 2010-2025 DBeaver Corp and others
+ * Copyright (C) 2010-2026 DBeaver Corp and others
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,8 @@ package org.dbvr.cli.app;
 
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
-import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.Log;
-import org.jkiss.dbeaver.ModelPreferences;
 import org.jkiss.dbeaver.model.cli.command.AbstractTopLevelCommand;
-import org.jkiss.dbeaver.model.impl.preferences.BundlePreferenceStore;
-import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
 import org.jkiss.utils.ArrayUtils;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -39,8 +35,6 @@ public class CLIActivator extends Plugin {
 
     private static CLIActivator instance;
 
-    private DBPPreferenceStore preferences;
-
     public static CLIActivator getInstance() {
         return instance;
     }
@@ -48,13 +42,6 @@ public class CLIActivator extends Plugin {
     @Override
     public void start(BundleContext context) throws Exception {
         instance = this;
-        this.preferences = new BundlePreferenceStore(this.getBundle()) {
-            @Override
-            public void save() {
-
-            }
-        };
-        ModelPreferences.setMainBundle(getBundle());
         checkTraceLogging(context);
 
         super.start(context);
@@ -85,10 +72,5 @@ public class CLIActivator extends Plugin {
     public void stop(BundleContext context) throws Exception {
         super.stop(context);
         instance = null;
-    }
-
-    @NotNull
-    public DBPPreferenceStore getPreferenceStore() {
-        return preferences;
     }
 }
