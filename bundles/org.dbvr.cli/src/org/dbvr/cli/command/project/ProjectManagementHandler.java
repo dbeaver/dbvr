@@ -31,7 +31,8 @@ import java.io.StringWriter;
         ListProjects.class,
         CreateProject.class,
         DeleteProject.class,
-        RenameProject.class
+        RenameProject.class,
+        SetDefaultProject.class
     }
 )
 public class ProjectManagementHandler extends CommandLineWithAuth {
