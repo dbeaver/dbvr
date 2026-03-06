@@ -22,11 +22,7 @@ import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
-import org.jkiss.dbeaver.model.cli.CLIConstants;
-import org.jkiss.dbeaver.model.cli.CLIException;
-import org.jkiss.dbeaver.model.cli.CLIProcessResult;
-import org.jkiss.dbeaver.model.cli.CLIUtils;
-import org.jkiss.dbeaver.model.cli.model.CommandLineWithAuth;
+import org.jkiss.dbeaver.model.cli.*;
 import org.jkiss.dbeaver.model.cli.model.option.*;
 import org.jkiss.dbeaver.model.exec.DBCExecutionContext;
 import org.jkiss.dbeaver.model.exec.DBCStatistics;
@@ -61,7 +57,7 @@ import java.nio.file.Files;
 import java.util.*;
 
 @CommandLine.Command(name = "sql", description = "Execute SQL script")
-public class SQLCommand extends CommandLineWithAuth {
+public class SQLCommand extends CLIAbstractSubcommand {
     private static final Log log = Log.getLog(SQLCommand.class);
 
     @CommandLine.Parameters(
@@ -104,7 +100,6 @@ public class SQLCommand extends CommandLineWithAuth {
 
     @Override
     public void run() throws CLIException {
-        super.run();
         CLIConnectionUtils.connect(
             dataSourceOptions.existDataSourceIdOrName,
             dataSourceOptions.tempDataSourceOptions,

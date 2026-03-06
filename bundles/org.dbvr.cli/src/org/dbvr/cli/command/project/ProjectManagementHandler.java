@@ -16,9 +16,9 @@
  */
 package org.dbvr.cli.command.project;
 
+import org.jkiss.dbeaver.model.cli.CLIAbstractSubcommand;
 import org.jkiss.dbeaver.model.cli.CLIException;
 import org.jkiss.dbeaver.model.cli.CLIProcessResult;
-import org.jkiss.dbeaver.model.cli.model.CommandLineWithAuth;
 import picocli.CommandLine;
 
 import java.io.PrintWriter;
@@ -34,7 +34,7 @@ import java.io.StringWriter;
         RenameProject.class
     }
 )
-public class ProjectManagementHandler extends CommandLineWithAuth {
+public class ProjectManagementHandler extends CLIAbstractSubcommand {
     @CommandLine.Spec
     CommandLine.Model.CommandSpec spec;
 
