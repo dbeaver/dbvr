@@ -38,12 +38,8 @@ public class SetDefaultProject extends AbstractProjectCommand {
             DBPWorkspace workspace = DBWorkbench.getPlatform().getWorkspace();
             DBPProject project = CLIUtils.findProject(projectIdOrName, context());
 
-            boolean isDefaultSet = setDefaultProject(workspace, project);
-            if (isDefaultSet) {
-                context().addResult("Project '" + project.getName() + "' set as default.");
-            } else {
-                context().addResult("Project '" + project.getName() + "' is not set as default.");
-            }
+            setDefaultProject(workspace, project);
+            context().addResult("Project '" + project.getName() + "' set as default.");
         } catch (CLIException e) {
             throw e;
         } catch (Exception e) {
@@ -51,14 +47,12 @@ public class SetDefaultProject extends AbstractProjectCommand {
         }
     }
 
-    private boolean setDefaultProject(
+    private void setDefaultProject(
         @NotNull DBPWorkspace workspace,
         @NotNull DBPProject project
     ) {
         if (workspace instanceof BaseWorkspaceImpl baseWorkspace) {
-            return baseWorkspace.setActiveProjectName(project.getName());
+            baseWorkspace.setActiveProjectName(project.getName());
         }
-
-        return false;
     }
 }
