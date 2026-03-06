@@ -170,7 +170,7 @@ public class SQLCommand extends CommandLineWithAuth {
         DataTransferProcessorDescriptor processorDescriptor = DataTransferRegistry.getInstance()
             .getAvailableProcessors(StreamTransferConsumer.class, DBSEntity.class)
             .stream()
-            .filter(p -> p.getProcessorFileExtension().equals(outputFormat))
+            .filter(p -> outputFormat.equals(p.getShortId()) || outputFormat.equals(p.getProcessorFileExtension()))
             .findFirst()
             .orElse(null);
         if (processorDescriptor == null) {
