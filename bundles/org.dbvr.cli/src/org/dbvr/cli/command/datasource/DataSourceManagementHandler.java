@@ -32,7 +32,8 @@ import java.io.StringWriter;
         UpdateDataSource.class,
         DeleteDataSource.class,
         ListDataSource.class,
-        ViewDataSource.class
+        ViewDataSource.class,
+        MoveDataSource.class
     }
 )
 public class DataSourceManagementHandler extends CLIAbstractSubcommand {
