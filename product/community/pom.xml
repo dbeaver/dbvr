@@ -28,8 +28,8 @@
                             <rootFolders>
                                 <!-- for MacOSX, make sure you use a folder ending with .app , see bug 463670 -->
                                 <macosx>dbvr-community.app</macosx>
-                                <win32>dbvr-community</win32>
-                                <linux>dbvr-community</linux>
+                                <win32>dbvr</win32>
+                                <linux>dbvr</linux>
                             </rootFolders>
                         </product>
                     </products>
