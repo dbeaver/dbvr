@@ -24,12 +24,12 @@
                     <products>
                         <product>
                             <id>org.dbvr.app.ce.product</id>
-                            <archiveFileName>dbvr-${dbeaver-version}</archiveFileName>
+                            <archiveFileName>dbvr-ce-${dbeaver-version}</archiveFileName>
                             <rootFolders>
                                 <!-- for MacOSX, make sure you use a folder ending with .app , see bug 463670 -->
-                                <macosx>dbvr.app</macosx>
-                                <win32>dbvr</win32>
-                                <linux>dbvr</linux>
+                                <macosx>dbvr-community.app</macosx>
+                                <win32>dbvr-community</win32>
+                                <linux>dbvr-community</linux>
                             </rootFolders>
                         </product>
                     </products>
