@@ -24,12 +24,14 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
+import org.jkiss.dbeaver.ModelPreferences;
 import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.model.cli.CLIConstants;
 import org.jkiss.dbeaver.model.cli.CLIProcessResult;
 import org.jkiss.dbeaver.model.cli.command.AbstractTopLevelCommand;
 import org.jkiss.dbeaver.model.impl.app.BaseApplicationImpl;
+import org.jkiss.dbeaver.model.impl.preferences.BundlePreferenceStore;
 import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
 import org.jkiss.dbeaver.registry.BasePlatformImpl;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
@@ -50,6 +52,8 @@ public class CLIApplicationBase extends BaseApplicationImpl {
     protected Path workspaceDirCurrent;
     private boolean started = false;
     private static final String[] DEFAULT_ARGS = new String[] {AbstractTopLevelCommand.HELP_OPTION};
+
+    private DBPPreferenceStore preferenceStore;
 
     protected CLIApplicationBase() {
 
@@ -93,6 +97,14 @@ public class CLIApplicationBase extends BaseApplicationImpl {
             log.error("Error setting workspace location to " + workspaceDirCurrent, e);
             throw e;
         }
+        this.preferenceStore = new BundlePreferenceStore(CLIActivator.getInstance().getBundle()) {
+            @Override
+            public void save() {
+
+            }
+        };
+        ModelPreferences.setMainBundle(CLIActivator.getInstance().getBundle());
+
         DBWorkbench.getPlatform();
 
         configureApplication();
@@ -188,7 +200,7 @@ public class CLIApplicationBase extends BaseApplicationImpl {
 
     @NotNull
     public DBPPreferenceStore getPreferenceStore() {
-        return CLIActivator.getInstance().getPreferenceStore();
+        return preferenceStore;
     }
 
     @NotNull
