@@ -16,13 +16,13 @@
  */
 package org.dbvr.cli.command.project;
 
+import org.dbvr.cli.app.CLIWorkspace;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.cli.CLIConstants;
 import org.jkiss.dbeaver.model.cli.CLIException;
 import org.jkiss.dbeaver.model.cli.CLIUtils;
-import org.jkiss.dbeaver.model.impl.app.BaseWorkspaceImpl;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import picocli.CommandLine;
 
@@ -51,8 +51,8 @@ public class SetDefaultProject extends AbstractProjectCommand {
         @NotNull DBPWorkspace workspace,
         @NotNull DBPProject project
     ) {
-        if (workspace instanceof BaseWorkspaceImpl baseWorkspace) {
-            baseWorkspace.setActiveProjectName(project.getName());
+        if (workspace instanceof CLIWorkspace cliWorkspace) {
+            cliWorkspace.setActiveProject(project);
         }
     }
 }

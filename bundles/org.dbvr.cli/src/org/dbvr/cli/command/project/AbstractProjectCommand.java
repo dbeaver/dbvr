@@ -41,8 +41,8 @@ public abstract class AbstractProjectCommand extends CLIAbstractSubcommand {
     protected String serializeProjectList() {
         DBPWorkspace workspace = DBWorkbench.getPlatform().getWorkspace();
         String activeProjectName = null;
-        if (workspace instanceof BaseWorkspaceImpl) {
-            activeProjectName = ((BaseWorkspaceImpl) workspace).getActiveProjectName();
+        if (workspace instanceof BaseWorkspaceImpl baseWorkspace) {
+            activeProjectName = baseWorkspace.getActiveProjectName();
         }
 
         List<Map<String, String>> projectData = new ArrayList<>();
