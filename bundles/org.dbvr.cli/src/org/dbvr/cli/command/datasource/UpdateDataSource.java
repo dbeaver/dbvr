@@ -41,7 +41,7 @@ public class UpdateDataSource extends AbstractDataSourceEditCommand {
     @CommandLine.Option(
         names = {"-net-delete", "--network-handler-delete"},
         arity = "1",
-        description = "Network handler id for deletion."
+        description = "Network handler id for deletion"
     )
     private List<String> handlersToDelete;
 
