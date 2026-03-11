@@ -31,13 +31,16 @@ public class MoveDataSource extends AbstractDataSourceCommand {
     @CommandLine.Parameters(index = "0", description = "Datasource id or name", arity = "1")
     private String datasourceIdOrName;
 
-    @CommandLine.Option(names = {"--target-project"}, required = true, description = "Target project name or ID")
+    @CommandLine.Option(names = {"-from", "--from-project"}, description = "Source project name or ID")
+    private String fromProjectIdOrName;
+
+    @CommandLine.Option(names = {"-to", "--to-project"}, required = true, description = "Target project name or ID")
     private String targetProjectIdOrName;
 
     @Override
     public void run() throws CLIException {
         super.run();
-        DBPProject sourceProject = getProject();
+        DBPProject sourceProject = CLIUtils.findProject(fromProjectIdOrName != null ? fromProjectIdOrName : projectOption.getProjectIdOrName(), context());
         DBPProject targetProject = CLIUtils.findProject(targetProjectIdOrName, context());
 
         if (sourceProject.getId().equals(targetProject.getId())) {

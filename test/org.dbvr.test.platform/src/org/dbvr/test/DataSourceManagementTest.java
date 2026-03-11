@@ -236,7 +236,7 @@ public class DataSourceManagementTest extends DBVRTest {
             var cmd = DBVRTestSuite.getApplication().createCommandLine();
             var args = new String[]{
                 "datasource", "move", dsId,
-                "--target-project=" + targetProjectName
+                "-to", targetProjectName
             };
             CLIProcessResult result = cmd.executeCommandLineCommands(null, false, false, args);
 
@@ -268,7 +268,7 @@ public class DataSourceManagementTest extends DBVRTest {
             var cmd = DBVRTestSuite.getApplication().createCommandLine();
             var args = new String[]{
                 "datasource", "move", ds.getId(),
-                "--target-project=" + activeProject.getName()
+                "-to", activeProject.getName()
             };
             CLIProcessResult result = cmd.executeCommandLineCommands(null, false, false, args);
 
