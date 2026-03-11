@@ -28,7 +28,10 @@ public class MoveDataSource extends CLIAbstractSubcommand {
     @CommandLine.Parameters(index = "0", description = "Datasource id or name", arity = "1")
     private String datasourceIdOrName;
 
-    @CommandLine.Option(names = {"-from", "--from-project"}, description = "Source project name or ID")
+    @CommandLine.Option(
+        names = {"-from", "--from-project"},
+        description = "Source project name or ID, if not specified, use current project"
+    )
     private String fromProjectIdOrName;
 
     @CommandLine.Option(names = {"-to", "--to-project"}, required = true, description = "Target project name or ID")
