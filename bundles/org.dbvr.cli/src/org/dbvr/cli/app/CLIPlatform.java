@@ -25,10 +25,8 @@ import org.jkiss.dbeaver.model.app.DBACertificateStorage;
 import org.jkiss.dbeaver.model.impl.app.BaseApplicationImpl;
 import org.jkiss.dbeaver.model.impl.app.DefaultCertificateStorage;
 import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
-import org.jkiss.dbeaver.model.qm.QMRegistry;
 import org.jkiss.dbeaver.model.qm.QMUtils;
 import org.jkiss.dbeaver.registry.BasePlatformImpl;
-import org.jkiss.dbeaver.runtime.qm.QMRegistryImpl;
 import org.jkiss.dbeaver.utils.RuntimeUtils;
 
 import java.io.IOException;
@@ -49,7 +47,6 @@ public class CLIPlatform extends BasePlatformImpl {
 
     private CLIWorkspace workspace;
 
-    private QMRegistryImpl qmController;
     private DefaultCertificateStorage defaultCertificateStorage;
 
     CLIPlatform() {
@@ -78,8 +75,7 @@ public class CLIPlatform extends BasePlatformImpl {
             throw new IllegalStateException("Cannot initialize CLI workspace", e);
         }
 
-        QMUtils.initApplication(this);
-        this.qmController = new QMRegistryImpl();
+        QMUtils.initPlatform(false);
 
         log.trace("CLI Platform initialized (" + (System.currentTimeMillis() - startTime) + "ms)");
     }
@@ -89,6 +85,7 @@ public class CLIPlatform extends BasePlatformImpl {
         isClosing = true;
         super.dispose();
         workspace.dispose();
+        QMUtils.disposePlatform();
 
         CLIPlatform.instance = null;
     }
@@ -103,11 +100,6 @@ public class CLIPlatform extends BasePlatformImpl {
     @Override
     public CLIApplicationBase getApplication() {
         return (CLIApplicationBase) BaseApplicationImpl.getInstance();
-    }
-
-    @NotNull
-    public QMRegistry getQueryManager() {
-        return qmController;
     }
 
     @NotNull
