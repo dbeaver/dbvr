@@ -19,14 +19,11 @@ package org.dbvr.cli.command.datasource;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPDataSourceRegistry;
 import org.jkiss.dbeaver.model.app.DBPProject;
-import org.jkiss.dbeaver.model.cli.CLIConstants;
-import org.jkiss.dbeaver.model.cli.CLIException;
-import org.jkiss.dbeaver.model.cli.CLIProcessResult;
-import org.jkiss.dbeaver.model.cli.CLIUtils;
+import org.jkiss.dbeaver.model.cli.*;
 import picocli.CommandLine;
 
 @CommandLine.Command(name = "move", description = "Move datasource to another project")
-public class MoveDataSource extends AbstractDataSourceCommand {
+public class MoveDataSource extends CLIAbstractSubcommand {
 
     @CommandLine.Parameters(index = "0", description = "Datasource id or name", arity = "1")
     private String datasourceIdOrName;
@@ -39,8 +36,7 @@ public class MoveDataSource extends AbstractDataSourceCommand {
 
     @Override
     public void run() throws CLIException {
-        super.run();
-        DBPProject sourceProject = CLIUtils.findProject(fromProjectIdOrName != null ? fromProjectIdOrName : projectOption.getProjectIdOrName(), context());
+        DBPProject sourceProject = CLIUtils.findProject(fromProjectIdOrName, context());
         DBPProject targetProject = CLIUtils.findProject(targetProjectIdOrName, context());
 
         if (sourceProject.getId().equals(targetProject.getId())) {
