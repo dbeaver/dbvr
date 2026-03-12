@@ -240,6 +240,47 @@ public class DataSourceManagementTest extends DBVRTest {
         Assert.assertTrue(output.contains("list"));
     }
 
+    @Test
+    public void testCreateWithUrlAndHostConflict() throws Exception {
+        var args = new String[] {
+            "datasource", "create",
+            "--driver=h2_embedded_v2",
+            "--url=jdbc:h2:mem:test",
+            "--host=localhost"
+        };
+
+        var cmd = DBVRTestSuite.getApplication().createCommandLine();
+
+        CLIProcessResult result = cmd.executeCommandLineCommands(null, false, false, args);
+        Assert.assertEquals(CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS, result.getExitCode());
+        Assert.assertNotNull(result.getOutput());
+        Assert.assertFalse(result.getOutput().isEmpty());
+        Assert.assertTrue(result.getOutput().getFirst().contains("Parameters --host, --port, --server and --database cannot be used with --url together"));
+    }
+
+    @Test
+    public void testUpdateWithUrlAndPortConflict() throws Exception {
+        String uniqName = "test_update_conflict" + UUID.randomUUID();
+        DBPDataSourceContainer ds = createFakeDataSource(uniqName);
+        var registry = DBWorkbench.getPlatform().getWorkspace().getActiveProject().getDataSourceRegistry();
+
+        var args = new String[] {
+            "datasource", "update", ds.getId(),
+            "--url=jdbc:h2:mem:test",
+            "--port=1234"
+        };
+
+        var cmd = DBVRTestSuite.getApplication().createCommandLine();
+
+        CLIProcessResult result = cmd.executeCommandLineCommands(null, false, false, args);
+        Assert.assertEquals(CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS, result.getExitCode());
+        Assert.assertNotNull(result.getOutput());
+        Assert.assertFalse(result.getOutput().isEmpty());
+        Assert.assertTrue(result.getOutput().getFirst().contains("Parameters --host, --port, --server and --database cannot be used with --url together"));
+
+        registry.removeDataSource(ds);
+    }
+
     @NotNull
     private static DBPDataSourceContainer createFakeDataSource(
         @NotNull String uniqName

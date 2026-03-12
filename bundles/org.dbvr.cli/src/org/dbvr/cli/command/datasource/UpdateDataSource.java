@@ -48,6 +48,9 @@ public class UpdateDataSource extends AbstractDataSourceEditCommand {
     @Override
     public void run() throws CLIException {
         super.run();
+        if (dataSourceOptions != null) {
+            dataSourceOptions.validate();
+        }
         DBPProject project = getProject();
         DBPDataSourceContainer dataSourceContainer = CLIUtils.findDataSource(
             project,
