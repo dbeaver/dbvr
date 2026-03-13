@@ -19,10 +19,8 @@ package org.dbvr.cli.command.driver;
 import org.jkiss.dbeaver.model.cli.CLIAbstractSubcommand;
 import org.jkiss.dbeaver.model.cli.CLIException;
 import org.jkiss.dbeaver.model.cli.CLIProcessResult;
+import org.jkiss.dbeaver.model.cli.CLIUtils;
 import picocli.CommandLine;
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
 
 @CommandLine.Command(
     name = "driver",
@@ -39,9 +37,8 @@ public class DriverManagerHandler extends CLIAbstractSubcommand {
     @Override
     public void run() throws CLIException {
         if (spec.commandLine().getParseResult().subcommand() == null) {
-            StringWriter writer = new StringWriter();
-            spec.commandLine().usage(new PrintWriter(writer));
-            context().addResult(writer.toString());
+            String helpMessage = CLIUtils.getHelpFromCommand(spec);
+            context().addResult(helpMessage);
             context().setPostAction(CLIProcessResult.PostAction.SHUTDOWN);
         }
     }
