@@ -23,13 +23,15 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.cli.*;
+import org.jkiss.dbeaver.model.cli.model.DataSourceUpdater;
 import org.jkiss.dbeaver.model.cli.model.option.CreateDataSourceOptions;
-import org.jkiss.dbeaver.model.cli.model.option.DataSourceAuthOptions;
 import org.jkiss.dbeaver.model.runtime.LoggingProgressMonitor;
 import org.jkiss.dbeaver.utils.DataSourceUtils;
 import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.dbeaver.utils.SystemVariablesResolver;
 import org.jkiss.utils.CommonUtils;
+
+import java.util.List;
 
 public class CLIConnectionUtils {
 
@@ -37,7 +39,7 @@ public class CLIConnectionUtils {
         @Nullable String existDataSourceIdOrName,
         @Nullable CreateDataSourceOptions tempDataSourceOptions,
         @Nullable String connectionSpec,
-        @NotNull DataSourceAuthOptions authOptions,
+        @NotNull List<DataSourceUpdater> updaters,
         @Nullable String projectIdOrName,
         @NotNull CLIContext context,
         @NotNull Log parentLog
@@ -51,13 +53,13 @@ public class CLIConnectionUtils {
                 project,
                 existDataSourceIdOrName
             );
-            CLIUtils.processDataSourceAuthOptions(dataSourceContainer, authOptions);
+            CLIUtils.updateDataSource(dataSourceContainer, updaters);
         } else if (tempDataSourceOptions != null) {
             dataSourceContainer = CLIUtils.createTempDataSource(
                 project,
                 tempDataSourceOptions.getDriver(),
                 tempDataSourceOptions.getDataSourceOptions(),
-                authOptions
+                updaters
             );
         } else if (CommonUtils.isNotEmpty(connectionSpec)) {
             var instanceConnectionParameters = new ApplicationInstanceServer.InstanceConnectionParameters();
@@ -68,9 +70,6 @@ public class CLIConnectionUtils {
                 false,
                 instanceConnectionParameters.isCreateNewConnection()
             );
-            if (dataSourceContainer != null) {
-                CLIUtils.processDataSourceAuthOptions(dataSourceContainer, authOptions);
-            }
         } else {
             throw new CLIException("No datasource options provided", CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS);
         }
@@ -114,7 +113,6 @@ public class CLIConnectionUtils {
     public static DBPDataSourceContainer findDataSource(
         @Nullable String projectIdOrName,
         @NotNull String connectionIdOrName,
-
         @NotNull CLIContextImpl context
     ) throws CLIException {
         DBPProject project = CLIUtils.findProject(projectIdOrName, context);

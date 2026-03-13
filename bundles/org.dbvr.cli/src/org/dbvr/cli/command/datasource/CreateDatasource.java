@@ -16,21 +16,22 @@
  */
 package org.dbvr.cli.command.datasource;
 
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.cli.CLIException;
 import org.jkiss.dbeaver.model.cli.CLIProcessResult;
 import org.jkiss.dbeaver.model.cli.CLIUtils;
+import org.jkiss.dbeaver.model.cli.model.DataSourceUpdater;
 import org.jkiss.dbeaver.model.cli.model.option.CreateDataSourceOptions;
-import org.jkiss.dbeaver.model.cli.model.option.DataSourceAuthOptions;
 import picocli.CommandLine;
 
+import java.util.List;
+
 @CommandLine.Command(name = "create", description = "Create datasource")
-public class CreateDatasource extends AbstractDataSourceCommand {
+public class CreateDatasource extends AbstractDataSourceEditCommand {
     @CommandLine.Mixin
     private CreateDataSourceOptions createOptions;
-    @CommandLine.Mixin
-    private DataSourceAuthOptions authOptions;
 
     @Override
     public void run() throws CLIException {
@@ -40,10 +41,21 @@ public class CreateDatasource extends AbstractDataSourceCommand {
             project,
             createOptions.getDriver(),
             createOptions.getDataSourceOptions(),
-            authOptions,
+            getDataSourceUpdaters(),
             false
         );
         context().setPostAction(CLIProcessResult.PostAction.SHUTDOWN);
         context().addResult(dataSourceContainer.getId());
+    }
+
+    @NotNull
+    @Override
+    protected List<DataSourceUpdater> getDataSourceUpdaters() {
+        var updaters = super.getDataSourceUpdaters();
+        updaters.add(dataSource -> CLIUtils.updateConnectionConfiguration(
+            createOptions.getDataSourceOptions(),
+            dataSource.getConnectionConfiguration()
+        ));
+        return updaters;
     }
 }

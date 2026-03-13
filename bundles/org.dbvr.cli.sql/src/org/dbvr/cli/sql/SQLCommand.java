@@ -27,6 +27,7 @@ import org.jkiss.dbeaver.model.cli.CLIException;
 import org.jkiss.dbeaver.model.cli.CLIProcessResult;
 import org.jkiss.dbeaver.model.cli.CLIUtils;
 import org.jkiss.dbeaver.model.cli.model.CommandLineWithAuth;
+import org.jkiss.dbeaver.model.cli.model.DataSourceUpdater;
 import org.jkiss.dbeaver.model.cli.model.option.*;
 import org.jkiss.dbeaver.model.exec.DBCExecutionContext;
 import org.jkiss.dbeaver.model.exec.DBCStatistics;
@@ -109,7 +110,7 @@ public class SQLCommand extends CommandLineWithAuth {
             dataSourceOptions.existDataSourceIdOrName,
             dataSourceOptions.tempDataSourceOptions,
             dataSourceOptions.connectionSpec,
-            authOptions,
+            getDataSourceUpdaters(),
             projectOption.getProjectIdOrName(),
             context(),
             log
@@ -326,6 +327,22 @@ public class SQLCommand extends CommandLineWithAuth {
         public void flush() {
 
         }
+    }
+
+    @NotNull
+    protected List<DataSourceUpdater> getDataSourceUpdaters() {
+        List<DataSourceUpdater> updaters = new ArrayList<>();
+        if (!CommonUtils.isEmpty(spec.mixins())) {
+            for (CommandLine.Model.CommandSpec mixin : spec.mixins().values()) {
+                if (mixin.userObject() instanceof DataSourceUpdater mixinUpdater) {
+                    updaters.add(mixinUpdater);
+                }
+            }
+        }
+        if (dataSourceOptions.tempDataSourceOptions != null) {
+            updaters.add(dataSourceOptions.tempDataSourceOptions);
+        }
+        return updaters;
     }
 
 
