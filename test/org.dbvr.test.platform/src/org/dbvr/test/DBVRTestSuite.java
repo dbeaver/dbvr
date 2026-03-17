@@ -30,7 +30,6 @@ import org.junit.runners.Suite;
     HelpArgTest.class,
     DataSourceManagementTest.class,
     ProjectManagementTest.class,
-    DataSourceManagementTest.class,
     AuthModelsTest.class,
     InjectTest.class
 })
