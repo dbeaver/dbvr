@@ -171,9 +171,14 @@ public class SQLCommand extends CommandLineWithAuth {
         DataTransferProcessorDescriptor processorDescriptor = DataTransferRegistry.getInstance()
             .getAvailableProcessors(StreamTransferConsumer.class, DBSEntity.class)
             .stream()
-            .filter(p -> p.getProcessorFileExtension().equals(outputFormat))
+            .filter(p -> outputFormat.equals(p.getShortId()))
             .findFirst()
-            .orElse(null);
+            .orElseGet(() -> DataTransferRegistry.getInstance()
+                .getAvailableProcessors(StreamTransferConsumer.class, DBSEntity.class)
+                .stream()
+                .filter(p -> outputFormat.equals(p.getProcessorFileExtension()))
+                .findFirst()
+                .orElse(null));
         if (processorDescriptor == null) {
             throw new CLIException(
                 "Can't find data transfer processor for format '" + outputFormat + "'",
