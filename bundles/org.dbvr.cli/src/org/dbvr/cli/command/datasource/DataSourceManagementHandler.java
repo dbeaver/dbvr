@@ -19,10 +19,9 @@ package org.dbvr.cli.command.datasource;
 import org.jkiss.dbeaver.model.cli.CLIAbstractSubcommand;
 import org.jkiss.dbeaver.model.cli.CLIException;
 import org.jkiss.dbeaver.model.cli.CLIProcessResult;
+import org.jkiss.dbeaver.model.cli.CLIUtils;
+import org.jkiss.dbeaver.model.cli.model.CommandLineWithAuth;
 import picocli.CommandLine;
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
 
 @CommandLine.Command(
     name = "datasource",
@@ -37,14 +36,13 @@ import java.io.StringWriter;
 )
 public class DataSourceManagementHandler extends CLIAbstractSubcommand {
     @CommandLine.Spec
-    CommandLine.Model.CommandSpec spec;
+    private CommandLine.Model.CommandSpec spec;
 
     @Override
     public void run() throws CLIException {
         if (spec.commandLine().getParseResult().subcommand() == null) {
-            StringWriter writer = new StringWriter();
-            spec.commandLine().usage(new PrintWriter(writer));
-            context().addResult(writer.toString());
+            String helpMessage = CLIUtils.getHelpFromCommand(spec);
+            context().addResult(helpMessage);
             context().setPostAction(CLIProcessResult.PostAction.SHUTDOWN);
         }
     }

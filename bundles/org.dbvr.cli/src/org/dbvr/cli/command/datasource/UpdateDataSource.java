@@ -16,13 +16,14 @@
  */
 package org.dbvr.cli.command.datasource;
 
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.cli.CLIConstants;
 import org.jkiss.dbeaver.model.cli.CLIException;
 import org.jkiss.dbeaver.model.cli.CLIProcessResult;
 import org.jkiss.dbeaver.model.cli.CLIUtils;
-import org.jkiss.dbeaver.model.cli.model.option.DataSourceAuthOptions;
+import org.jkiss.dbeaver.model.cli.model.DataSourceUpdater;
 import org.jkiss.dbeaver.model.cli.model.option.DataSourceOptions;
 import org.jkiss.utils.CommonUtils;
 import picocli.CommandLine;
@@ -30,15 +31,12 @@ import picocli.CommandLine;
 import java.util.List;
 
 @CommandLine.Command(name = "update", description = "Update datasource")
-public class UpdateDataSource extends AbstractDataSourceCommand {
+public class UpdateDataSource extends AbstractDataSourceEditCommand {
     @CommandLine.Parameters(index = "0", description = "Datasource id or name", arity = "1")
     private String datasourceIdOrName;
 
     @CommandLine.Mixin
     private DataSourceOptions dataSourceOptions;
-    @CommandLine.Mixin
-    private DataSourceAuthOptions authOptions;
-
 
     @CommandLine.Option(
         names = {"-net-delete", "--network-handler-delete"},
@@ -57,13 +55,8 @@ public class UpdateDataSource extends AbstractDataSourceCommand {
         );
 
         CLIUtils.updateDataSource(
-            dataSourceOptions,
-            authOptions,
-            dataSourceContainer
-        );
-        CLIUtils.updateConnectionConfiguration(
-            dataSourceOptions,
-            dataSourceContainer.getConnectionConfiguration()
+            dataSourceContainer,
+            getDataSourceUpdaters()
         );
 
         if (!CommonUtils.isEmpty(handlersToDelete)) {
@@ -86,5 +79,16 @@ public class UpdateDataSource extends AbstractDataSourceCommand {
 
         context().setPostAction(CLIProcessResult.PostAction.SHUTDOWN);
         context().addResult(serializeDataSourceToJson(project, dataSourceContainer.getId()).trim());
+    }
+
+    @NotNull
+    @Override
+    protected List<DataSourceUpdater> getDataSourceUpdaters() {
+        var updaters = super.getDataSourceUpdaters();
+        updaters.add(dataSource -> CLIUtils.updateConnectionConfiguration(
+            dataSourceOptions,
+            dataSource.getConnectionConfiguration()
+        ));
+        return updaters;
     }
 }

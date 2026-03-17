@@ -166,6 +166,30 @@ public class ProjectManagementTest extends DBVRTest {
     }
 
     @Test
+    public void testSetDefaultProject() throws Exception {
+        String name = "test_prj_" + UUID.randomUUID();
+        DBPProject project = DBWorkbench.getPlatform().getWorkspace().createProject(name, "Default test");
+        projectsToDelete.add(project);
+
+        String[] args = {
+            "project", "default", project.getId()
+        };
+
+        var cmd = DBVRTestSuite.getApplication().createCommandLine();
+        CLIProcessResult result = cmd.executeCommandLineCommands(null, false, false, args);
+
+        Assert.assertNotNull(result.getOutput());
+        Assert.assertTrue(String.join("\n", result.getOutput()).contains("Project '" + name + "' set as default."));
+
+        String[] listArgs = {
+            "project", "list"
+        };
+        CLIProcessResult listResult = cmd.executeCommandLineCommands(null, false, false, listArgs);
+        String listOutput = String.join("\n", listResult.getOutput());
+        Assert.assertTrue("Default project should be marked in list output", listOutput.contains("yes"));
+    }
+
+    @Test
     public void testProjectFileCreation() throws Exception {
         String name = "test_prj_file_" + UUID.randomUUID();
         DBPProject project = DBWorkbench.getPlatform().getWorkspace().createProject(name, null);

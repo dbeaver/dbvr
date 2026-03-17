@@ -23,6 +23,7 @@ import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.cli.*;
+import org.jkiss.dbeaver.model.cli.model.DataSourceUpdater;
 import org.jkiss.dbeaver.model.cli.model.option.*;
 import org.jkiss.dbeaver.model.exec.DBCExecutionContext;
 import org.jkiss.dbeaver.model.exec.DBCStatistics;
@@ -104,7 +105,7 @@ public class SQLCommand extends CLIAbstractSubcommand {
             dataSourceOptions.existDataSourceIdOrName,
             dataSourceOptions.tempDataSourceOptions,
             dataSourceOptions.connectionSpec,
-            authOptions,
+            getDataSourceUpdaters(),
             projectOption.getProjectIdOrName(),
             context(),
             log
@@ -165,9 +166,14 @@ public class SQLCommand extends CLIAbstractSubcommand {
         DataTransferProcessorDescriptor processorDescriptor = DataTransferRegistry.getInstance()
             .getAvailableProcessors(StreamTransferConsumer.class, DBSEntity.class)
             .stream()
-            .filter(p -> p.getProcessorFileExtension().equals(outputFormat))
+            .filter(p -> outputFormat.equals(p.getShortId()))
             .findFirst()
-            .orElse(null);
+            .orElseGet(() -> DataTransferRegistry.getInstance()
+                .getAvailableProcessors(StreamTransferConsumer.class, DBSEntity.class)
+                .stream()
+                .filter(p -> outputFormat.equals(p.getProcessorFileExtension()))
+                .findFirst()
+                .orElse(null));
         if (processorDescriptor == null) {
             throw new CLIException(
                 "Can't find data transfer processor for format '" + outputFormat + "'",
@@ -321,6 +327,22 @@ public class SQLCommand extends CLIAbstractSubcommand {
         public void flush() {
 
         }
+    }
+
+    @NotNull
+    protected List<DataSourceUpdater> getDataSourceUpdaters() {
+        List<DataSourceUpdater> updaters = new ArrayList<>();
+        if (!CommonUtils.isEmpty(spec.mixins())) {
+            for (CommandLine.Model.CommandSpec mixin : spec.mixins().values()) {
+                if (mixin.userObject() instanceof DataSourceUpdater mixinUpdater) {
+                    updaters.add(mixinUpdater);
+                }
+            }
+        }
+        if (dataSourceOptions.tempDataSourceOptions != null) {
+            updaters.add(dataSourceOptions.tempDataSourceOptions);
+        }
+        return updaters;
     }
 
 

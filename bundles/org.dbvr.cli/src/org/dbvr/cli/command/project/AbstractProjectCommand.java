@@ -18,9 +18,11 @@ package org.dbvr.cli.command.project;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.app.DBPProject;
+import org.jkiss.dbeaver.model.app.DBPWorkspace;
 import org.jkiss.dbeaver.model.cli.CLIAbstractSubcommand;
 import org.jkiss.dbeaver.model.cli.CLIUtils;
 import org.jkiss.dbeaver.model.impl.app.BaseProjectImpl;
+import org.jkiss.dbeaver.model.impl.app.BaseWorkspaceImpl;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.utils.CommonUtils;
 import picocli.CommandLine;
@@ -37,21 +39,29 @@ public abstract class AbstractProjectCommand extends CLIAbstractSubcommand {
 
     @NotNull
     protected String serializeProjectList() {
+        DBPWorkspace workspace = DBWorkbench.getPlatform().getWorkspace();
+        String activeProjectName = null;
+        if (workspace instanceof BaseWorkspaceImpl baseWorkspace) {
+            activeProjectName = baseWorkspace.getActiveProjectName();
+        }
+
         List<Map<String, String>> projectData = new ArrayList<>();
-        for (DBPProject project : DBWorkbench.getPlatform().getWorkspace().getProjects()) {
+        for (DBPProject project : workspace.getProjects()) {
             String name = project.getName();
             if (BaseProjectImpl.isHiddenProjectName(name)) {
                 continue;
             }
-            projectData.add(collectProjectData(project.getId(), name, project.getDescription()));
+            boolean isDefault = name.equals(activeProjectName);
+            projectData.add(collectProjectData(project.getId(), name, project.getDescription(), isDefault));
         }
         return CLIUtils.formatAsTable(projectData);
     }
 
-    private Map<String, String> collectProjectData(String id, String name, String description) {
+    private Map<String, String> collectProjectData(String id, String name, String description, boolean isDefault) {
         Map<String, String> row = new LinkedHashMap<>();
         row.put("ID", id);
         row.put("NAME", name);
+        row.put("DEFAULT", isDefault ? "yes" : "");
         row.put("DESCRIPTION", CommonUtils.notNull(description, ""));
         return row;
     }

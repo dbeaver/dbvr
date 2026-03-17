@@ -68,6 +68,7 @@ public class CLIPlatform extends BasePlatformImpl {
 
         // Register properties adapter
         try {
+            getApplication().beforeWorkspaceInitialization();
             this.workspace = getApplication().createWorkspace(this);
             this.workspace.initializeProjects();
         } catch (Exception e) {

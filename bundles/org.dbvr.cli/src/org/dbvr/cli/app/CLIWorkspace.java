@@ -141,6 +141,11 @@ public class CLIWorkspace extends BaseWorkspaceImpl {
         return activeProject;
     }
 
+    public void setActiveProject(@NotNull DBPProject project) {
+        this.activeProject = project;
+        setActiveProjectName(project.getName());
+    }
+
     @Nullable
     @Override
     public DBPProject getProject(@NotNull String projectName) {
@@ -196,7 +201,13 @@ public class CLIWorkspace extends BaseWorkspaceImpl {
         for (Path projectPath : projectPaths) {
             projects.add(createProject(projectPath));
         }
-        var defaultProject = getProject(platform.getApplication().getDefaultProjectName());
+
+        String activeProjectName = getActiveProjectName();
+        var defaultProject = CommonUtils.isEmpty(activeProjectName) ? null : getProject(activeProjectName);
+        if (defaultProject == null) {
+            activeProjectName = platform.getApplication().getDefaultProjectName();
+            defaultProject = getProject(activeProjectName);
+        }
         if (defaultProject == null) {
             defaultProject = createDefaultProject();
         }

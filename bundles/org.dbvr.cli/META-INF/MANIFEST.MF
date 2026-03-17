@@ -12,5 +12,6 @@ Require-Bundle: org.jkiss.dbeaver.model;visibility:=reexport,
  org.jkiss.dbeaver.registry;visibility:=reexport,
  org.jkiss.dbeaver.model.cli;visibility:=reexport
 Export-Package: org.dbvr.cli.app,
- org.dbvr.cli.model
+ org.dbvr.cli.model,
+ org.dbvr.cli.command.datasource
 Automatic-Module-Name: org.dbvr.app.ce
