@@ -272,9 +272,11 @@ public class DataSourceManagementTest extends DBVRTest {
             };
             CLIProcessResult result = cmd.executeCommandLineCommands(null, false, false, args);
 
-            Assert.assertEquals(CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS, result.getExitCode());
             String output = String.join("\n", result.getOutput());
-            Assert.assertTrue(output.contains("same"));
+            Assert.assertEquals("Move to same project should fail with ILLEGAL_ARGUMENTS. Output: " + output,
+                CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS, result.getExitCode());
+            Assert.assertTrue("Output should contain word 'same'. Actual output: " + output,
+                output.contains("same"));
         } finally {
             registry.removeDataSource(registry.getDataSource(ds.getId()));
         }
