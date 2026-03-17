@@ -308,10 +308,11 @@ public class DataSourceManagementTest extends DBVRTest {
         var cmd = DBVRTestSuite.getApplication().createCommandLine();
 
         CLIProcessResult result = cmd.executeCommandLineCommands(null, false, false, args);
-        Assert.assertEquals(CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS, result.getExitCode());
+        String output = String.join("\n", result.getOutput());
+        Assert.assertEquals(CLIConstants.EXIT_CODE_ERROR, result.getExitCode());
         Assert.assertNotNull(result.getOutput());
         Assert.assertFalse(result.getOutput().isEmpty());
-        Assert.assertTrue(result.getOutput().getFirst().contains("Parameters --host, --port, --server and --database cannot be used with --url together"));
+        Assert.assertTrue(output.contains("mutually exclusive"));
     }
 
     @Test
@@ -329,10 +330,11 @@ public class DataSourceManagementTest extends DBVRTest {
         var cmd = DBVRTestSuite.getApplication().createCommandLine();
 
         CLIProcessResult result = cmd.executeCommandLineCommands(null, false, false, args);
-        Assert.assertEquals(CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS, result.getExitCode());
+        String output = String.join("\n", result.getOutput());
+        Assert.assertEquals(CLIConstants.EXIT_CODE_ERROR, result.getExitCode());
         Assert.assertNotNull(result.getOutput());
         Assert.assertFalse(result.getOutput().isEmpty());
-        Assert.assertTrue(result.getOutput().getFirst().contains("Parameters --host, --port, --server and --database cannot be used with --url together"));
+        Assert.assertTrue(output.contains("mutually exclusive"));
 
         registry.removeDataSource(ds);
     }

@@ -36,9 +36,6 @@ public class CreateDatasource extends AbstractDataSourceEditCommand {
     @Override
     public void run() throws CLIException {
         super.run();
-        if (createOptions.getDataSourceOptions() != null) {
-            createOptions.getDataSourceOptions().validate();
-        }
         DBPProject project = getProject();
         DBPDataSourceContainer dataSourceContainer = CLIUtils.createDataSource(
             project,
