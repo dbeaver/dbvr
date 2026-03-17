@@ -225,6 +225,62 @@ public class DataSourceManagementTest extends DBVRTest {
     }
 
     @Test
+    public void testMove() throws Exception {
+        String uniqName = "test_move" + UUID.randomUUID();
+        DBPDataSourceContainer ds = createFakeDataSource(uniqName);
+        String dsId = ds.getId();
+
+        String targetProjectName = "test_move_target_prj_" + UUID.randomUUID();
+        DBPProject targetProject = DBWorkbench.getPlatform().getWorkspace().createProject(targetProjectName, null);
+        try {
+            var cmd = DBVRTestSuite.getApplication().createCommandLine();
+            var args = new String[]{
+                "datasource", "move", dsId,
+                "-to", targetProjectName
+            };
+            CLIProcessResult result = cmd.executeCommandLineCommands(null, false, false, args);
+
+            // datasource removed from the source project
+            DBPProject sourceProject = DBWorkbench.getPlatform().getWorkspace().getActiveProject();
+            Assert.assertNull(sourceProject.getDataSourceRegistry().getDataSource(dsId));
+
+            // datasource must exist in the target project
+            DBPDataSourceContainer movedDs = targetProject.getDataSourceRegistry().findDataSourceByName(uniqName);
+            Assert.assertNotNull(movedDs);
+
+            Assert.assertNotNull(result.getOutput());
+            Assert.assertEquals(1, result.getOutput().size());
+            String output = result.getOutput().getFirst();
+            Assert.assertTrue(output.contains(uniqName));
+            Assert.assertTrue(output.contains(targetProjectName));
+        } finally {
+            DBWorkbench.getPlatform().getWorkspace().deleteProject(targetProject);
+        }
+    }
+
+    @Test
+    public void testMoveSameProject() throws Exception {
+        String uniqName = "test_move_same" + UUID.randomUUID();
+        DBPDataSourceContainer ds = createFakeDataSource(uniqName);
+        var registry = DBWorkbench.getPlatform().getWorkspace().getActiveProject().getDataSourceRegistry();
+        try {
+            DBPProject activeProject = DBWorkbench.getPlatform().getWorkspace().getActiveProject();
+            var cmd = DBVRTestSuite.getApplication().createCommandLine();
+            var args = new String[]{
+                "datasource", "move", ds.getId(),
+                "-to", activeProject.getName()
+            };
+            CLIProcessResult result = cmd.executeCommandLineCommands(null, false, false, args);
+
+            Assert.assertEquals(CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS, result.getExitCode());
+            String output = String.join("\n", result.getOutput());
+            Assert.assertTrue(output.contains("same"));
+        } finally {
+            registry.removeDataSource(registry.getDataSource(ds.getId()));
+        }
+    }
+
+    @Test
     public void testHelpWhenWhenCommandWithNoParams() throws Exception {
         var cmd = DBVRTestSuite.getApplication().createCommandLine();
         var args = new String[] {

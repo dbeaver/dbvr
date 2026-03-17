@@ -20,7 +20,6 @@ import org.jkiss.dbeaver.model.cli.CLIAbstractSubcommand;
 import org.jkiss.dbeaver.model.cli.CLIException;
 import org.jkiss.dbeaver.model.cli.CLIProcessResult;
 import org.jkiss.dbeaver.model.cli.CLIUtils;
-import org.jkiss.dbeaver.model.cli.model.CommandLineWithAuth;
 import picocli.CommandLine;
 
 @CommandLine.Command(
@@ -31,7 +30,8 @@ import picocli.CommandLine;
         UpdateDataSource.class,
         DeleteDataSource.class,
         ListDataSource.class,
-        ViewDataSource.class
+        ViewDataSource.class,
+        MoveDataSource.class
     }
 )
 public class DataSourceManagementHandler extends CLIAbstractSubcommand {
