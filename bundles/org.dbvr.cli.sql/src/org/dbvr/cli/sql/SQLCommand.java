@@ -29,7 +29,6 @@ import org.jkiss.dbeaver.model.exec.DBCExecutionContext;
 import org.jkiss.dbeaver.model.exec.DBCStatistics;
 import org.jkiss.dbeaver.model.exec.output.DBCOutputSeverity;
 import org.jkiss.dbeaver.model.exec.output.DBCOutputWriter;
-import org.jkiss.dbeaver.model.fs.DBFPath;
 import org.jkiss.dbeaver.model.impl.DataSourceContextProvider;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
@@ -55,6 +54,7 @@ import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FilterOutputStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
 
 @CommandLine.Command(name = "sql", description = "Execute SQL script")
@@ -222,10 +222,11 @@ public class SQLCommand extends CLIAbstractSubcommand {
 
         long offset = dataTransferOptions.getOffset();
         long limit = dataTransferOptions.getLimit();
-        try (DBFPath outputFile = outputFileOption.getOutputFile();
+        Path outputFile = outputFileOption.getOutputFile();
+        try (
             var out = outputFile == null
                 ? new ByteArrayOutputStream()
-                : new BufferedOutputStream(Files.newOutputStream(outputFile.path()))
+                : new BufferedOutputStream(Files.newOutputStream(outputFile))
         ) {
             var uncloseableOut = new FilterOutputStream(out) {
                 @Override
