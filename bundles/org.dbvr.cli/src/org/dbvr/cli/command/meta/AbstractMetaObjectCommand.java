@@ -50,9 +50,6 @@ import java.util.stream.Collectors;
 )
 public abstract class AbstractMetaObjectCommand extends CLIAbstractSubcommand {
 
-    @CommandLine.Mixin
-    private ProjectOption projectOption;
-
     @CommandLine.Option(names = {"--datasource"}, description = "Datasource ID or name", required = true,
         scope = CommandLine.ScopeType.INHERIT)
     private String datasourceId;
@@ -63,14 +60,17 @@ public abstract class AbstractMetaObjectCommand extends CLIAbstractSubcommand {
     @CommandLine.Option(names = {"--schema"}, description = "Schema name", scope = CommandLine.ScopeType.INHERIT)
     private String schemaName;
 
+    @CommandLine.Option(names = {"--table"}, description = "Table name", scope = CommandLine.ScopeType.INHERIT)
+    private String tableName;
+
+    @CommandLine.Mixin
+    private ProjectOption projectOption;
+
     @CommandLine.Mixin
     private DataSourceOptions dataSourceOptions;
 
     @CommandLine.Mixin
     private DataSourceAuthOptions authOptions;
-
-    @CommandLine.Option(names = {"--table"}, description = "Table name", scope = CommandLine.ScopeType.INHERIT)
-    private String tableName;
 
     /**
      * @return type of object this command manages (e.g "table", "schhema", "database")
@@ -153,13 +153,8 @@ public abstract class AbstractMetaObjectCommand extends CLIAbstractSubcommand {
                 .filter(this::isRelevantObject)
                 .map(DBPNamedObject::getName)
                 .collect(Collectors.joining("\n"));
-            if (CommonUtils.isEmpty(result)) {
-                throw new CLIException("No " + getObjectTypeName() + "s found", CLIConstants.EXIT_CODE_ERROR);
-            }
             context().addResult(result);
             context().setPostAction(CLIProcessResult.PostAction.SHUTDOWN);
-        } else {
-            throw new CLIException("No " + getObjectTypeName() + "s found", CLIConstants.EXIT_CODE_ERROR);
         }
     }
 
@@ -190,23 +185,23 @@ public abstract class AbstractMetaObjectCommand extends CLIAbstractSubcommand {
             throw new CLIException(getObjectTypeName() + " '" + objectName + "' not found", CLIConstants.EXIT_CODE_ERROR);
         }
 
-        if (!(object instanceof DBPScriptObject)) {
+        if (object instanceof DBPScriptObject dbpScriptObject) {
+            Map<String, Object> options = new HashMap<>();
+            if (fullDDL) {
+                options.put(DBPScriptObject.OPTION_INCLUDE_NESTED_OBJECTS, true);
+                options.put(DBPScriptObject.OPTION_INCLUDE_COMMENTS, true);
+                options.put(DBPScriptObject.OPTION_INCLUDE_PERMISSIONS, true);
+            }
+
+            String ddl = dbpScriptObject.getObjectDefinitionText(monitor, options);
+            context().addResult(ddl.trim());
+            context().setPostAction(CLIProcessResult.PostAction.SHUTDOWN);
+        } else {
             throw new CLIException(
                 getObjectTypeName() + " '" + objectName + "' does not support DDL",
                 CLIConstants.EXIT_CODE_ERROR
             );
         }
-
-        Map<String, Object> options = new HashMap<>();
-        if (fullDDL) {
-            options.put(DBPScriptObject.OPTION_INCLUDE_NESTED_OBJECTS, true);
-            options.put(DBPScriptObject.OPTION_INCLUDE_COMMENTS, true);
-            options.put(DBPScriptObject.OPTION_INCLUDE_PERMISSIONS, true);
-        }
-
-        String ddl = ((DBPScriptObject) object).getObjectDefinitionText(monitor, options);
-        context().addResult(ddl.trim());
-        context().setPostAction(CLIProcessResult.PostAction.SHUTDOWN);
     }
 
     protected void executeOperation(@NotNull String name, @NotNull MetaOperation operation) throws Exception {
