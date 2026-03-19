@@ -11,5 +11,8 @@
         <parameter
             exitAfterExecute="true"
             handler="org.dbvr.cli.command.project.ProjectManagementHandler"/>
+        <parameter
+            exitAfterExecute="true"
+            handler="org.dbvr.cli.command.meta.MetaCommand"/>
     </extension>
 </plugin>
