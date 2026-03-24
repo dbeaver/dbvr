@@ -27,16 +27,13 @@ public class MetaDdlCommand extends CLIAbstractSubcommand {
     @CommandLine.ParentCommand
     private AbstractMetaObjectCommand parent;
 
-    @CommandLine.Option(names = {"--object"}, description = "Object name")
-    private String objectName;
-
     @CommandLine.Option(names = {"--full"}, description = "Show full DDL")
     private boolean fullDDL;
 
     @Override
     public void run() throws CLIException {
         try {
-            parent.ddl(objectName, fullDDL);
+            parent.ddl(fullDDL);
         } catch (Exception e) {
             throw new CLIException(
                 "Error getting DDL for " + parent.getObjectTypeName() + ": " + e.getMessage(),

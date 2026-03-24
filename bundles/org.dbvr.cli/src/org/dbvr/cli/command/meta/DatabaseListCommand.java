@@ -19,8 +19,7 @@ package org.dbvr.cli.command.meta;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPDataSource;
-import org.jkiss.dbeaver.model.cli.CLIConstants;
-import org.jkiss.dbeaver.model.cli.CLIException;
+import org.jkiss.dbeaver.model.cli.CLIProcessResult;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.DBSObjectContainer;
@@ -47,8 +46,17 @@ public class DatabaseListCommand extends AbstractMetaObjectCommand {
     ) throws DBException {
         // for databases which itself is the container
         if (dataSource instanceof DBSObjectContainer dbsObjectContainer) {
-            return dbsObjectContainer;
+            var container = dbsObjectContainer.getDataSource();
+            if (container != null) {
+                boolean embedded = container.getContainer().getDriver().isEmbedded();
+                if (embedded) {
+                    context().addResult("Database doesn't support databases/catalogs");
+                    context().setPostAction(CLIProcessResult.PostAction.SHUTDOWN);
+                    return null;
+                }
+            }
         }
-        throw new CLIException("Datasource '" + getDatasourceId() + "' does not support metadata", CLIConstants.EXIT_CODE_ERROR);
+
+        return super.getBaseContainer(monitor, dataSource);
     }
 }

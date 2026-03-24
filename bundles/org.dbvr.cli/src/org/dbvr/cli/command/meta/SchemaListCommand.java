@@ -18,6 +18,7 @@ package org.dbvr.cli.command.meta;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.struct.DBSObject;
+import org.jkiss.dbeaver.model.struct.rdb.DBSCatalog;
 import org.jkiss.dbeaver.model.struct.rdb.DBSSchema;
 import picocli.CommandLine;
 
@@ -31,6 +32,6 @@ public class SchemaListCommand extends AbstractMetaObjectCommand {
 
     @Override
     public boolean isRelevantObject(@NotNull DBSObject object) {
-        return object instanceof DBSSchema;
+        return object instanceof DBSSchema || object instanceof DBSCatalog;
     }
 }

@@ -54,13 +54,13 @@ public abstract class AbstractMetaObjectCommand extends CLIAbstractSubcommand {
         scope = CommandLine.ScopeType.INHERIT)
     private String datasourceId;
 
-    @CommandLine.Option(names = {"--catalog"}, description = "Database (catalog) name", scope = CommandLine.ScopeType.INHERIT)
+    @CommandLine.Option(names = {"--database-name"}, description = "Database (catalog) name", scope = CommandLine.ScopeType.INHERIT)
     private String databaseName;
 
-    @CommandLine.Option(names = {"--schema"}, description = "Schema name", scope = CommandLine.ScopeType.INHERIT)
+    @CommandLine.Option(names = {"--schema-name"}, description = "Schema name", scope = CommandLine.ScopeType.INHERIT)
     private String schemaName;
 
-    @CommandLine.Option(names = {"--table"}, description = "Table name", scope = CommandLine.ScopeType.INHERIT)
+    @CommandLine.Option(names = {"--table-name"}, description = "Table name", scope = CommandLine.ScopeType.INHERIT)
     private String tableName;
 
     @CommandLine.Mixin
@@ -146,8 +146,10 @@ public abstract class AbstractMetaObjectCommand extends CLIAbstractSubcommand {
         }
 
         DBSObjectContainer container = getBaseContainer(monitor, dataSource);
+        if (container == null) {
+            return;
+        }
         Collection<? extends DBSObject> children = container.getChildren(monitor);
-
         if (children != null) {
             String result = children.stream()
                 .filter(this::isRelevantObject)
@@ -158,12 +160,18 @@ public abstract class AbstractMetaObjectCommand extends CLIAbstractSubcommand {
         }
     }
 
-    public void ddl(String objectName, boolean fullDDL) throws Exception {
-        if (CommonUtils.isEmpty(objectName)) {
+    public void ddl(boolean fullDDL) throws Exception {
+        String objectName = null;
+        if (CommonUtils.isNotEmpty(tableName)) {
             objectName = tableName;
+        } else if (CommonUtils.isNotEmpty(schemaName)) {
+            objectName = schemaName;
+        } else if (CommonUtils.isNotEmpty(databaseName)) {
+            objectName = databaseName;
         }
+
         if (CommonUtils.isEmpty(objectName)) {
-            throw new CLIException("Object name is not specified", CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS);
+            throw new CLIException("Object name is not specified (use --table-name, --schema-name or --database-name)", CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS);
         }
         String finalObjectName = objectName;
         String operationName = "Get " + getObjectTypeName() + " DDL";
@@ -179,7 +187,16 @@ public abstract class AbstractMetaObjectCommand extends CLIAbstractSubcommand {
         }
 
         DBSObjectContainer container = getBaseContainer(monitor, dataSource);
-        DBSObject object = container.getChild(monitor, objectName);
+        if (container == null) {
+            return;
+        }
+
+        DBSObject object;
+        if (container.getName().equals(objectName) && isRelevantObject(container)) {
+            object = container;
+        } else {
+            object = container.getChild(monitor, objectName);
+        }
 
         if (object == null || !isRelevantObject(object)) {
             throw new CLIException(getObjectTypeName() + " '" + objectName + "' not found", CLIConstants.EXIT_CODE_ERROR);
