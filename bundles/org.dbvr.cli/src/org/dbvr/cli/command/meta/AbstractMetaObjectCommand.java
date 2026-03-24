@@ -82,8 +82,6 @@ public abstract class AbstractMetaObjectCommand extends CLIAbstractSubcommand {
 
     /**
      * Gets the type of object this command manages (e.g. "table", "schema", "database").
-     *
-     * @return type of object this command manages
      */
     @NotNull
     public abstract String getObjectTypeName();
