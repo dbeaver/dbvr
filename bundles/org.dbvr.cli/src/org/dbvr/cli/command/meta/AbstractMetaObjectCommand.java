@@ -56,18 +56,6 @@ public abstract class AbstractMetaObjectCommand extends CLIAbstractSubcommand {
         scope = CommandLine.ScopeType.INHERIT)
     private String datasourceId;
 
-    @Nullable
-    @CommandLine.Option(names = {"--database-name"}, description = "Database (catalog) name", scope = CommandLine.ScopeType.INHERIT)
-    private String databaseName;
-
-    @Nullable
-    @CommandLine.Option(names = {"--schema-name"}, description = "Schema name", scope = CommandLine.ScopeType.INHERIT)
-    private String schemaName;
-
-    @Nullable
-    @CommandLine.Option(names = {"--table-name"}, description = "Table name", scope = CommandLine.ScopeType.INHERIT)
-    private String tableName;
-
     @NotNull
     @CommandLine.Mixin
     private ProjectOption projectOption;
@@ -87,6 +75,15 @@ public abstract class AbstractMetaObjectCommand extends CLIAbstractSubcommand {
     public abstract String getObjectTypeName();
 
     public abstract boolean isRelevantObject(@NotNull DBSObject object);
+
+    @Nullable
+    public abstract String getDatabaseName();
+
+    @Nullable
+    public abstract String getSchemaName();
+
+    @Nullable
+    public abstract String getTableName();
 
     @NotNull
     public DBPDataSourceContainer getDataSourceContainer() throws DBException {
@@ -111,6 +108,7 @@ public abstract class AbstractMetaObjectCommand extends CLIAbstractSubcommand {
             container = dbsObjectContainer;
         }
 
+        String databaseName = getDatabaseName();
         if (CommonUtils.isNotEmpty(databaseName)) {
             if (container != null) {
                 DBSObject child = container.getChild(monitor, databaseName);
@@ -124,6 +122,7 @@ public abstract class AbstractMetaObjectCommand extends CLIAbstractSubcommand {
             }
         }
 
+        String schemaName = getSchemaName();
         if (CommonUtils.isNotEmpty(schemaName)) {
             if (container != null) {
                 DBSObject child = container.getChild(monitor, schemaName);
@@ -173,6 +172,10 @@ public abstract class AbstractMetaObjectCommand extends CLIAbstractSubcommand {
 
     public void ddl(boolean fullDDL) throws Exception {
         String objectName = null;
+        String tableName = getTableName();
+        String schemaName = getSchemaName();
+        String databaseName = getDatabaseName();
+
         if (CommonUtils.isNotEmpty(tableName)) {
             objectName = tableName;
         } else if (CommonUtils.isNotEmpty(schemaName)) {
@@ -269,21 +272,6 @@ public abstract class AbstractMetaObjectCommand extends CLIAbstractSubcommand {
     @NotNull
     public String getDatasourceId() {
         return datasourceId;
-    }
-
-    @Nullable
-    public String getDatabaseName() {
-        return databaseName;
-    }
-
-    @Nullable
-    public String getSchemaName() {
-        return schemaName;
-    }
-
-    @Nullable
-    public String getTableName() {
-        return tableName;
     }
 
     @NotNull

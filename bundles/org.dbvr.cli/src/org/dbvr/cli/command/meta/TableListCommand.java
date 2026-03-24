@@ -17,6 +17,7 @@
 package org.dbvr.cli.command.meta;
 
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.struct.DBSEntity;
 import org.jkiss.dbeaver.model.struct.DBSEntityType;
 import org.jkiss.dbeaver.model.struct.DBSObject;
@@ -38,5 +39,35 @@ public class TableListCommand extends AbstractMetaObjectCommand {
             return entityType == DBSEntityType.TABLE || entityType == DBSEntityType.VIEW;
         }
         return false;
+    }
+
+    @Nullable
+    @CommandLine.Option(names = {"--database-name"}, description = "Database (catalog) name", scope = CommandLine.ScopeType.INHERIT)
+    private String databaseName;
+
+    @Nullable
+    @CommandLine.Option(names = {"--schema-name"}, description = "Schema name", scope = CommandLine.ScopeType.INHERIT)
+    private String schemaName;
+
+    @Nullable
+    @CommandLine.Option(names = {"--table-name"}, description = "Table name", scope = CommandLine.ScopeType.INHERIT)
+    private String tableName;
+
+    @Nullable
+    @Override
+    public String getDatabaseName() {
+        return databaseName;
+    }
+
+    @Nullable
+    @Override
+    public String getSchemaName() {
+        return schemaName;
+    }
+
+    @Nullable
+    @Override
+    public String getTableName() {
+        return tableName;
     }
 }

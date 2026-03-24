@@ -62,4 +62,26 @@ public class DatabaseListCommand extends AbstractMetaObjectCommand {
 
         return super.getBaseContainer(monitor, dataSource);
     }
+
+    @Nullable
+    @CommandLine.Option(names = {"--database-name"}, description = "Database (catalog) name", scope = CommandLine.ScopeType.INHERIT)
+    private String databaseName;
+
+    @Nullable
+    @Override
+    public String getDatabaseName() {
+        return databaseName;
+    }
+
+    @Nullable
+    @Override
+    public String getSchemaName() {
+        return null;
+    }
+
+    @Nullable
+    @Override
+    public String getTableName() {
+        return null;
+    }
 }

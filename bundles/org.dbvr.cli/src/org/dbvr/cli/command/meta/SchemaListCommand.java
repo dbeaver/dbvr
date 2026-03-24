@@ -17,6 +17,7 @@
 package org.dbvr.cli.command.meta;
 
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.rdb.DBSCatalog;
 import org.jkiss.dbeaver.model.struct.rdb.DBSSchema;
@@ -34,5 +35,31 @@ public class SchemaListCommand extends AbstractMetaObjectCommand {
     @Override
     public boolean isRelevantObject(@NotNull DBSObject object) {
         return object instanceof DBSSchema || object instanceof DBSCatalog;
+    }
+
+    @Nullable
+    @CommandLine.Option(names = {"--database-name"}, description = "Database (catalog) name", scope = CommandLine.ScopeType.INHERIT)
+    private String databaseName;
+
+    @Nullable
+    @CommandLine.Option(names = {"--schema-name"}, description = "Schema name", scope = CommandLine.ScopeType.INHERIT)
+    private String schemaName;
+
+    @Nullable
+    @Override
+    public String getDatabaseName() {
+        return databaseName;
+    }
+
+    @Nullable
+    @Override
+    public String getSchemaName() {
+        return schemaName;
+    }
+
+    @Nullable
+    @Override
+    public String getTableName() {
+        return null;
     }
 }
