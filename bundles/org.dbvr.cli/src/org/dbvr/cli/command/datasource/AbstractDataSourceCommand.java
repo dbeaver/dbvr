@@ -30,7 +30,6 @@ import org.jkiss.dbeaver.model.cli.CLIUtils;
 import org.jkiss.dbeaver.model.cli.model.option.ProjectOption;
 import org.jkiss.dbeaver.model.data.json.JSONUtils;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
-import org.jkiss.dbeaver.registry.DataSourceConfigurationManagerBuffer;
 import org.jkiss.dbeaver.registry.DataSourceRegistry;
 import picocli.CommandLine;
 
@@ -84,12 +83,7 @@ public abstract class AbstractDataSourceCommand extends CLIAbstractSubcommand {
     }
 
     private String serializeDataSources(@NotNull DBPProject project, @Nullable String dsId) throws CLIException {
-        DataSourceConfigurationManagerBuffer buffer = new DataSourceConfigurationManagerBuffer() {
-            @Override
-            public boolean isTrusted() {
-                return false;
-            }
-        };
+        var buffer = new CLIDataSourceConfigurationManagerBuffer();
         DBPDataSourceRegistry registry = project.getDataSourceRegistry();
         if (!(registry instanceof DataSourceRegistry<?> dataSourceRegistry)) {
             throw new CLIException(
