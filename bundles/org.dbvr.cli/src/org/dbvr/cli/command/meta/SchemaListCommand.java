@@ -25,6 +25,7 @@ import picocli.CommandLine;
 @CommandLine.Command(name = "schema", description = "Schema operations")
 public class SchemaListCommand extends AbstractMetaObjectCommand {
 
+    @NotNull
     @Override
     public String getObjectTypeName() {
         return "schema";

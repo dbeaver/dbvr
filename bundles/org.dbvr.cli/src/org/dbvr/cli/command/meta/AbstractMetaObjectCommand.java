@@ -19,6 +19,7 @@ package org.dbvr.cli.command.meta;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
@@ -50,35 +51,46 @@ import java.util.stream.Collectors;
 )
 public abstract class AbstractMetaObjectCommand extends CLIAbstractSubcommand {
 
+    @NotNull
     @CommandLine.Option(names = {"--datasource"}, description = "Datasource ID or name", required = true,
         scope = CommandLine.ScopeType.INHERIT)
     private String datasourceId;
 
+    @Nullable
     @CommandLine.Option(names = {"--database-name"}, description = "Database (catalog) name", scope = CommandLine.ScopeType.INHERIT)
     private String databaseName;
 
+    @Nullable
     @CommandLine.Option(names = {"--schema-name"}, description = "Schema name", scope = CommandLine.ScopeType.INHERIT)
     private String schemaName;
 
+    @Nullable
     @CommandLine.Option(names = {"--table-name"}, description = "Table name", scope = CommandLine.ScopeType.INHERIT)
     private String tableName;
 
+    @NotNull
     @CommandLine.Mixin
     private ProjectOption projectOption;
 
+    @NotNull
     @CommandLine.Mixin
     private DataSourceOptions dataSourceOptions;
 
+    @NotNull
     @CommandLine.Mixin
     private DataSourceAuthOptions authOptions;
 
     /**
-     * @return type of object this command manages (e.g "table", "schhema", "database")
+     * Gets the type of object this command manages (e.g. "table", "schema", "database").
+     *
+     * @return type of object this command manages
      */
+    @NotNull
     public abstract String getObjectTypeName();
 
     public abstract boolean isRelevantObject(@NotNull DBSObject object);
 
+    @NotNull
     public DBPDataSourceContainer getDataSourceContainer() throws DBException {
         DBPDataSourceContainer container = CLIUtils.findDataSource(
             CLIUtils.findProject(projectOption.getProjectIdOrName(), context()),
@@ -91,6 +103,7 @@ public abstract class AbstractMetaObjectCommand extends CLIAbstractSubcommand {
         return container;
     }
 
+    @Nullable
     public DBSObjectContainer getBaseContainer(
         @NotNull DBRProgressMonitor monitor,
         @NotNull DBPDataSource dataSource
@@ -178,7 +191,7 @@ public abstract class AbstractMetaObjectCommand extends CLIAbstractSubcommand {
         executeOperation(operationName, monitor -> internalDdl(monitor, finalObjectName, fullDDL));
     }
 
-    public void internalDdl(@NotNull DBRProgressMonitor monitor, String objectName, boolean fullDDL) throws DBException {
+    public void internalDdl(@NotNull DBRProgressMonitor monitor, @NotNull String objectName, boolean fullDDL) throws DBException {
         DBPDataSourceContainer dataSourceContainer = getDataSourceContainer();
         dataSourceContainer.connect(monitor, true, false);
         DBPDataSource dataSource = dataSourceContainer.getDataSource();
@@ -255,30 +268,37 @@ public abstract class AbstractMetaObjectCommand extends CLIAbstractSubcommand {
         }
     }
 
+    @NotNull
     public String getDatasourceId() {
         return datasourceId;
     }
 
+    @Nullable
     public String getDatabaseName() {
         return databaseName;
     }
 
+    @Nullable
     public String getSchemaName() {
         return schemaName;
     }
 
+    @Nullable
     public String getTableName() {
         return tableName;
     }
 
+    @NotNull
     public ProjectOption getProjectOption() {
         return projectOption;
     }
 
+    @NotNull
     public DataSourceOptions getDataSourceOptions() {
         return dataSourceOptions;
     }
 
+    @NotNull
     public DataSourceAuthOptions getAuthOptions() {
         return authOptions;
     }

@@ -17,6 +17,7 @@
 package org.dbvr.cli.command.meta;
 
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.cli.CLIProcessResult;
@@ -29,6 +30,7 @@ import picocli.CommandLine;
 @CommandLine.Command(name = "database", description = "Database (catalog) operations")
 public class DatabaseListCommand extends AbstractMetaObjectCommand {
 
+    @NotNull
     @Override
     public String getObjectTypeName() {
         return "database";
@@ -39,6 +41,7 @@ public class DatabaseListCommand extends AbstractMetaObjectCommand {
         return object instanceof DBSCatalog;
     }
 
+    @Nullable
     @Override
     public DBSObjectContainer getBaseContainer(
         @NotNull DBRProgressMonitor monitor,

@@ -16,6 +16,7 @@
  */
 package org.dbvr.cli.command.meta;
 
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.cli.CLIAbstractSubcommand;
 import org.jkiss.dbeaver.model.cli.CLIConstants;
 import org.jkiss.dbeaver.model.cli.CLIException;
@@ -24,6 +25,7 @@ import picocli.CommandLine;
 @CommandLine.Command(name = "list", description = "List metadata objects")
 public class MetaListCommand extends CLIAbstractSubcommand {
 
+    @NotNull
     @CommandLine.ParentCommand
     private AbstractMetaObjectCommand parent;
 

@@ -25,6 +25,7 @@ import picocli.CommandLine;
 @CommandLine.Command(name = "table", description = "Table meta operations")
 public class TableListCommand extends AbstractMetaObjectCommand {
 
+    @NotNull
     @Override
     public String getObjectTypeName() {
         return "table";

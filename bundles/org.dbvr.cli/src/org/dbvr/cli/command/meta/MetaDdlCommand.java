@@ -16,6 +16,7 @@
  */
 package org.dbvr.cli.command.meta;
 
+import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.cli.CLIAbstractSubcommand;
 import org.jkiss.dbeaver.model.cli.CLIConstants;
 import org.jkiss.dbeaver.model.cli.CLIException;
@@ -24,6 +25,7 @@ import picocli.CommandLine;
 @CommandLine.Command(name = "ddl", description = "Get object DDL")
 public class MetaDdlCommand extends CLIAbstractSubcommand {
 
+    @NotNull
     @CommandLine.ParentCommand
     private AbstractMetaObjectCommand parent;
 
