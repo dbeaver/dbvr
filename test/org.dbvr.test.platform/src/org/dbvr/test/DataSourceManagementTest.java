@@ -272,9 +272,11 @@ public class DataSourceManagementTest extends DBVRTest {
             };
             CLIProcessResult result = cmd.executeCommandLineCommands(null, false, false, args);
 
-            Assert.assertEquals(CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS, result.getExitCode());
             String output = String.join("\n", result.getOutput());
-            Assert.assertTrue(output.contains("same"));
+            Assert.assertEquals("Move to same project should fail with ILLEGAL_ARGUMENTS. Output: " + output,
+                CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS, result.getExitCode());
+            Assert.assertTrue("Output should contain word 'same'. Actual output: " + output,
+                output.contains("same"));
         } finally {
             registry.removeDataSource(registry.getDataSource(ds.getId()));
         }
@@ -294,6 +296,49 @@ public class DataSourceManagementTest extends DBVRTest {
         Assert.assertTrue(output.contains("Commands:"));
         Assert.assertTrue(output.contains("create"));
         Assert.assertTrue(output.contains("list"));
+    }
+
+    @Test
+    public void testCreateWithUrlAndHostConflict() throws Exception {
+        var args = new String[] {
+            "datasource", "create",
+            "--driver=h2_embedded_v2",
+            "--url=jdbc:h2:mem:test",
+            "--host=localhost"
+        };
+
+        var cmd = DBVRTestSuite.getApplication().createCommandLine();
+
+        CLIProcessResult result = cmd.executeCommandLineCommands(null, false, false, args);
+        String output = String.join("\n", result.getOutput());
+        Assert.assertEquals(CLIConstants.EXIT_CODE_ERROR, result.getExitCode());
+        Assert.assertNotNull(result.getOutput());
+        Assert.assertFalse(result.getOutput().isEmpty());
+        Assert.assertTrue(output.contains("mutually exclusive"));
+    }
+
+    @Test
+    public void testUpdateWithUrlAndPortConflict() throws Exception {
+        String uniqName = "test_update_conflict" + UUID.randomUUID();
+        DBPDataSourceContainer ds = createFakeDataSource(uniqName);
+        var registry = DBWorkbench.getPlatform().getWorkspace().getActiveProject().getDataSourceRegistry();
+
+        var args = new String[] {
+            "datasource", "update", ds.getId(),
+            "--url=jdbc:h2:mem:test",
+            "--port=1234"
+        };
+
+        var cmd = DBVRTestSuite.getApplication().createCommandLine();
+
+        CLIProcessResult result = cmd.executeCommandLineCommands(null, false, false, args);
+        String output = String.join("\n", result.getOutput());
+        Assert.assertEquals(CLIConstants.EXIT_CODE_ERROR, result.getExitCode());
+        Assert.assertNotNull(result.getOutput());
+        Assert.assertFalse(result.getOutput().isEmpty());
+        Assert.assertTrue(output.contains("mutually exclusive"));
+
+        registry.removeDataSource(ds);
     }
 
     @NotNull
