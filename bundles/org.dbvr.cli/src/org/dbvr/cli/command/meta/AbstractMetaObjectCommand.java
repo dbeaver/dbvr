@@ -16,8 +16,6 @@
  */
 package org.dbvr.cli.command.meta;
 
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -29,18 +27,16 @@ import org.jkiss.dbeaver.model.cli.*;
 import org.jkiss.dbeaver.model.cli.model.option.DataSourceAuthOptions;
 import org.jkiss.dbeaver.model.cli.model.option.DataSourceOptions;
 import org.jkiss.dbeaver.model.cli.model.option.ProjectOption;
-import org.jkiss.dbeaver.model.runtime.AbstractJob;
+import org.jkiss.dbeaver.model.cli.runtime.CLIMonitor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.DBSObjectContainer;
-import org.jkiss.dbeaver.utils.GeneralUtils;
 import org.jkiss.utils.CommonUtils;
 import picocli.CommandLine;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @CommandLine.Command(
@@ -236,24 +232,12 @@ public abstract class AbstractMetaObjectCommand extends CLIAbstractSubcommand {
     }
 
     protected void executeOperation(@NotNull String name, @NotNull MetaOperation operation) throws Exception {
-        AtomicReference<Exception> error = new AtomicReference<>();
-        AbstractJob job = new AbstractJob(name) {
-            @NotNull
-            @Override
-            protected IStatus run(@NotNull DBRProgressMonitor monitor) {
-                try {
-                    operation.run(monitor);
-                } catch (Exception e) {
-                    error.set(e);
-                    return GeneralUtils.makeExceptionStatus(e);
-                }
-                return Status.OK_STATUS;
-            }
-        };
-        job.schedule();
-        job.join();
-        if (error.get() != null) {
-            throw error.get();
+        DBRProgressMonitor monitor = new CLIMonitor();
+        monitor.beginTask(name, 1);
+        try {
+            operation.run(monitor);
+        } finally {
+            monitor.done();
         }
     }
 
