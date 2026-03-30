@@ -42,15 +42,15 @@ public class TableListCommand extends AbstractMetaObjectCommand {
     }
 
     @Nullable
-    @CommandLine.Option(names = {"--database-name"}, description = "Database (catalog) name", scope = CommandLine.ScopeType.INHERIT)
+    @CommandLine.Option(names = {"--database-name", "-db"}, description = "Database (catalog) name", scope = CommandLine.ScopeType.INHERIT)
     private String databaseName;
 
     @Nullable
-    @CommandLine.Option(names = {"--schema-name"}, description = "Schema name", scope = CommandLine.ScopeType.INHERIT)
+    @CommandLine.Option(names = {"--schema-name", "-sn"}, description = "Schema name", scope = CommandLine.ScopeType.INHERIT)
     private String schemaName;
 
     @Nullable
-    @CommandLine.Option(names = {"--table-name"}, description = "Table name", scope = CommandLine.ScopeType.INHERIT)
+    @CommandLine.Option(names = {"--table-name", "-tn"}, description = "Table name", scope = CommandLine.ScopeType.INHERIT)
     private String tableName;
 
     @Nullable

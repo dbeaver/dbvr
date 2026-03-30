@@ -257,13 +257,10 @@ public abstract class AbstractMetaObjectCommand extends CLIAbstractSubcommand {
         }
     }
 
-    @CommandLine.Spec
-    CommandLine.Model.CommandSpec commandSpec;
-
     @Override
     public void run() throws CLIException {
-        if (commandSpec.commandLine().getParseResult().subcommand() == null) {
-            String helpMessage = CLIUtils.getHelpFromCommand(commandSpec);
+        if (spec.commandLine().getParseResult().subcommand() == null) {
+            String helpMessage = CLIUtils.getHelpFromCommand(spec);
             context().addResult(helpMessage);
             context().setPostAction(CLIProcessResult.PostAction.SHUTDOWN);
         }
