@@ -110,7 +110,13 @@ public abstract class AbstractMetaObjectCommand extends CLIAbstractSubcommand {
     @NotNull
     protected List<DataSourceUpdater> getDataSourceUpdaters(@NotNull CreateOrFindDataSource options) {
         List<DataSourceUpdater> updaters = new ArrayList<>();
-        updaters.add(authOptions);
+        if (!CommonUtils.isEmpty(spec.mixins())) {
+            for (CommandLine.Model.CommandSpec mixin : spec.mixins().values()) {
+                if (mixin.userObject() instanceof DataSourceUpdater mixinUpdater) {
+                    updaters.add(mixinUpdater);
+                }
+            }
+        }
         if (options.tempDataSourceOptions != null) {
             updaters.add(options.tempDataSourceOptions);
         }
