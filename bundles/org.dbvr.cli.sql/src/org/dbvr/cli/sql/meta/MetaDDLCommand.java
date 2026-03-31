@@ -51,7 +51,7 @@ public class MetaDDLCommand extends CLIAbstractSubcommand {
         String objectName = parent.getTargetObjectName();
         if (CommonUtils.isEmpty(objectName)) {
             throw new CLIException(
-                "Object name is not specified (use --table-name, --schema-name or --database-name)",
+                "Object name is not specified",
                 CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS
             );
         }
