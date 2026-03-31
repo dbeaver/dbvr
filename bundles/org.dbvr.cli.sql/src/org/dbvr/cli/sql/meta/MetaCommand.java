@@ -26,9 +26,9 @@ import picocli.CommandLine;
     name = MetaCommand.COMMAND_NAME,
     description = "Metadata management commands",
     subcommands = {
-        DatabaseListCommand.class,
-        SchemaListCommand.class,
-        TableListCommand.class
+        DatabaseCommand.class,
+        SchemaCommand.class,
+        TableCommand.class
     }
 )
 public class MetaCommand extends CLIAbstractSubcommand {

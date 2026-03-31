@@ -17,59 +17,45 @@
 package org.dbvr.cli.sql.meta;
 
 import org.jkiss.code.NotNull;
-import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPDataSource;
+import org.jkiss.dbeaver.model.DBPNamedObject;
+import org.jkiss.dbeaver.model.cli.CLIException;
 import org.jkiss.dbeaver.model.cli.CLIProcessResult;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.DBSObjectContainer;
-import org.jkiss.dbeaver.model.struct.rdb.DBSCatalog;
 import picocli.CommandLine;
 
-@CommandLine.Command(name = "database", description = "Database (catalog) operations")
-public class DatabaseListCommand extends AbstractMetaObjectCommand {
+import java.util.Collection;
+import java.util.stream.Collectors;
 
-    @Nullable
-    @CommandLine.Option(names = {"--database-name", "-db"}, description = "Database (catalog) name", scope = CommandLine.ScopeType.INHERIT)
-    protected String databaseName;
+@CommandLine.Command(name = "list", description = "List databases")
+public class DatabaseListCommand extends AbstractMetaCommand {
 
     @NotNull
-    @Override
-    public String getObjectTypeName() {
-        return "database";
-    }
+    @CommandLine.ParentCommand
+    private DatabaseCommand parent;
 
     @Override
-    public boolean isRelevantObject(@NotNull DBSObject object) {
-        return object instanceof DBSCatalog;
+    public void run() throws CLIException {
+        parent.executeWithMonitor("List databases", this::execute);
     }
 
-    @Nullable
-    @Override
-    public DBSObjectContainer getBaseContainer(
-        @NotNull DBRProgressMonitor monitor,
-        @NotNull DBPDataSource dataSource
-    ) throws DBException {
-        // for databases which itself is the container
-        if (dataSource instanceof DBSObjectContainer dbsObjectContainer) {
-            DBPDataSource ds = dbsObjectContainer.getDataSource();
-            if (ds != null) {
-                boolean embedded = ds.getContainer().getDriver().isEmbedded();
-                if (embedded) {
-                    context().addResult("Database doesn't support databases/catalogs");
-                    context().setPostAction(CLIProcessResult.PostAction.SHUTDOWN);
-                    return null;
-                }
-            }
+    private void execute(@NotNull DBRProgressMonitor monitor) throws DBException {
+        DBPDataSource dataSource = connectDataSource(monitor);
+        DBSObjectContainer container = parent.getBaseContainer(monitor, dataSource);
+        if (container == null) {
+            return;
         }
-
-        return resolveContainer(monitor, dataSource, this.databaseName, null);
-    }
-
-    @Nullable
-    @Override
-    public String getTargetObjectName() {
-        return this.databaseName;
+        Collection<? extends DBSObject> children = container.getChildren(monitor);
+        if (children != null) {
+            String result = children.stream()
+                .filter(parent::isRelevantObject)
+                .map(DBPNamedObject::getName)
+                .collect(Collectors.joining("\n"));
+            context().addResult(result);
+            context().setPostAction(CLIProcessResult.PostAction.SHUTDOWN);
+        }
     }
 }

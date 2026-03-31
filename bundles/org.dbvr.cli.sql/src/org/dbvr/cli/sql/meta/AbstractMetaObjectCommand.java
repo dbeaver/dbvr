@@ -16,18 +16,12 @@
  */
 package org.dbvr.cli.sql.meta;
 
-import org.dbvr.cli.sql.CLIConnectionUtils;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSource;
-import org.jkiss.dbeaver.model.DBPDataSourceContainer;
 import org.jkiss.dbeaver.model.cli.*;
-import org.jkiss.dbeaver.model.cli.model.DataSourceUpdater;
-import org.jkiss.dbeaver.model.cli.model.option.CreateDataSourceOptions;
-import org.jkiss.dbeaver.model.cli.model.option.DataSourceAuthOptions;
-import org.jkiss.dbeaver.model.cli.model.option.ProjectOption;
 import org.jkiss.dbeaver.model.cli.runtime.CLIMonitor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSObject;
@@ -35,40 +29,10 @@ import org.jkiss.dbeaver.model.struct.DBSObjectContainer;
 import org.jkiss.utils.CommonUtils;
 import picocli.CommandLine;
 
-import java.util.ArrayList;
-import java.util.List;
-
-@CommandLine.Command(
-    subcommands = {
-        MetaListCommand.class,
-        MetaDDLCommand.class
-    }
-)
+@CommandLine.Command
 public abstract class AbstractMetaObjectCommand extends CLIAbstractSubcommand {
 
     private static final Log log = Log.getLog(AbstractMetaObjectCommand.class);
-
-    @CommandLine.Mixin
-    private ProjectOption projectOption;
-
-    @CommandLine.Mixin
-    private DataSourceAuthOptions authOptions;
-
-    @CommandLine.ArgGroup(exclusive = true, multiplicity = "0..1")
-    protected CreateOrFindDataSource dataSourceOptions;
-
-    protected static class CreateOrFindDataSource {
-        @CommandLine.ArgGroup(
-            exclusive = false
-        )
-        protected CreateDataSourceOptions tempDataSourceOptions;
-
-        @CommandLine.Option(names = {"-ds", "--datasource"}, arity = "1", description = "DataSource ID or name")
-        protected String existDataSourceIdOrName;
-
-        @CommandLine.Option(names = {"-con", "-connect", "-ds-spec", "--datasource-specification"}, arity = "1")
-        protected String connectionSpec;
-    }
 
     /**
      * Gets the type of object this command manages (e.g. "table", "schema", "database").
@@ -81,47 +45,6 @@ public abstract class AbstractMetaObjectCommand extends CLIAbstractSubcommand {
     @Nullable
     public abstract String getTargetObjectName();
 
-    @NotNull
-    public DBPDataSource connectDataSource(
-        @NotNull DBRProgressMonitor monitor,
-        @Nullable CreateOrFindDataSource options
-    ) throws DBException {
-        CLIConnectionUtils.connect(
-            options.existDataSourceIdOrName,
-            options.tempDataSourceOptions,
-            options.connectionSpec,
-            getDataSourceUpdaters(options),
-            projectOption.getProjectIdOrName(),
-            context(),
-            log
-        );
-
-        DBPDataSourceContainer container = context().getContextParameter(DBPDataSourceContainer.class.getName());
-        if (container == null) {
-            throw new CLIException("Can't connect to datasource", CLIConstants.EXIT_CODE_ERROR);
-        }
-        DBPDataSource dataSource = container.getDataSource();
-        if (dataSource == null) {
-            throw new CLIException("Can't connect to datasource", CLIConstants.EXIT_CODE_ERROR);
-        }
-        return dataSource;
-    }
-
-    @NotNull
-    protected List<DataSourceUpdater> getDataSourceUpdaters(@NotNull CreateOrFindDataSource options) {
-        List<DataSourceUpdater> updaters = new ArrayList<>();
-        if (!CommonUtils.isEmpty(spec.mixins())) {
-            for (CommandLine.Model.CommandSpec mixin : spec.mixins().values()) {
-                if (mixin.userObject() instanceof DataSourceUpdater mixinUpdater) {
-                    updaters.add(mixinUpdater);
-                }
-            }
-        }
-        if (options.tempDataSourceOptions != null) {
-            updaters.add(options.tempDataSourceOptions);
-        }
-        return updaters;
-    }
 
     @Nullable
     public DBSObject findObject(

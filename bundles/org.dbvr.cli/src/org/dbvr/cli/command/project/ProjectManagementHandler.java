@@ -19,10 +19,8 @@ package org.dbvr.cli.command.project;
 import org.jkiss.dbeaver.model.cli.CLIAbstractSubcommand;
 import org.jkiss.dbeaver.model.cli.CLIException;
 import org.jkiss.dbeaver.model.cli.CLIProcessResult;
+import org.jkiss.dbeaver.model.cli.CLIUtils;
 import picocli.CommandLine;
-
-import java.io.PrintWriter;
-import java.io.StringWriter;
 
 @CommandLine.Command(
     name = "project",
@@ -36,15 +34,11 @@ import java.io.StringWriter;
     }
 )
 public class ProjectManagementHandler extends CLIAbstractSubcommand {
-    @CommandLine.Spec
-    CommandLine.Model.CommandSpec spec;
 
     @Override
     public void run() throws CLIException {
         if (spec.commandLine().getParseResult().subcommand() == null) {
-            StringWriter writer = new StringWriter();
-            spec.commandLine().usage(new PrintWriter(writer));
-            context().addResult(writer.toString());
+            CLIUtils.getHelpFromCommand(spec);
             context().setPostAction(CLIProcessResult.PostAction.SHUTDOWN);
         }
     }

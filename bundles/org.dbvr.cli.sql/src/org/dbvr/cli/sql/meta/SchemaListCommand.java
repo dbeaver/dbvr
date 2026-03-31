@@ -17,46 +17,45 @@
 package org.dbvr.cli.sql.meta;
 
 import org.jkiss.code.NotNull;
-import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPDataSource;
+import org.jkiss.dbeaver.model.DBPNamedObject;
+import org.jkiss.dbeaver.model.cli.CLIException;
+import org.jkiss.dbeaver.model.cli.CLIProcessResult;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.DBSObjectContainer;
-import org.jkiss.dbeaver.model.struct.rdb.DBSCatalog;
-import org.jkiss.dbeaver.model.struct.rdb.DBSSchema;
 import picocli.CommandLine;
 
-@CommandLine.Command(name = "schema", description = "Schema operations")
-public class SchemaListCommand extends DatabaseListCommand {
+import java.util.Collection;
+import java.util.stream.Collectors;
 
-    @Nullable
-    @CommandLine.Option(names = {"--schema-name", "-sn"}, description = "Schema name", scope = CommandLine.ScopeType.INHERIT)
-    protected String schemaName;
+@CommandLine.Command(name = "list", description = "List schemas")
+public class SchemaListCommand extends AbstractMetaCommand {
 
     @NotNull
-    @Override
-    public String getObjectTypeName() {
-        return "schema";
-    }
+    @CommandLine.ParentCommand
+    private SchemaCommand parent;
 
     @Override
-    public boolean isRelevantObject(@NotNull DBSObject object) {
-        return object instanceof DBSSchema || object instanceof DBSCatalog;
+    public void run() throws CLIException {
+        parent.executeWithMonitor("List schemas", this::execute);
     }
 
-    @Nullable
-    @Override
-    public DBSObjectContainer getBaseContainer(
-        @NotNull DBRProgressMonitor monitor,
-        @NotNull DBPDataSource dataSource
-    ) throws DBException {
-        return resolveContainer(monitor, dataSource, this.databaseName, null);
-    }
-
-    @Nullable
-    @Override
-    public String getTargetObjectName() {
-        return this.schemaName;
+    private void execute(@NotNull DBRProgressMonitor monitor) throws DBException {
+        DBPDataSource dataSource = connectDataSource(monitor);
+        DBSObjectContainer container = parent.getBaseContainer(monitor, dataSource);
+        if (container == null) {
+            return;
+        }
+        Collection<? extends DBSObject> children = container.getChildren(monitor);
+        if (children != null) {
+            String result = children.stream()
+                .filter(parent::isRelevantObject)
+                .map(DBPNamedObject::getName)
+                .collect(Collectors.joining("\n"));
+            context().addResult(result);
+            context().setPostAction(CLIProcessResult.PostAction.SHUTDOWN);
+        }
     }
 }

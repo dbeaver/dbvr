@@ -17,50 +17,45 @@
 package org.dbvr.cli.sql.meta;
 
 import org.jkiss.code.NotNull;
-import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPDataSource;
+import org.jkiss.dbeaver.model.DBPNamedObject;
+import org.jkiss.dbeaver.model.cli.CLIException;
+import org.jkiss.dbeaver.model.cli.CLIProcessResult;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
-import org.jkiss.dbeaver.model.struct.DBSEntity;
-import org.jkiss.dbeaver.model.struct.DBSEntityType;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.DBSObjectContainer;
 import picocli.CommandLine;
 
-@CommandLine.Command(name = "table", description = "Table meta operations")
-public class TableListCommand extends SchemaListCommand {
+import java.util.Collection;
+import java.util.stream.Collectors;
 
-    @Nullable
-    @CommandLine.Option(names = {"--table-name", "-tn"}, description = "Table name", scope = CommandLine.ScopeType.INHERIT)
-    protected String tableName;
+@CommandLine.Command(name = "list", description = "List tables")
+public class TableListCommand extends AbstractMetaCommand {
 
     @NotNull
-    @Override
-    public String getObjectTypeName() {
-        return "table";
-    }
+    @CommandLine.ParentCommand
+    private TableCommand parent;
 
     @Override
-    public boolean isRelevantObject(@NotNull DBSObject object) {
-        if (object instanceof DBSEntity dbsEntity) {
-            DBSEntityType entityType = dbsEntity.getEntityType();
-            return entityType == DBSEntityType.TABLE || entityType == DBSEntityType.VIEW;
+    public void run() throws CLIException {
+        parent.executeWithMonitor("List tables", this::execute);
+    }
+
+    private void execute(@NotNull DBRProgressMonitor monitor) throws DBException {
+        DBPDataSource dataSource = connectDataSource(monitor);
+        DBSObjectContainer container = parent.getBaseContainer(monitor, dataSource);
+        if (container == null) {
+            return;
         }
-        return false;
-    }
-
-    @Nullable
-    @Override
-    public DBSObjectContainer getBaseContainer(
-        @NotNull DBRProgressMonitor monitor,
-        @NotNull DBPDataSource dataSource
-    ) throws DBException {
-        return resolveContainer(monitor, dataSource, this.databaseName, this.schemaName);
-    }
-
-    @Nullable
-    @Override
-    public String getTargetObjectName() {
-        return this.tableName;
+        Collection<? extends DBSObject> children = container.getChildren(monitor);
+        if (children != null) {
+            String result = children.stream()
+                .filter(parent::isRelevantObject)
+                .map(DBPNamedObject::getName)
+                .collect(Collectors.joining("\n"));
+            context().addResult(result);
+            context().setPostAction(CLIProcessResult.PostAction.SHUTDOWN);
+        }
     }
 }
