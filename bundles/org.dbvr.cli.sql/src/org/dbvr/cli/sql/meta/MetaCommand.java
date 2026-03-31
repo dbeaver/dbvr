@@ -14,34 +14,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.dbvr.cli.command.meta;
+package org.dbvr.cli.sql.meta;
 
-import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.model.cli.CLIAbstractSubcommand;
-import org.jkiss.dbeaver.model.cli.CLIConstants;
 import org.jkiss.dbeaver.model.cli.CLIException;
+import org.jkiss.dbeaver.model.cli.CLIProcessResult;
+import org.jkiss.dbeaver.model.cli.CLIUtils;
 import picocli.CommandLine;
 
-@CommandLine.Command(name = "ddl", description = "Get object DDL")
-public class MetaDdlCommand extends CLIAbstractSubcommand {
-
-    @NotNull
-    @CommandLine.ParentCommand
-    private AbstractMetaObjectCommand parent;
-
-    @CommandLine.Option(names = {"--full"}, description = "Show full DDL")
-    private boolean fullDDL;
+@CommandLine.Command(
+    name = MetaCommand.COMMAND_NAME,
+    description = "Metadata management commands",
+    subcommands = {
+        DatabaseListCommand.class,
+        SchemaListCommand.class,
+        TableListCommand.class
+    }
+)
+public class MetaCommand extends CLIAbstractSubcommand {
+    public static final String COMMAND_NAME = "meta";
 
     @Override
     public void run() throws CLIException {
-        try {
-            parent.ddl(fullDDL);
-        } catch (Exception e) {
-            throw new CLIException(
-                "Error getting DDL for " + parent.getObjectTypeName() + ": " + e.getMessage(),
-                e,
-                CLIConstants.EXIT_CODE_ERROR
-            );
+        if (spec.commandLine().getParseResult().subcommand() == null) {
+            String helpMessage = CLIUtils.getHelpFromCommand(spec);
+            context().addResult(helpMessage);
+            context().setPostAction(CLIProcessResult.PostAction.SHUTDOWN);
         }
     }
 }

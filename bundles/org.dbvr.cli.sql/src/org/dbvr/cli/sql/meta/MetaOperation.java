@@ -14,16 +14,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.dbvr.cli.command.meta;
+package org.dbvr.cli.sql.meta;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
-import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.dbeaver.model.cli.runtime.CLIMonitor;
 
 /**
  * MetaOperation
  */
 @FunctionalInterface
 public interface MetaOperation {
-    void run(@NotNull DBRProgressMonitor monitor) throws DBException;
+    void run(@NotNull CLIMonitor monitor) throws DBException;
 }

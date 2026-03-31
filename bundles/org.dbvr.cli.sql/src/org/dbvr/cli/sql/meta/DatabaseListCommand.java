@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.dbvr.cli.command.meta;
+package org.dbvr.cli.sql.meta;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -29,6 +29,10 @@ import picocli.CommandLine;
 
 @CommandLine.Command(name = "database", description = "Database (catalog) operations")
 public class DatabaseListCommand extends AbstractMetaObjectCommand {
+
+    @Nullable
+    @CommandLine.Option(names = {"--database-name", "-db"}, description = "Database (catalog) name", scope = CommandLine.ScopeType.INHERIT)
+    protected String databaseName;
 
     @NotNull
     @Override
@@ -49,9 +53,9 @@ public class DatabaseListCommand extends AbstractMetaObjectCommand {
     ) throws DBException {
         // for databases which itself is the container
         if (dataSource instanceof DBSObjectContainer dbsObjectContainer) {
-            var container = dbsObjectContainer.getDataSource();
-            if (container != null) {
-                boolean embedded = container.getContainer().getDriver().isEmbedded();
+            DBPDataSource ds = dbsObjectContainer.getDataSource();
+            if (ds != null) {
+                boolean embedded = ds.getContainer().getDriver().isEmbedded();
                 if (embedded) {
                     context().addResult("Database doesn't support databases/catalogs");
                     context().setPostAction(CLIProcessResult.PostAction.SHUTDOWN);
@@ -60,28 +64,12 @@ public class DatabaseListCommand extends AbstractMetaObjectCommand {
             }
         }
 
-        return super.getBaseContainer(monitor, dataSource);
-    }
-
-    @Nullable
-    @CommandLine.Option(names = {"--database-name"}, description = "Database (catalog) name", scope = CommandLine.ScopeType.INHERIT)
-    private String databaseName;
-
-    @Nullable
-    @Override
-    public String getDatabaseName() {
-        return databaseName;
+        return resolveContainer(monitor, dataSource, this.databaseName, null);
     }
 
     @Nullable
     @Override
-    public String getSchemaName() {
-        return null;
-    }
-
-    @Nullable
-    @Override
-    public String getTableName() {
-        return null;
+    public String getTargetObjectName() {
+        return this.databaseName;
     }
 }

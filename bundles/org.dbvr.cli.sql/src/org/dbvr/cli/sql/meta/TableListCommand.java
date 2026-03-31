@@ -14,17 +14,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.dbvr.cli.command.meta;
+package org.dbvr.cli.sql.meta;
 
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.model.DBPDataSource;
+import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSEntity;
 import org.jkiss.dbeaver.model.struct.DBSEntityType;
 import org.jkiss.dbeaver.model.struct.DBSObject;
+import org.jkiss.dbeaver.model.struct.DBSObjectContainer;
 import picocli.CommandLine;
 
 @CommandLine.Command(name = "table", description = "Table meta operations")
-public class TableListCommand extends AbstractMetaObjectCommand {
+public class TableListCommand extends SchemaListCommand {
+
+    @Nullable
+    @CommandLine.Option(names = {"--table-name", "-tn"}, description = "Table name", scope = CommandLine.ScopeType.INHERIT)
+    protected String tableName;
 
     @NotNull
     @Override
@@ -42,32 +50,17 @@ public class TableListCommand extends AbstractMetaObjectCommand {
     }
 
     @Nullable
-    @CommandLine.Option(names = {"--database-name", "-db"}, description = "Database (catalog) name", scope = CommandLine.ScopeType.INHERIT)
-    private String databaseName;
-
-    @Nullable
-    @CommandLine.Option(names = {"--schema-name", "-sn"}, description = "Schema name", scope = CommandLine.ScopeType.INHERIT)
-    private String schemaName;
-
-    @Nullable
-    @CommandLine.Option(names = {"--table-name", "-tn"}, description = "Table name", scope = CommandLine.ScopeType.INHERIT)
-    private String tableName;
-
-    @Nullable
     @Override
-    public String getDatabaseName() {
-        return databaseName;
+    public DBSObjectContainer getBaseContainer(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull DBPDataSource dataSource
+    ) throws DBException {
+        return resolveContainer(monitor, dataSource, this.databaseName, this.schemaName);
     }
 
     @Nullable
     @Override
-    public String getSchemaName() {
-        return schemaName;
-    }
-
-    @Nullable
-    @Override
-    public String getTableName() {
-        return tableName;
+    public String getTargetObjectName() {
+        return this.tableName;
     }
 }
