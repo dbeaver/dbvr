@@ -16,6 +16,8 @@
  */
 package org.dbvr.cli.sql.meta;
 
+import org.dbvr.cli.sql.meta.ddl.SchemaDDLCommand;
+import org.dbvr.cli.sql.meta.list.SchemaListCommand;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;

@@ -14,8 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.dbvr.cli.sql.meta;
+package org.dbvr.cli.sql.meta.list;
 
+import org.dbvr.cli.sql.meta.AbstractMetaCommand;
+import org.dbvr.cli.sql.meta.TableCommand;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPDataSource;

@@ -16,6 +16,8 @@
  */
 package org.dbvr.cli.sql.meta;
 
+import org.dbvr.cli.sql.meta.ddl.TableDDLCommand;
+import org.dbvr.cli.sql.meta.list.TableListCommand;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;

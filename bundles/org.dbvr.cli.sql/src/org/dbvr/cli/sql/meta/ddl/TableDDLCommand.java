@@ -14,8 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.dbvr.cli.sql.meta;
+package org.dbvr.cli.sql.meta.ddl;
 
+import org.dbvr.cli.sql.meta.AbstractMetaObjectCommand;
+import org.dbvr.cli.sql.meta.TableCommand;
 import org.jkiss.code.NotNull;
 import picocli.CommandLine;
 
