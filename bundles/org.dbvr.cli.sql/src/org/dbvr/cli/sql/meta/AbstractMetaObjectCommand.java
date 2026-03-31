@@ -85,38 +85,39 @@ public abstract class AbstractMetaObjectCommand extends CLIAbstractSubcommand {
         }
 
         if (CommonUtils.isNotEmpty(databaseName)) {
-            if (container != null) {
-                DBSObject child = container.getChild(monitor, databaseName);
-                if (child instanceof DBSObjectContainer dbsObjectContainer) {
-                    container = dbsObjectContainer;
-                } else {
-                    throw new CLIException("Database '" + databaseName + "' not found", CLIConstants.EXIT_CODE_ERROR);
-                }
-            } else {
+            if (container == null) {
                 throw new CLIException(
                     "Datasource '" + dataSource.getContainer().getName() + "' does not support databases",
                     CLIConstants.EXIT_CODE_ERROR
                 );
             }
+            container = getChildContainer(monitor, container, databaseName);
         }
 
         if (CommonUtils.isNotEmpty(schemaName)) {
-            if (container != null) {
-                DBSObject child = container.getChild(monitor, schemaName);
-                if (child instanceof DBSObjectContainer dbsObjectContainer) {
-                    container = dbsObjectContainer;
-                } else {
-                    throw new CLIException("Schema '" + schemaName + "' not found", CLIConstants.EXIT_CODE_ERROR);
-                }
-            } else {
+            if (container == null) {
                 throw new CLIException("Container does not support schemas", CLIConstants.EXIT_CODE_ERROR);
             }
+            container = getChildContainer(monitor, container, schemaName);
         }
 
         return container;
     }
 
-
+    @NotNull
+    protected DBSObjectContainer getChildContainer(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull DBSObjectContainer parent,
+        @NotNull String childName
+    ) throws DBException {
+        DBSObject child = parent.getChild(monitor, childName);
+        if (child instanceof DBSObjectContainer dbsObjectContainer) {
+            return dbsObjectContainer;
+        } else {
+            throw new CLIException(childName + "' not found", CLIConstants.EXIT_CODE_ERROR);
+        }
+    }
+    
     @Override
     public void run() throws CLIException {
         if (spec.commandLine().getParseResult().subcommand() == null) {

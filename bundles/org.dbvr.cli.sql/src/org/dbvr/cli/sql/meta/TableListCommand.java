@@ -33,7 +33,6 @@ import java.util.stream.Collectors;
 @CommandLine.Command(name = "list", description = "List tables")
 public class TableListCommand extends AbstractMetaCommand {
 
-    @NotNull
     @CommandLine.ParentCommand
     private TableCommand parent;
 
@@ -43,7 +42,7 @@ public class TableListCommand extends AbstractMetaCommand {
     }
 
     private void execute(@NotNull DBRProgressMonitor monitor) throws DBException {
-        DBPDataSource dataSource = connectDataSource(monitor);
+        DBPDataSource dataSource = connectDataSource();
         DBSObjectContainer container = parent.getBaseContainer(monitor, dataSource);
         if (container == null) {
             return;

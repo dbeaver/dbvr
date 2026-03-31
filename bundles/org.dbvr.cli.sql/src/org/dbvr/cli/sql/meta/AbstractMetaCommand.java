@@ -29,7 +29,6 @@ import org.jkiss.dbeaver.model.cli.model.DataSourceUpdater;
 import org.jkiss.dbeaver.model.cli.model.option.CreateDataSourceOptions;
 import org.jkiss.dbeaver.model.cli.model.option.DataSourceAuthOptions;
 import org.jkiss.dbeaver.model.cli.model.option.ProjectOption;
-import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.utils.CommonUtils;
 import picocli.CommandLine;
 
@@ -63,9 +62,7 @@ public abstract class AbstractMetaCommand extends CLIAbstractSubcommand {
     }
 
     @NotNull
-    public DBPDataSource connectDataSource(
-        @NotNull DBRProgressMonitor monitor
-    ) throws DBException {
+    public DBPDataSource connectDataSource() throws DBException {
         if (dataSourceOptions == null) {
             throw new CLIException("No datasource options provided", CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS);
         }

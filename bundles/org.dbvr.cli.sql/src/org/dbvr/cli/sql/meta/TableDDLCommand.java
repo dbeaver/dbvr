@@ -17,68 +17,23 @@
 package org.dbvr.cli.sql.meta;
 
 import org.jkiss.code.NotNull;
-import org.jkiss.dbeaver.DBException;
-import org.jkiss.dbeaver.model.DBPDataSource;
-import org.jkiss.dbeaver.model.DBPScriptObject;
-import org.jkiss.dbeaver.model.cli.CLIConstants;
-import org.jkiss.dbeaver.model.cli.CLIException;
-import org.jkiss.dbeaver.model.cli.CLIProcessResult;
-import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
-import org.jkiss.dbeaver.model.struct.DBSObject;
-import org.jkiss.dbeaver.model.struct.DBSObjectContainer;
-import org.jkiss.utils.CommonUtils;
 import picocli.CommandLine;
 
-import java.util.HashMap;
-import java.util.Map;
-
 @CommandLine.Command(name = "ddl", description = "Get table DDL")
-public class TableDDLCommand extends AbstractMetaCommand {
+public class TableDDLCommand extends AbstractDDLCommand {
 
-    @NotNull
     @CommandLine.ParentCommand
     private TableCommand parent;
 
-    @CommandLine.Option(names = {"--full"}, description = "Show full DDL")
-    private boolean fullDDL;
-
+    @NotNull
     @Override
-    public void run() throws CLIException {
-        String objectName = parent.getTargetObjectName();
-        if (CommonUtils.isEmpty(objectName)) {
-            throw new CLIException(
-                "Object name is not specified",
-                CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS
-            );
-        }
-        parent.executeWithMonitor("Get table DDL", monitor -> execute(monitor, objectName));
+    protected AbstractMetaObjectCommand getParentCommand() {
+        return parent;
     }
 
-    private void execute(@NotNull DBRProgressMonitor monitor, @NotNull String objectName) throws DBException {
-        DBPDataSource dataSource = connectDataSource(monitor);
-        DBSObjectContainer container = parent.getBaseContainer(monitor, dataSource);
-        if (container == null) {
-            return;
-        }
-        DBSObject object = parent.findObject(monitor, container, objectName);
-        if (object == null || !parent.isRelevantObject(object)) {
-            throw new CLIException("Table '" + objectName + "' not found", CLIConstants.EXIT_CODE_ERROR);
-        }
-        if (object instanceof DBPScriptObject dbpScriptObject) {
-            Map<String, Object> options = new HashMap<>();
-            if (fullDDL) {
-                options.put(DBPScriptObject.OPTION_INCLUDE_NESTED_OBJECTS, true);
-                options.put(DBPScriptObject.OPTION_INCLUDE_COMMENTS, true);
-                options.put(DBPScriptObject.OPTION_INCLUDE_PERMISSIONS, true);
-            }
-            String ddl = dbpScriptObject.getObjectDefinitionText(monitor, options);
-            context().addResult(ddl.trim());
-            context().setPostAction(CLIProcessResult.PostAction.SHUTDOWN);
-        } else {
-            throw new CLIException(
-                "Table '" + objectName + "' does not support DDL",
-                CLIConstants.EXIT_CODE_ERROR
-            );
-        }
+    @NotNull
+    @Override
+    protected String getObjectTypeName() {
+        return "Table";
     }
 }
