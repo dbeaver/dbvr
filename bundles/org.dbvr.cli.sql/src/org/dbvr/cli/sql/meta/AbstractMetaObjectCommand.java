@@ -19,7 +19,6 @@ package org.dbvr.cli.sql.meta;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
-import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.cli.*;
 import org.jkiss.dbeaver.model.cli.runtime.CLIMonitor;
@@ -32,13 +31,6 @@ import picocli.CommandLine;
 @CommandLine.Command
 public abstract class AbstractMetaObjectCommand extends CLIAbstractSubcommand {
 
-    private static final Log log = Log.getLog(AbstractMetaObjectCommand.class);
-
-    /**
-     * Gets the type of object this command manages (e.g. "table", "schema", "database").
-     */
-    @NotNull
-    public abstract String getObjectTypeName();
 
     public abstract boolean isRelevantObject(@NotNull DBSObject object);
 

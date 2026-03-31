@@ -46,12 +46,6 @@ public class TableCommand extends AbstractMetaObjectCommand {
     @CommandLine.Option(names = {"--table-name", "-tn"}, description = "Table name", scope = CommandLine.ScopeType.INHERIT)
     protected String tableName;
 
-    @NotNull
-    @Override
-    public String getObjectTypeName() {
-        return "table";
-    }
-
     @Override
     public boolean isRelevantObject(@NotNull DBSObject object) {
         if (object instanceof DBSEntity dbsEntity) {

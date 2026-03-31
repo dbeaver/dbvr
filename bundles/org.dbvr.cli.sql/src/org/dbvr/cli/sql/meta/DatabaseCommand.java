@@ -39,12 +39,6 @@ public class DatabaseCommand extends AbstractMetaObjectCommand {
     @CommandLine.Option(names = {"--database-name", "-db"}, description = "Database (catalog) name", scope = CommandLine.ScopeType.INHERIT)
     protected String databaseName;
 
-    @NotNull
-    @Override
-    public String getObjectTypeName() {
-        return "database";
-    }
-
     @Override
     public boolean isRelevantObject(@NotNull DBSObject object) {
         return object instanceof DBSCatalog;

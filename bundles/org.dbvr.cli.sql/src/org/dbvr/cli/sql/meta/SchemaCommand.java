@@ -42,12 +42,6 @@ public class SchemaCommand extends AbstractMetaObjectCommand {
     @CommandLine.Option(names = {"--schema-name", "-sn"}, description = "Schema name", scope = CommandLine.ScopeType.INHERIT)
     protected String schemaName;
 
-    @NotNull
-    @Override
-    public String getObjectTypeName() {
-        return "schema";
-    }
-
     @Override
     public boolean isRelevantObject(@NotNull DBSObject object) {
         return object instanceof DBSSchema || object instanceof DBSCatalog;
