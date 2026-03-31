@@ -25,12 +25,15 @@ import org.jkiss.dbeaver.model.cli.runtime.CLIMonitor;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.DBSObjectContainer;
+import org.jkiss.dbeaver.model.struct.rdb.DBSCatalog;
+import org.jkiss.dbeaver.model.struct.rdb.DBSSchema;
 import org.jkiss.utils.CommonUtils;
 import picocli.CommandLine;
 
+import java.util.Collection;
+
 @CommandLine.Command
 public abstract class AbstractMetaObjectCommand extends CLIAbstractSubcommand {
-
 
     public abstract boolean isRelevantObject(@NotNull DBSObject object);
 
@@ -92,6 +95,8 @@ public abstract class AbstractMetaObjectCommand extends CLIAbstractSubcommand {
                 );
             }
             container = getChildContainer(monitor, container, databaseName);
+        } else if (container != null && !(this instanceof DatabaseCommand) && containsObjectOfType(monitor, container, DBSCatalog.class)) {
+            throw new CLIException("Database name not specified", CLIConstants.EXIT_CODE_ERROR);
         }
 
         if (CommonUtils.isNotEmpty(schemaName)) {
@@ -99,9 +104,27 @@ public abstract class AbstractMetaObjectCommand extends CLIAbstractSubcommand {
                 throw new CLIException("Container does not support schemas", CLIConstants.EXIT_CODE_ERROR);
             }
             container = getChildContainer(monitor, container, schemaName);
+        } else if (container != null && !(this instanceof SchemaCommand) && containsObjectOfType(monitor, container, DBSSchema.class)) {
+            throw new CLIException("Schema name not specified", CLIConstants.EXIT_CODE_ERROR);
         }
 
         return container;
+    }
+
+    private boolean containsObjectOfType(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull DBSObjectContainer container,
+        @NotNull Class<?> type
+    ) throws DBException {
+        Collection<? extends DBSObject> children = container.getChildren(monitor);
+        if (children != null) {
+            for (DBSObject child : children) {
+                if (type.isInstance(child)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     @NotNull
