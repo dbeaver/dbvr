@@ -63,6 +63,7 @@ public abstract class AbstractMetaObjectCommand extends CLIAbstractSubcommand {
         }
     }
 
+    @Nullable
     public abstract DBSObjectContainer getBaseContainer(
         @NotNull DBRProgressMonitor monitor,
         @NotNull DBPDataSource dataSource,
