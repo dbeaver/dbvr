@@ -95,7 +95,10 @@ public abstract class AbstractMetaObjectCommand extends CLIAbstractSubcommand {
                 );
             }
             container = getChildContainer(monitor, container, databaseName);
-        } else if (container != null && !(this instanceof DatabaseCommand) && containsObjectOfType(monitor, container, DBSCatalog.class)) {
+        } else if (container != null
+            && !(this instanceof DatabaseCommand)
+            && containsObjectOfType(monitor, container, DBSCatalog.class)
+        ) {
             throw new CLIException("Database name not specified", CLIConstants.EXIT_CODE_ERROR);
         }
 
@@ -104,17 +107,20 @@ public abstract class AbstractMetaObjectCommand extends CLIAbstractSubcommand {
                 throw new CLIException("Container does not support schemas", CLIConstants.EXIT_CODE_ERROR);
             }
             container = getChildContainer(monitor, container, schemaName);
-        } else if (container != null && !(this instanceof SchemaCommand) && containsObjectOfType(monitor, container, DBSSchema.class)) {
+        } else if (container != null
+            && !(this instanceof SchemaCommand)
+            && containsObjectOfType(monitor, container, DBSSchema.class)
+        ) {
             throw new CLIException("Schema name not specified", CLIConstants.EXIT_CODE_ERROR);
         }
 
         return container;
     }
 
-    private boolean containsObjectOfType(
-        @NotNull DBRProgressMonitor monitor,
-        @NotNull DBSObjectContainer container,
-        @NotNull Class<?> type
+    private boolean containsObjectOfType(// in case if schema/database not specified but needs
+                                         @NotNull DBRProgressMonitor monitor,
+                                         @NotNull DBSObjectContainer container,
+                                         @NotNull Class<?> type
     ) throws DBException {
         Collection<? extends DBSObject> children = container.getChildren(monitor);
         if (children != null) {
@@ -140,7 +146,7 @@ public abstract class AbstractMetaObjectCommand extends CLIAbstractSubcommand {
             throw new CLIException(childName + "' not found", CLIConstants.EXIT_CODE_ERROR);
         }
     }
-    
+
     @Override
     public void run() throws CLIException {
         if (spec.commandLine().getParseResult().subcommand() == null) {
