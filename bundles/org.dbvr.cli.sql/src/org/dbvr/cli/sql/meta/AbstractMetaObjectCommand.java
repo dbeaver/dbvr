@@ -38,9 +38,6 @@ public abstract class AbstractMetaObjectCommand extends CLIAbstractSubcommand {
     public abstract boolean isRelevantObject(@NotNull DBSObject object);
 
     @Nullable
-    public abstract String getTargetObjectName();
-
-    @Nullable
     public DBSObject findObject(
         @NotNull DBRProgressMonitor monitor,
         @NotNull DBSObjectContainer container,
@@ -66,13 +63,12 @@ public abstract class AbstractMetaObjectCommand extends CLIAbstractSubcommand {
         }
     }
 
-    @Nullable
-    public DBSObjectContainer getBaseContainer(
+    public abstract DBSObjectContainer getBaseContainer(
         @NotNull DBRProgressMonitor monitor,
-        @NotNull DBPDataSource dataSource
-    ) throws DBException {
-        return resolveContainer(monitor, dataSource, null, null);
-    }
+        @NotNull DBPDataSource dataSource,
+        @Nullable String databaseName,
+        @Nullable String schemaName
+    ) throws DBException;
 
     @Nullable
     protected DBSObjectContainer resolveContainer(
@@ -96,6 +92,7 @@ public abstract class AbstractMetaObjectCommand extends CLIAbstractSubcommand {
             container = getChildContainer(monitor, container, databaseName);
         } else if (container != null
             && !(this instanceof DatabaseCommand)
+            && !(this instanceof SchemaCommand)
             && containsObjectOfType(monitor, container, DBSCatalog.class)
         ) {
             throw new CLIException("Database name not specified", CLIConstants.EXIT_CODE_ERROR);
@@ -107,7 +104,9 @@ public abstract class AbstractMetaObjectCommand extends CLIAbstractSubcommand {
             }
             container = getChildContainer(monitor, container, schemaName);
         } else if (container != null
+            && !(this instanceof DatabaseCommand)
             && !(this instanceof SchemaCommand)
+            && !(this instanceof TableCommand)
             && containsObjectOfType(monitor, container, DBSSchema.class)
         ) {
             throw new CLIException("Schema name not specified", CLIConstants.EXIT_CODE_ERROR);

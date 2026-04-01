@@ -17,8 +17,14 @@
 package org.dbvr.cli.sql.meta.ddl;
 
 import org.dbvr.cli.sql.meta.AbstractMetaObjectCommand;
+import org.dbvr.cli.sql.meta.MetaContainerOptions;
 import org.dbvr.cli.sql.meta.TableCommand;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
+import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.model.DBPDataSource;
+import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.dbeaver.model.struct.DBSObjectContainer;
 import picocli.CommandLine;
 
 @CommandLine.Command(name = "ddl", description = "Get table DDL")
@@ -26,6 +32,13 @@ public class TableDDLCommand extends AbstractDDLCommand {
 
     @CommandLine.ParentCommand
     private TableCommand parent;
+
+    @CommandLine.Mixin
+    private MetaContainerOptions containerOptions;
+
+    @Nullable
+    @CommandLine.Option(names = {"--table-name", "-tn"}, description = "Table name")
+    protected String tableName;
 
     @NotNull
     @Override
@@ -37,5 +50,20 @@ public class TableDDLCommand extends AbstractDDLCommand {
     @Override
     protected String getObjectTypeName() {
         return "Table";
+    }
+
+    @Nullable
+    @Override
+    protected String getTargetObjectName() {
+        return tableName;
+    }
+
+    @Nullable
+    @Override
+    protected DBSObjectContainer getBaseContainer(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull DBPDataSource dataSource
+    ) throws DBException {
+        return parent.getBaseContainer(monitor, dataSource, containerOptions.getDatabaseName(), containerOptions.getSchemaName());
     }
 }

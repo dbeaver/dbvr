@@ -36,18 +36,6 @@ import picocli.CommandLine;
     })
 public class TableCommand extends AbstractMetaObjectCommand {
 
-    @Nullable
-    @CommandLine.Option(names = {"--database-name", "-db"}, description = "Database (catalog) name", scope = CommandLine.ScopeType.INHERIT)
-    protected String databaseName;
-
-    @Nullable
-    @CommandLine.Option(names = {"--schema-name", "-sn"}, description = "Schema name", scope = CommandLine.ScopeType.INHERIT)
-    protected String schemaName;
-
-    @Nullable
-    @CommandLine.Option(names = {"--table-name", "-tn"}, description = "Table name", scope = CommandLine.ScopeType.INHERIT)
-    protected String tableName;
-
     @Override
     public boolean isRelevantObject(@NotNull DBSObject object) {
         if (object instanceof DBSEntity dbsEntity) {
@@ -58,17 +46,12 @@ public class TableCommand extends AbstractMetaObjectCommand {
     }
 
     @Nullable
-    @Override
     public DBSObjectContainer getBaseContainer(
         @NotNull DBRProgressMonitor monitor,
-        @NotNull DBPDataSource dataSource
+        @NotNull DBPDataSource dataSource,
+        @Nullable String databaseName,
+        @Nullable String schemaName
     ) throws DBException {
-        return resolveContainer(monitor, dataSource, this.databaseName, this.schemaName);
-    }
-
-    @Nullable
-    @Override
-    public String getTargetObjectName() {
-        return this.tableName;
+        return resolveContainer(monitor, dataSource, databaseName, schemaName);
     }
 }

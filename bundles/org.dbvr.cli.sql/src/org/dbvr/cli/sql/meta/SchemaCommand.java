@@ -36,31 +36,18 @@ import picocli.CommandLine;
     })
 public class SchemaCommand extends AbstractMetaObjectCommand {
 
-    @Nullable
-    @CommandLine.Option(names = {"--database-name", "-db"}, description = "Database (catalog) name", scope = CommandLine.ScopeType.INHERIT)
-    protected String databaseName;
-
-    @Nullable
-    @CommandLine.Option(names = {"--schema-name", "-sn"}, description = "Schema name", scope = CommandLine.ScopeType.INHERIT)
-    protected String schemaName;
-
     @Override
     public boolean isRelevantObject(@NotNull DBSObject object) {
         return object instanceof DBSSchema || object instanceof DBSCatalog;
     }
 
     @Nullable
-    @Override
     public DBSObjectContainer getBaseContainer(
         @NotNull DBRProgressMonitor monitor,
-        @NotNull DBPDataSource dataSource
+        @NotNull DBPDataSource dataSource,
+        @Nullable String databaseName,
+        @Nullable String schemaName
     ) throws DBException {
-        return resolveContainer(monitor, dataSource, this.databaseName, null);
-    }
-
-    @Nullable
-    @Override
-    public String getTargetObjectName() {
-        return this.schemaName;
+        return resolveContainer(monitor, dataSource, databaseName, null);
     }
 }

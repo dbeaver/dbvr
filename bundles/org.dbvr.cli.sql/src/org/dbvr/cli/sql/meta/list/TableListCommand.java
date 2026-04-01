@@ -16,47 +16,44 @@
  */
 package org.dbvr.cli.sql.meta.list;
 
-import org.dbvr.cli.sql.meta.AbstractMetaCommand;
+import org.dbvr.cli.sql.meta.AbstractMetaObjectCommand;
+import org.dbvr.cli.sql.meta.MetaContainerOptions;
 import org.dbvr.cli.sql.meta.TableCommand;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPDataSource;
-import org.jkiss.dbeaver.model.DBPNamedObject;
-import org.jkiss.dbeaver.model.cli.CLIException;
-import org.jkiss.dbeaver.model.cli.CLIProcessResult;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
-import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.DBSObjectContainer;
 import picocli.CommandLine;
 
-import java.util.Collection;
-import java.util.stream.Collectors;
-
 @CommandLine.Command(name = "list", description = "List tables")
-public class TableListCommand extends AbstractMetaCommand {
+public class TableListCommand extends AbstractListCommand {
 
     @CommandLine.ParentCommand
     private TableCommand parent;
 
+    @CommandLine.Mixin
+    private MetaContainerOptions containerOptions;
+
+    @NotNull
     @Override
-    public void run() throws CLIException {
-        parent.executeWithMonitor("List tables", this::execute);
+    protected AbstractMetaObjectCommand getParentCommand() {
+        return parent;
     }
 
-    private void execute(@NotNull DBRProgressMonitor monitor) throws DBException {
-        DBPDataSource dataSource = connectDataSource();
-        DBSObjectContainer container = parent.getBaseContainer(monitor, dataSource);
-        if (container == null) {
-            return;
-        }
-        Collection<? extends DBSObject> children = container.getChildren(monitor);
-        if (children != null) {
-            String result = children.stream()
-                .filter(parent::isRelevantObject)
-                .map(DBPNamedObject::getName)
-                .collect(Collectors.joining("\n"));
-            context().addResult(result);
-            context().setPostAction(CLIProcessResult.PostAction.SHUTDOWN);
-        }
+    @NotNull
+    @Override
+    protected String getOperationName() {
+        return "List tables";
+    }
+
+    @Nullable
+    @Override
+    protected DBSObjectContainer getBaseContainer(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull DBPDataSource dataSource
+    ) throws DBException {
+        return parent.getBaseContainer(monitor, dataSource, containerOptions.getDatabaseName(), containerOptions.getSchemaName());
     }
 }

@@ -19,6 +19,7 @@ package org.dbvr.cli.sql.meta.ddl;
 import org.dbvr.cli.sql.meta.AbstractMetaCommand;
 import org.dbvr.cli.sql.meta.AbstractMetaObjectCommand;
 import org.jkiss.code.NotNull;
+import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.DBPScriptObject;
@@ -45,10 +46,19 @@ public abstract class AbstractDDLCommand extends AbstractMetaCommand {
     @NotNull
     protected abstract String getObjectTypeName();
 
+    @Nullable
+    protected abstract String getTargetObjectName();
+
+    @Nullable
+    protected abstract DBSObjectContainer getBaseContainer(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull DBPDataSource dataSource
+    ) throws DBException;
+
     @Override
     public void run() throws CLIException {
         AbstractMetaObjectCommand parent = getParentCommand();
-        String objectName = parent.getTargetObjectName();
+        String objectName = getTargetObjectName();
         if (CommonUtils.isEmpty(objectName)) {
             throw new CLIException(
                 "Object name is not specified",
@@ -61,7 +71,7 @@ public abstract class AbstractDDLCommand extends AbstractMetaCommand {
     protected void execute(@NotNull DBRProgressMonitor monitor, @NotNull String objectName) throws DBException {
         AbstractMetaObjectCommand parent = getParentCommand();
         DBPDataSource dataSource = connectDataSource();
-        DBSObjectContainer container = parent.getBaseContainer(monitor, dataSource);
+        DBSObjectContainer container = getBaseContainer(monitor, dataSource);
         if (container == null) {
             return;
         }
