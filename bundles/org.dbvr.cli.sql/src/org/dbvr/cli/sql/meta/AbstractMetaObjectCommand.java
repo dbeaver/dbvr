@@ -104,9 +104,7 @@ public abstract class AbstractMetaObjectCommand extends CLIAbstractSubcommand {
             }
             container = getChildContainer(monitor, container, schemaName);
         } else if (container != null
-            && !(this instanceof DatabaseCommand)
             && !(this instanceof SchemaCommand)
-            && !(this instanceof TableCommand)
             && containsObjectOfType(monitor, container, DBSSchema.class)
         ) {
             throw new CLIException("Schema name not specified", CLIConstants.EXIT_CODE_ERROR);
