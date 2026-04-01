@@ -40,7 +40,6 @@ public abstract class AbstractMetaObjectCommand extends CLIAbstractSubcommand {
     @Nullable
     public abstract String getTargetObjectName();
 
-
     @Nullable
     public DBSObject findObject(
         @NotNull DBRProgressMonitor monitor,
