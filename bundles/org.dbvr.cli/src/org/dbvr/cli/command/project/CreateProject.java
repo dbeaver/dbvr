@@ -18,10 +18,14 @@ package org.dbvr.cli.command.project;
 
 import org.jkiss.dbeaver.model.cli.CLIConstants;
 import org.jkiss.dbeaver.model.cli.CLIException;
+import org.jkiss.dbeaver.model.cli.help.CLIExample;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import picocli.CommandLine;
 
 @CommandLine.Command(name = "create", description = "Create new project")
+@CLIExample(examples = {
+    "project create --name MyProject --description \"This is my project\""
+})
 public class CreateProject extends AbstractProjectCommand {
 
     @CommandLine.Option(names = {"-n", "--name"}, description = "Project name", required = true)

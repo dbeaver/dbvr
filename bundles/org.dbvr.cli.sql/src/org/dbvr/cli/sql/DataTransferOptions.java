@@ -25,8 +25,9 @@ public class DataTransferOptions {
 
     @CommandLine.Option(names = {"-l", "--limit"},
         arity = "1",
-        description = "Limits number of fetched rows and sets offset. Format: \"[offset,]limit\". Default: 1000",
-        defaultValue = "1000")
+        description = "Limits number of fetched rows and sets offset. Format: \"[offset,]limit\".",
+        defaultValue = "1000",
+        showDefaultValue = CommandLine.Help.Visibility.ALWAYS)
     private String limit = "1000";
 
     @NotNull

@@ -83,7 +83,7 @@ public class SQLCommand extends CLIAbstractSubcommand {
     @CommandLine.Mixin
     private DataSourceAuthOptions authOptions;
 
-    @CommandLine.ArgGroup(exclusive = true, multiplicity = "1")
+    @CommandLine.ArgGroup(exclusive = true, multiplicity = "1", heading = "Datasource options:\n")
     private CreateOrFindDataSource dataSourceOptions;
 
     private static class CreateOrFindDataSource {

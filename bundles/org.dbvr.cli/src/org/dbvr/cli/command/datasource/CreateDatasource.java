@@ -22,6 +22,7 @@ import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.cli.CLIException;
 import org.jkiss.dbeaver.model.cli.CLIProcessResult;
 import org.jkiss.dbeaver.model.cli.CLIUtils;
+import org.jkiss.dbeaver.model.cli.help.CLIExample;
 import org.jkiss.dbeaver.model.cli.model.DataSourceUpdater;
 import org.jkiss.dbeaver.model.cli.model.option.CreateDataSourceOptions;
 import picocli.CommandLine;
@@ -29,6 +30,9 @@ import picocli.CommandLine;
 import java.util.List;
 
 @CommandLine.Command(name = "create", description = "Create datasource")
+@CLIExample(examples = {
+    "datasource create --driver postgres-jdbc --host localhost --port 5432 --user postgres --password postgres --database postgres"
+})
 public class CreateDatasource extends AbstractDataSourceEditCommand {
     @CommandLine.Mixin
     private CreateDataSourceOptions createOptions;

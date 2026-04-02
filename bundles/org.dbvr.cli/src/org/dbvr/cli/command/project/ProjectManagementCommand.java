@@ -35,7 +35,7 @@ import java.io.StringWriter;
         SetDefaultProject.class
     }
 )
-public class ProjectManagementHandler extends CLIAbstractSubcommand {
+public class ProjectManagementCommand extends CLIAbstractSubcommand {
     @CommandLine.Spec
     CommandLine.Model.CommandSpec spec;
 

@@ -10,6 +10,9 @@
             handler="org.dbvr.cli.command.driver.DriverManagerHandler"/>
         <parameter
             exitAfterExecute="true"
-            handler="org.dbvr.cli.command.project.ProjectManagementHandler"/>
+            handler="org.dbvr.cli.command.project.ProjectManagementCommand"/>
+        <parameter
+            exitAfterExecute="true"
+            handler="org.dbvr.cli.command.TestCommand"/>
     </extension>
 </plugin>
