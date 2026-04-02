@@ -17,7 +17,7 @@
 package org.dbvr.cli.sql.meta.ddl;
 
 import org.dbvr.cli.sql.meta.AbstractMetaObjectCommand;
-import org.dbvr.cli.sql.meta.MetaContainerOptions;
+import org.dbvr.cli.sql.meta.MetaSchemaOptions;
 import org.dbvr.cli.sql.meta.SchemaCommand;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -34,7 +34,7 @@ public class SchemaDDLCommand extends AbstractDDLCommand {
     private SchemaCommand parent;
 
     @CommandLine.Mixin
-    private MetaContainerOptions containerOptions;
+    private MetaSchemaOptions containerOptions;
 
     @NotNull
     @Override

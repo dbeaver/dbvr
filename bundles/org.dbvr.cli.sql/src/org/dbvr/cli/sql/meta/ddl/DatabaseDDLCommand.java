@@ -18,7 +18,7 @@ package org.dbvr.cli.sql.meta.ddl;
 
 import org.dbvr.cli.sql.meta.AbstractMetaObjectCommand;
 import org.dbvr.cli.sql.meta.DatabaseCommand;
-import org.dbvr.cli.sql.meta.MetaContainerOptions;
+import org.dbvr.cli.sql.meta.MetaDatabaseOptions;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -34,7 +34,7 @@ public class DatabaseDDLCommand extends AbstractDDLCommand {
     private DatabaseCommand parent;
 
     @CommandLine.Mixin
-    private MetaContainerOptions containerOptions;
+    private MetaDatabaseOptions containerOptions;
 
     @NotNull
     @Override

@@ -17,7 +17,7 @@
 package org.dbvr.cli.sql.meta.ddl;
 
 import org.dbvr.cli.sql.meta.AbstractMetaObjectCommand;
-import org.dbvr.cli.sql.meta.MetaContainerOptions;
+import org.dbvr.cli.sql.meta.MetaSchemaOptions;
 import org.dbvr.cli.sql.meta.TableCommand;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
@@ -34,7 +34,7 @@ public class TableDDLCommand extends AbstractDDLCommand {
     private TableCommand parent;
 
     @CommandLine.Mixin
-    private MetaContainerOptions containerOptions;
+    private MetaSchemaOptions containerOptions;
 
     @Nullable
     @CommandLine.Option(names = {"--table-name", "-tn"}, description = "Table name")

@@ -19,20 +19,11 @@ package org.dbvr.cli.sql.meta;
 import org.jkiss.code.Nullable;
 import picocli.CommandLine;
 
-public class MetaContainerOptions {
-
-    @Nullable
-    @CommandLine.Option(names = {"--database-name", "-db"}, description = "Database (catalog) name")
-    protected String databaseName;
+public class MetaSchemaOptions extends MetaDatabaseOptions {
 
     @Nullable
     @CommandLine.Option(names = {"--schema-name", "-sn"}, description = "Schema name")
     protected String schemaName;
-
-    @Nullable
-    public String getDatabaseName() {
-        return databaseName;
-    }
 
     @Nullable
     public String getSchemaName() {
