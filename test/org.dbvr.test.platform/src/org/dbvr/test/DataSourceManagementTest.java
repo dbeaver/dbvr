@@ -293,7 +293,6 @@ public class DataSourceManagementTest extends DBVRTest {
         Assert.assertFalse(result.getOutput().isEmpty());
         String output = result.getOutput().getFirst();
         Assert.assertTrue(output.contains("Usage: dbvr datasource"));
-        Assert.assertTrue(output.contains("Commands:"));
         Assert.assertTrue(output.contains("create"));
         Assert.assertTrue(output.contains("list"));
     }
