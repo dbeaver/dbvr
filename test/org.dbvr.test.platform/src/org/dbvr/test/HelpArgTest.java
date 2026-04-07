@@ -75,18 +75,20 @@ public class HelpArgTest extends DBVRTest {
         Assert.assertFalse(position3.contains("required"));
 
 
-        String reqOption1 = allArgsByLine[3].trim();
-        String reqOption2 = allArgsByLine[5].trim(); // cause line 4 - it help for command from line 3
+        String reqOption1 = allArgsByLine[4].trim();
+        String reqOption2 = allArgsByLine[6].trim(); // cause line 6 - it help for command from line 4
 
         Assert.assertTrue(reqOption1.startsWith(TestCommand.TEST_REQ_FIRST));
         Assert.assertTrue(reqOption1.contains("required"));
         Assert.assertTrue(reqOption2.startsWith(TestCommand.TEST_REQ_IN_MIDDLE));
         Assert.assertTrue(reqOption2.contains("required"));
+        Assert.assertFalse(findOptionLine(allArgsByLine, TestCommand.TEST_PARAM_NAME_NOT_REQ).contains("required"));
 
-        Assert.assertFalse(findOptionLine(allArgsByLine, TestCommand.TEST_INT_ARRAY).contains("<integer[]>"));
-        Assert.assertFalse(findOptionLine(allArgsByLine, TestCommand.TEST_INT_LIST).contains("<integer[]>"));
-        Assert.assertFalse(findOptionLine(allArgsByLine, TestCommand.TEST_DOUBLE).contains("<double>"));
-        Assert.assertFalse(findOptionLine(allArgsByLine, TestCommand.TEST_STRING_LIST).contains("<string[]>"));
+
+        Assert.assertTrue(findOptionLine(allArgsByLine, TestCommand.TEST_INT_ARRAY).contains("(integer[])"));
+        Assert.assertTrue(findOptionLine(allArgsByLine, TestCommand.TEST_INT_LIST).contains("(integer[])"));
+        Assert.assertTrue(findOptionLine(allArgsByLine, TestCommand.TEST_DOUBLE).contains("(double)"));
+        Assert.assertTrue(findOptionLine(allArgsByLine, TestCommand.TEST_STRING_LIST).contains("(string[])"));
 
 
         String example1 = allArgsByLine[allArgsByLine.length - 2].trim();

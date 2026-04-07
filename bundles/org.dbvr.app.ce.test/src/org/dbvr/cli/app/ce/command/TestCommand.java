@@ -33,7 +33,7 @@ import static org.dbvr.cli.app.ce.command.TestCommand.TEST_COMMAND_NAME;
 public class TestCommand extends CLIAbstractSubcommand {
     public static final String DESCRIPTION = "A test command for testing purposes";
     public static final String TEST_COMMAND_NAME = "test-command";
-    public static final String TEST_PARAM_NAME = "--test-parameter-value";
+    public static final String TEST_PARAM_NAME_NOT_REQ = "--test-parameter-value";
     public static final String TEST_INT_ARRAY = "--test-int-array";
     public static final String TEST_INT_LIST = "--test-int-list";
     public static final String TEST_STRING_LIST = "--test-string-list";
@@ -42,23 +42,27 @@ public class TestCommand extends CLIAbstractSubcommand {
     public static final String TEST_REQ_IN_MIDDLE = "--test-req-middle";
 
     public static final String EXAMPLE_COMMAND1 = TEST_COMMAND_NAME + " " + TEST_DOUBLE + "12.00";
-    public static final String EXAMPLE_COMMAND2 = TEST_COMMAND_NAME + " " + TEST_PARAM_NAME + "ASDASD";
+    public static final String EXAMPLE_COMMAND2 = TEST_COMMAND_NAME + " " + TEST_PARAM_NAME_NOT_REQ + "ASDASD";
 
 
     @CommandLine.Option(names = {TEST_REQ_FIRST}, required = true, description = "Req opt first position")
     private String reqString;
 
-    @CommandLine.Option(names = {TEST_PARAM_NAME}, description = "A test parameter")
+    @CommandLine.Option(names = {TEST_PARAM_NAME_NOT_REQ}, description = "A test parameter")
     private String param;
 
     @CommandLine.Option(names = {TEST_INT_ARRAY}, description = "An int array")
     private int[] intArray;
 
-    @CommandLine.Option(names = {TEST_INT_LIST}, description = "An int list")
+    @CommandLine.Option(names = {TEST_STRING_LIST}, description = "A string list")
     private List<String> stringList;
 
-    @CommandLine.Option(names = {TEST_STRING_LIST}, description = "A string array")
+    @CommandLine.Option(names = {TEST_INT_LIST}, description = "An int array")
     private List<Integer> integerList;
+
+
+    @CommandLine.Option(names = {TEST_DOUBLE}, description = "A double")
+    private Double doubleValue;
 
 
     //must be sorted to the top in help
@@ -68,9 +72,9 @@ public class TestCommand extends CLIAbstractSubcommand {
     @CommandLine.Parameters(index = "0", description = "Positional parameter 1", arity = "0..1")
     private String pos1;
     // arity > 0 means req parameter, but it is not sorted because tied to position
-    @CommandLine.Parameters(index = "1", description = "Positional parameter 1", arity = "1")
+    @CommandLine.Parameters(index = "1", description = "Positional parameter 2", arity = "1")
     private String pos2;
-    @CommandLine.Parameters(index = "2", description = "Positional parameter 1", arity = "0..1")
+    @CommandLine.Parameters(index = "2", description = "Positional parameter 3", arity = "0..1")
     private String pos3;
 
 
