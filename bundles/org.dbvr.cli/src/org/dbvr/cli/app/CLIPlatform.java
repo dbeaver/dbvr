@@ -53,9 +53,9 @@ public class CLIPlatform extends BasePlatformImpl {
     }
 
     protected void initialize() {
+        instance = this;
         long startTime = System.currentTimeMillis();
         log.trace("Initialize CLI Platform...");
-
         try {
             Path installPath = RuntimeUtils.getLocalPathFromURL(Platform.getInstallLocation().getURL());
 
@@ -65,7 +65,6 @@ public class CLIPlatform extends BasePlatformImpl {
         } catch (IOException e) {
             log.debug(e);
         }
-
         // Register properties adapter
         try {
             getApplication().beforeWorkspaceInitialization();
@@ -77,6 +76,7 @@ public class CLIPlatform extends BasePlatformImpl {
 
         QMUtils.initPlatform(false);
 
+        super.initialize();
         log.trace("CLI Platform initialized (" + (System.currentTimeMillis() - startTime) + "ms)");
     }
 

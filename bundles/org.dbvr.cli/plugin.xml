@@ -12,4 +12,8 @@
             exitAfterExecute="true"
             handler="org.dbvr.cli.command.project.ProjectManagementHandler"/>
     </extension>
+
+    <extension point="org.jkiss.dbeaver.service">
+        <service name="org.jkiss.dbeaver.runtime.ui.UIServiceDrivers" class="org.dbvr.cli.service.CLIServiceDriver"/>
+    </extension>
 </plugin>

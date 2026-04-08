@@ -54,6 +54,7 @@ public class CLIApplicationBase extends BaseApplicationImpl {
     private static final String[] DEFAULT_ARGS = new String[] {AbstractTopLevelCommand.HELP_OPTION};
 
     private DBPPreferenceStore preferenceStore;
+    private boolean stateless = false;
 
     protected CLIApplicationBase() {
 
@@ -78,6 +79,9 @@ public class CLIApplicationBase extends BaseApplicationImpl {
     public Object start(IApplicationContext context) throws Exception {
         // hide standard Eclipse exit message if exit code is not OK (otherwise it may be confusing)
         System.setProperty(ECLIPSE_EXIT_DATA, "");
+
+        String[] args = Platform.getApplicationArgs();
+        this.stateless = ArrayUtils.contains(args, CLITopLevelCommand.OPTION_STATELESS);
         // Register core components
         initializeApplicationServices();
 
@@ -112,7 +116,7 @@ public class CLIApplicationBase extends BaseApplicationImpl {
 
         int exitCode;
         try {
-            CLIProcessResult processResult = executeCommandLine(Platform.getApplicationArgs());
+            CLIProcessResult processResult = executeCommandLine(args);
             var out = processResult.getPostAction() == CLIProcessResult.PostAction.ERROR
                 ? System.err
                 : System.out;
@@ -210,5 +214,9 @@ public class CLIApplicationBase extends BaseApplicationImpl {
 
     public synchronized boolean isStarted() {
         return started;
+    }
+
+    public boolean isStateless() {
+        return stateless;
     }
 }
