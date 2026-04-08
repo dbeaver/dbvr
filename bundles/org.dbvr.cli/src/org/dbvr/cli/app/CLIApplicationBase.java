@@ -33,6 +33,7 @@ import org.jkiss.dbeaver.model.cli.command.AbstractTopLevelCommand;
 import org.jkiss.dbeaver.model.impl.app.BaseApplicationImpl;
 import org.jkiss.dbeaver.model.impl.preferences.BundlePreferenceStore;
 import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
+import org.jkiss.dbeaver.model.qm.QMUtils;
 import org.jkiss.dbeaver.registry.BasePlatformImpl;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.ui.DBPPlatformUI;
@@ -134,6 +135,11 @@ public class CLIApplicationBase extends BaseApplicationImpl {
             // hide standard Eclipse exit message if exit code is not OK (otherwise it may be confusing)
             System.setProperty(ECLIPSE_EXIT_DATA, "");
         }
+        //Manually disable QM at the end of the application's execution,
+        //since we need to wait for it to finish in cases where database queries complete before QM initializes,
+        //and we need to avoid partial deactivation of plugins while QM is running
+        QMUtils.disposePlatform();
+
         return exitCode;
     }
 
