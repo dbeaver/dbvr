@@ -4,7 +4,7 @@
     <extension point="org.jkiss.dbeaver.commandLine">
         <parameter
             exitAfterExecute="true"
-            handler="org.dbvr.cli.command.datasource.DataSourceManagementHandler"/>
+            handler="org.dbvr.cli.command.datasource.DataSourceManagementCommand"/>
         <parameter
             exitAfterExecute="true"
             handler="org.dbvr.cli.command.driver.DriverManagerHandler"/>

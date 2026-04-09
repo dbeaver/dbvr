@@ -47,7 +47,7 @@ public abstract class AbstractDataSourceCommand extends CLIAbstractSubcommand {
      * Root command uses as context
      */
     @CommandLine.ParentCommand
-    private DataSourceManagementHandler parent;
+    private DataSourceManagementCommand parent;
 
     protected DBPProject getProject() throws CLIException {
         return CLIUtils.findProject(projectOption.getProjectIdOrName(), context());

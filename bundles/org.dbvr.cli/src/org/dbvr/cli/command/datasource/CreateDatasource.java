@@ -25,21 +25,32 @@ import org.jkiss.dbeaver.model.cli.CLIUtils;
 import org.jkiss.dbeaver.model.cli.help.CLIExample;
 import org.jkiss.dbeaver.model.cli.model.DataSourceUpdater;
 import org.jkiss.dbeaver.model.cli.model.option.CreateDataSourceOptions;
+import org.jkiss.dbeaver.model.cli.model.option.DataSourceOptions;
 import picocli.CommandLine;
 
 import java.util.List;
 
 @CommandLine.Command(name = "create", description = "Create datasource")
 @CLIExample(examples = {
-    "datasource create --driver postgres-jdbc --host localhost --port 5432 --user postgres --password postgres --database postgres"
+    CreateDatasource.EXAMPLE
 })
 public class CreateDatasource extends AbstractDataSourceEditCommand {
+    public static final String COMMAND_CREATE = "create";
+    protected static final String EXAMPLE = DataSourceManagementCommand.COMMAND_DATASOURCE + " " + COMMAND_CREATE
+        + " " + CreateDataSourceOptions.OPTION_DRIVER + " postgres-jdbc "
+        + DataSourceOptions.OPTION_HOST + " localhost "
+        + DataSourceOptions.OPTION_PORT + " 5432 "
+        + DataSourceOptions.OPTION_DATABASE + " postgres "
+        + DataSourceOptions.OPTION_USER + " pg_user "
+        + DataSourceOptions.OPTION_PASSWORD + " pg_password";
+
     @CommandLine.Mixin
     private CreateDataSourceOptions createOptions;
 
     @Override
     public void run() throws CLIException {
         super.run();
+
         DBPProject project = getProject();
         DBPDataSourceContainer dataSourceContainer = CLIUtils.createDataSource(
             project,
