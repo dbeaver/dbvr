@@ -19,13 +19,11 @@ package org.dbvr.cli.command.project;
 import org.jkiss.dbeaver.model.cli.CLIAbstractSubcommand;
 import org.jkiss.dbeaver.model.cli.CLIException;
 import org.jkiss.dbeaver.model.cli.CLIProcessResult;
+import org.jkiss.dbeaver.model.cli.CLIUtils;
 import picocli.CommandLine;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
 @CommandLine.Command(
-    name = "project",
+    name = ProjectManagementCommand.COMMAND_PROJECT,
     description = "Project management commands",
     subcommands = {
         ListProjects.class,
@@ -36,15 +34,11 @@ import java.io.StringWriter;
     }
 )
 public class ProjectManagementCommand extends CLIAbstractSubcommand {
-    @CommandLine.Spec
-    CommandLine.Model.CommandSpec spec;
-
+    public static final String COMMAND_PROJECT = "project";
     @Override
     public void run() throws CLIException {
         if (spec.commandLine().getParseResult().subcommand() == null) {
-            StringWriter writer = new StringWriter();
-            spec.commandLine().usage(new PrintWriter(writer));
-            context().addResult(writer.toString());
+            context().addResult(CLIUtils.getHelpFromCommand(spec));
             context().setPostAction(CLIProcessResult.PostAction.SHUTDOWN);
         }
     }
