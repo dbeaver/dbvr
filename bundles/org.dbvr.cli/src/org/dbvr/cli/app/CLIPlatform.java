@@ -19,6 +19,7 @@ package org.dbvr.cli.app;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.app.DBACertificateStorage;
@@ -52,7 +53,7 @@ public class CLIPlatform extends BasePlatformImpl {
     CLIPlatform() {
     }
 
-    protected void initialize() {
+    protected void initialize() throws DBException {
         instance = this;
         long startTime = System.currentTimeMillis();
         log.trace("Initialize CLI Platform...");
