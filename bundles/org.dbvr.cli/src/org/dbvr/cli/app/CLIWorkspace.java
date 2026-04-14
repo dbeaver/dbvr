@@ -169,7 +169,7 @@ public class CLIWorkspace extends BaseWorkspaceImpl {
     }
 
     @Override
-    public void initializeProjects() throws DBException {
+    public void initializeProjects() {
         List<Path> projectPaths = new ArrayList<>();
         try {
             Files.walkFileTree(getAbsolutePath(), new SimpleFileVisitor<>() {
