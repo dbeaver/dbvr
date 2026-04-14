@@ -83,6 +83,9 @@ public class SQLCommand extends CLIAbstractSubcommand {
     @CommandLine.Mixin
     private DataSourceAuthOptions authOptions;
 
+    @CommandLine.Option(names = "--print-queries", description = "Print queries before execution")
+    private boolean printQueries;
+
     @CommandLine.ArgGroup(exclusive = true, multiplicity = "1")
     private CreateOrFindDataSource dataSourceOptions;
 
@@ -239,6 +242,14 @@ public class SQLCommand extends CLIAbstractSubcommand {
                 if (!(script instanceof SQLQuery q)) {
                     log.debug("Skip non-query script element: " + script.getText());
                     continue;
+                }
+                if (printQueries) {
+                    String queryText = q.getText() + "\n";
+                    if (outputFile == null) {
+                        out.write(queryText.getBytes(settings.getOutputEncoding()));
+                    } else {
+                        context().addResult(queryText);
+                    }
                 }
                 StreamTransferConsumer consumer = new StreamTransferConsumer();
                 SQLQueryDataContainer sqlQueryDataContainer = new SQLQueryDataContainer(
