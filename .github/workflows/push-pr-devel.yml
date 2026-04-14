@@ -25,7 +25,7 @@ jobs:
       project-directory: ./dbvr/product/aggregate
       project-deps: ./dbvr/project.deps
       timeout-minutes: 15
-      mvn-args: -Dheadless-platform -Pproduct-dbvr-ce
+      mvn-args: -Dheadless-platform -Pproduct-dbvr-ce -Dbuild.all-environments
       use-private-p2: true
 
   lint-java:
