@@ -135,12 +135,16 @@ public class CLIApplicationBase extends BaseApplicationImpl {
             // hide standard Eclipse exit message if exit code is not OK (otherwise it may be confusing)
             System.setProperty(ECLIPSE_EXIT_DATA, "");
         }
+
+        beforeApplicationExit();
+        return exitCode;
+    }
+
+    protected void beforeApplicationExit() {
         //Manually disable QM at the end of the application's execution,
         //since we need to wait for it to finish in cases where database queries complete before QM initializes,
         //and we need to avoid partial deactivation of plugins while QM is running
         QMUtils.disposePlatform();
-
-        return exitCode;
     }
 
     public CLIProcessResult executeCommandLine(@NotNull String[] args) throws DBException {
