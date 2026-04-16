@@ -19,6 +19,7 @@ package org.dbvr.cli.app;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.Log;
 import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.app.DBACertificateStorage;
@@ -52,10 +53,10 @@ public class CLIPlatform extends BasePlatformImpl {
     CLIPlatform() {
     }
 
-    protected void initialize() {
+    protected void initialize() throws DBException {
+        instance = this;
         long startTime = System.currentTimeMillis();
         log.trace("Initialize CLI Platform...");
-
         try {
             Path installPath = RuntimeUtils.getLocalPathFromURL(Platform.getInstallLocation().getURL());
 
@@ -65,7 +66,6 @@ public class CLIPlatform extends BasePlatformImpl {
         } catch (IOException e) {
             log.debug(e);
         }
-
         // Register properties adapter
         try {
             getApplication().beforeWorkspaceInitialization();
@@ -77,6 +77,7 @@ public class CLIPlatform extends BasePlatformImpl {
 
         QMUtils.initPlatform(false);
 
+        super.initialize();
         log.trace("CLI Platform initialized (" + (System.currentTimeMillis() - startTime) + "ms)");
     }
 
