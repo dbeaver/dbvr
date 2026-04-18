@@ -20,6 +20,7 @@ import org.jkiss.junit.osgi.annotation.RunWithApplication;
 import org.jkiss.junit.osgi.annotation.RunWithProduct;
 import org.jkiss.junit.osgi.behaviors.IAsyncApplication;
 import org.jkiss.junit.osgi.extension.OSGITestExtension;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 @RunWithProduct("dbvr-unittest.product")
@@ -33,6 +34,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
     }
 )
 public abstract class DBVRTest implements IAsyncApplication {
+
+    @BeforeAll
+    public static void setUpApplication() throws Exception {
+        DBVRTestSuite.initApplication();
+    }
 
     @Override
     public boolean verifyLaunched() {
