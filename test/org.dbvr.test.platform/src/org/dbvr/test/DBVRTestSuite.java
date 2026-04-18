@@ -33,7 +33,7 @@ import org.junit.platform.suite.api.Suite;
     AuthModelsTest.class,
     InjectTest.class
 })
-public class DBVRTestSuite {
+public class DBVRTestSuite extends DBVRTest {
     private static CLIApplicationCE applicationCE;
 
     public static void initApplication() throws Exception {
