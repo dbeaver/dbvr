@@ -19,14 +19,14 @@ package org.dbvr.test;
 import org.dbvr.cli.app.ce.CLIApplicationCE;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
+import org.jkiss.dbeaver.model.impl.app.AbstractApplication;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
-import org.junit.BeforeClass;
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
+import org.junit.platform.suite.api.SelectClasses;
+import org.junit.platform.suite.api.Suite;
 
 
-@RunWith(Suite.class)
-@Suite.SuiteClasses({
+@Suite
+@SelectClasses({
     HelpArgTest.class,
     DataSourceManagementTest.class,
     ProjectManagementTest.class,
@@ -36,7 +36,6 @@ import org.junit.runners.Suite;
 public class DBVRTestSuite {
     private static CLIApplicationCE applicationCE;
 
-    @BeforeClass
     public static void initApplication() throws Exception {
         System.out.println("Start CLI Application");
         if (DBWorkbench.isPlatformStarted()) {
@@ -71,10 +70,13 @@ public class DBVRTestSuite {
     @NotNull
     public static CLIApplicationCE getApplication() throws DBException {
         if (applicationCE == null) {
-            if (DBWorkbench.isPlatformStarted()) {
-                return (CLIApplicationCE) DBWorkbench.getPlatform().getApplication();
+            Object instance = AbstractApplication.getInstanceOrNull();
+            if (instance instanceof CLIApplicationCE ce) {
+                applicationCE = ce;
             }
-            throw new DBException("Application is not running");
+            if (applicationCE == null) {
+                throw new DBException("Application is not running");
+            }
         }
 
         return applicationCE;

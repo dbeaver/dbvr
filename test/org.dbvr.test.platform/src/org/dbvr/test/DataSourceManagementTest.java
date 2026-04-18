@@ -30,8 +30,8 @@ import org.jkiss.dbeaver.model.net.DBWHandlerDescriptor;
 import org.jkiss.dbeaver.model.net.DBWUtils;
 import org.jkiss.dbeaver.registry.network.NetworkHandlerRegistry;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
@@ -53,15 +53,15 @@ public class DataSourceManagementTest extends DBVRTest {
         var cmd = DBVRTestSuite.getApplication().createCommandLine();
 
         CLIProcessResult result = cmd.executeCommandLineCommands(null, false, false, args);
-        Assert.assertNotNull(result.getOutput());
-        Assert.assertEquals(1, result.getOutput().size());
+        Assertions.assertNotNull(result.getOutput());
+        Assertions.assertEquals(1, result.getOutput().size());
         String createdId = result.getOutput().getFirst();
 
         DBPProject project = DBWorkbench.getPlatform().getWorkspace().getActiveProject();
-        Assert.assertNotNull(project);
+        Assertions.assertNotNull(project);
         DBPDataSourceContainer ds = project.getDataSourceRegistry().getDataSource(createdId);
-        Assert.assertNotNull(ds);
-        Assert.assertEquals(uniqName, ds.getName());
+        Assertions.assertNotNull(ds);
+        Assertions.assertEquals(uniqName, ds.getName());
         project.getDataSourceRegistry().removeDataSource(ds);
     }
 
@@ -88,25 +88,25 @@ public class DataSourceManagementTest extends DBVRTest {
         var cmd = DBVRTestSuite.getApplication().createCommandLine();
 
         CLIProcessResult result = cmd.executeCommandLineCommands(null, false, false, args);
-        Assert.assertNotNull(result.getOutput());
-        Assert.assertEquals(1, result.getOutput().size());
+        Assertions.assertNotNull(result.getOutput());
+        Assertions.assertEquals(1, result.getOutput().size());
         if (result.getExitCode() == CLIConstants.EXIT_CODE_ERROR) {
-            Assert.fail("Error during datasource creation: " + String.join("\n", result.getOutput()));
+            Assertions.fail("Error during datasource creation: " + String.join("\n", result.getOutput()));
         }
         String createdId = result.getOutput().get(0);
 
         DBPProject project = DBWorkbench.getPlatform().getWorkspace().getActiveProject();
-        Assert.assertNotNull(project);
+        Assertions.assertNotNull(project);
         DBPDataSourceContainer ds = project.getDataSourceRegistry().getDataSource(createdId);
-        Assert.assertNotNull(ds);
-        Assert.assertEquals(uniqName, ds.getName());
+        Assertions.assertNotNull(ds);
+        Assertions.assertEquals(uniqName, ds.getName());
         DBWHandlerConfiguration sshConf = ds.getConnectionConfiguration().getHandler(DBWUtils.SSH_TUNNEL);
-        Assert.assertNotNull(sshConf);
-        Assert.assertEquals("test_host", sshConf.getProperty("host"));
-        Assert.assertEquals("/opt/test/path", sshConf.getProperty("keyPath"));
-        Assert.assertEquals(uniqUser, sshConf.getUserName());
-        Assert.assertEquals(uniqPwd, sshConf.getPassword());
-        Assert.assertEquals("PUBLIC_KEY", sshConf.getProperty("authType"));
+        Assertions.assertNotNull(sshConf);
+        Assertions.assertEquals("test_host", sshConf.getProperty("host"));
+        Assertions.assertEquals("/opt/test/path", sshConf.getProperty("keyPath"));
+        Assertions.assertEquals(uniqUser, sshConf.getUserName());
+        Assertions.assertEquals(uniqPwd, sshConf.getPassword());
+        Assertions.assertEquals("PUBLIC_KEY", sshConf.getProperty("authType"));
         project.getDataSourceRegistry().removeDataSource(ds);
     }
 
@@ -117,17 +117,17 @@ public class DataSourceManagementTest extends DBVRTest {
         createFakeDataSource(uniqName);
         var registry = DBWorkbench.getPlatform().getWorkspace().getActiveProject()
             .getDataSourceRegistry();
-        Assert.assertNotNull(registry.findDataSourceByName(uniqName));
+        Assertions.assertNotNull(registry.findDataSourceByName(uniqName));
         var cmd = DBVRTestSuite.getApplication().createCommandLine();
         var args = new String[] {
             "datasource",
             "delete", uniqName
         };
         CLIProcessResult result = cmd.executeCommandLineCommands(null, false, false, args);
-        Assert.assertNotNull(result.getOutput());
-        Assert.assertEquals(1, result.getOutput().size());
-        Assert.assertTrue(result.getOutput().get(0).contains(uniqName));
-        Assert.assertNull(registry.findDataSourceByName(uniqName));
+        Assertions.assertNotNull(result.getOutput());
+        Assertions.assertEquals(1, result.getOutput().size());
+        Assertions.assertTrue(result.getOutput().get(0).contains(uniqName));
+        Assertions.assertNull(registry.findDataSourceByName(uniqName));
     }
 
     @Test
@@ -137,10 +137,10 @@ public class DataSourceManagementTest extends DBVRTest {
         DBPDataSourceContainer ds = createFakeDataSource(uniqName);
         var registry = DBWorkbench.getPlatform().getWorkspace().getActiveProject()
             .getDataSourceRegistry();
-        Assert.assertNotNull(registry.findDataSourceByName(uniqName));
+        Assertions.assertNotNull(registry.findDataSourceByName(uniqName));
         var cmd = DBVRTestSuite.getApplication().createCommandLine();
         String newRandomHost = "host" + UUID.randomUUID();
-        Assert.assertNotEquals(newRandomHost, ds.getConnectionConfiguration().getHostName());
+        Assertions.assertNotEquals(newRandomHost, ds.getConnectionConfiguration().getHostName());
         var args = new String[] {
             "datasource",
             "update", ds.getId(),
@@ -150,14 +150,14 @@ public class DataSourceManagementTest extends DBVRTest {
 
         ds = registry.findDataSourceByName(uniqName);
 
-        Assert.assertNotNull(ds);
-        Assert.assertEquals(newRandomHost, ds.getConnectionConfiguration().getHostName());
+        Assertions.assertNotNull(ds);
+        Assertions.assertEquals(newRandomHost, ds.getConnectionConfiguration().getHostName());
 
-        Assert.assertNotNull(result.getOutput());
-        Assert.assertEquals(1, result.getOutput().size());
+        Assertions.assertNotNull(result.getOutput());
+        Assertions.assertEquals(1, result.getOutput().size());
         String output = result.getOutput().getFirst();
-        Assert.assertTrue(output.contains(newRandomHost));
-        Assert.assertTrue(output.contains(uniqName));
+        Assertions.assertTrue(output.contains(newRandomHost));
+        Assertions.assertTrue(output.contains(uniqName));
 
         registry.removeDataSource(ds);
     }
@@ -173,27 +173,27 @@ public class DataSourceManagementTest extends DBVRTest {
             "datasource", "view", ds.getId()
         };
         CLIProcessResult result = cmd.executeCommandLineCommands(null, false, false, args);
-        Assert.assertNotNull(result.getOutput());
-        Assert.assertEquals(uniqUser, ds.getConnectionConfiguration().getUserName());
-        Assert.assertEquals(uniqPwd, ds.getConnectionConfiguration().getUserPassword());
-        Assert.assertEquals(1, result.getOutput().size());
+        Assertions.assertNotNull(result.getOutput());
+        Assertions.assertEquals(uniqUser, ds.getConnectionConfiguration().getUserName());
+        Assertions.assertEquals(uniqPwd, ds.getConnectionConfiguration().getUserPassword());
+        Assertions.assertEquals(1, result.getOutput().size());
 
         String output = result.getOutput().getFirst();
-        Assert.assertTrue(output.contains(uniqName));
-        Assert.assertFalse(output.contains(uniqUser));
-        Assert.assertFalse(output.contains(uniqPwd));
+        Assertions.assertTrue(output.contains(uniqName));
+        Assertions.assertFalse(output.contains(uniqUser));
+        Assertions.assertFalse(output.contains(uniqPwd));
 
         var sshConf = ds.getConnectionConfiguration().getHandler(DBWUtils.SSH_TUNNEL);
-        Assert.assertNotNull(sshConf);
-        Assert.assertNotNull(sshConf.getPassword());
-        Assert.assertNotNull(sshConf.getUserName());
+        Assertions.assertNotNull(sshConf);
+        Assertions.assertNotNull(sshConf.getPassword());
+        Assertions.assertNotNull(sshConf.getUserName());
 
-        Assert.assertFalse(output.contains(sshConf.getPassword()));
-        Assert.assertFalse(output.contains(sshConf.getUserName()));
-        Assert.assertFalse(output.contains("turbo_secure_prop"));
+        Assertions.assertFalse(output.contains(sshConf.getPassword()));
+        Assertions.assertFalse(output.contains(sshConf.getUserName()));
+        Assertions.assertFalse(output.contains("turbo_secure_prop"));
 
-        Assert.assertNotNull(sshConf.getSecureProperty("turbo_secure_prop"));
-        Assert.assertFalse(output.contains(sshConf.getSecureProperty("turbo_secure_prop")));
+        Assertions.assertNotNull(sshConf.getSecureProperty("turbo_secure_prop"));
+        Assertions.assertFalse(output.contains(sshConf.getSecureProperty("turbo_secure_prop")));
 
 
         var registry = DBWorkbench.getPlatform().getWorkspace().getActiveProject()
@@ -210,14 +210,14 @@ public class DataSourceManagementTest extends DBVRTest {
             "datasource", "list"
         };
         CLIProcessResult result = cmd.executeCommandLineCommands(null, false, false, args);
-        Assert.assertNotNull(result.getOutput());
-        Assert.assertEquals(1, result.getOutput().size());
+        Assertions.assertNotNull(result.getOutput());
+        Assertions.assertEquals(1, result.getOutput().size());
         String output = result.getOutput().getFirst();
-        Assert.assertTrue(output.contains("ID"));
-        Assert.assertTrue(output.contains("NAME"));
-        Assert.assertTrue(output.contains("DRIVER"));
-        Assert.assertTrue(output.contains(ds.getId()));
-        Assert.assertTrue(output.contains(uniqName));
+        Assertions.assertTrue(output.contains("ID"));
+        Assertions.assertTrue(output.contains("NAME"));
+        Assertions.assertTrue(output.contains("DRIVER"));
+        Assertions.assertTrue(output.contains(ds.getId()));
+        Assertions.assertTrue(output.contains(uniqName));
 
         var registry = DBWorkbench.getPlatform().getWorkspace().getActiveProject()
             .getDataSourceRegistry();
@@ -242,17 +242,17 @@ public class DataSourceManagementTest extends DBVRTest {
 
             // datasource removed from the source project
             DBPProject sourceProject = DBWorkbench.getPlatform().getWorkspace().getActiveProject();
-            Assert.assertNull(sourceProject.getDataSourceRegistry().getDataSource(dsId));
+            Assertions.assertNull(sourceProject.getDataSourceRegistry().getDataSource(dsId));
 
             // datasource must exist in the target project
             DBPDataSourceContainer movedDs = targetProject.getDataSourceRegistry().findDataSourceByName(uniqName);
-            Assert.assertNotNull(movedDs);
+            Assertions.assertNotNull(movedDs);
 
-            Assert.assertNotNull(result.getOutput());
-            Assert.assertEquals(1, result.getOutput().size());
+            Assertions.assertNotNull(result.getOutput());
+            Assertions.assertEquals(1, result.getOutput().size());
             String output = result.getOutput().getFirst();
-            Assert.assertTrue(output.contains(uniqName));
-            Assert.assertTrue(output.contains(targetProjectName));
+            Assertions.assertTrue(output.contains(uniqName));
+            Assertions.assertTrue(output.contains(targetProjectName));
         } finally {
             DBWorkbench.getPlatform().getWorkspace().deleteProject(targetProject);
         }
@@ -273,10 +273,10 @@ public class DataSourceManagementTest extends DBVRTest {
             CLIProcessResult result = cmd.executeCommandLineCommands(null, false, false, args);
 
             String output = String.join("\n", result.getOutput());
-            Assert.assertEquals("Move to same project should fail with ILLEGAL_ARGUMENTS. Output: " + output,
-                CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS, result.getExitCode());
-            Assert.assertTrue("Output should contain word 'same'. Actual output: " + output,
-                output.contains("same"));
+            Assertions.assertEquals(CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS, result.getExitCode(),
+                "Move to same project should fail with ILLEGAL_ARGUMENTS. Output: " + output);
+            Assertions.assertTrue(output.contains("same"),
+                "Output should contain word 'same'. Actual output: " + output);
         } finally {
             registry.removeDataSource(registry.getDataSource(ds.getId()));
         }
@@ -289,12 +289,12 @@ public class DataSourceManagementTest extends DBVRTest {
             "datasource"
         };
         CLIProcessResult result = cmd.executeCommandLineCommands(null, false, false, args);
-        Assert.assertNotNull(result.getOutput());
-        Assert.assertFalse(result.getOutput().isEmpty());
+        Assertions.assertNotNull(result.getOutput());
+        Assertions.assertFalse(result.getOutput().isEmpty());
         String output = result.getOutput().getFirst();
-        Assert.assertTrue(output.contains("Usage: dbvr datasource"));
-        Assert.assertTrue(output.contains("create"));
-        Assert.assertTrue(output.contains("list"));
+        Assertions.assertTrue(output.contains("Usage: dbvr datasource"));
+        Assertions.assertTrue(output.contains("create"));
+        Assertions.assertTrue(output.contains("list"));
     }
 
     @Test
@@ -310,10 +310,10 @@ public class DataSourceManagementTest extends DBVRTest {
 
         CLIProcessResult result = cmd.executeCommandLineCommands(null, false, false, args);
         String output = String.join("\n", result.getOutput());
-        Assert.assertEquals(CLIConstants.EXIT_CODE_ERROR, result.getExitCode());
-        Assert.assertNotNull(result.getOutput());
-        Assert.assertFalse(result.getOutput().isEmpty());
-        Assert.assertTrue(output.contains("mutually exclusive"));
+        Assertions.assertEquals(CLIConstants.EXIT_CODE_ERROR, result.getExitCode());
+        Assertions.assertNotNull(result.getOutput());
+        Assertions.assertFalse(result.getOutput().isEmpty());
+        Assertions.assertTrue(output.contains("mutually exclusive"));
     }
 
     @Test
@@ -332,10 +332,10 @@ public class DataSourceManagementTest extends DBVRTest {
 
         CLIProcessResult result = cmd.executeCommandLineCommands(null, false, false, args);
         String output = String.join("\n", result.getOutput());
-        Assert.assertEquals(CLIConstants.EXIT_CODE_ERROR, result.getExitCode());
-        Assert.assertNotNull(result.getOutput());
-        Assert.assertFalse(result.getOutput().isEmpty());
-        Assert.assertTrue(output.contains("mutually exclusive"));
+        Assertions.assertEquals(CLIConstants.EXIT_CODE_ERROR, result.getExitCode());
+        Assertions.assertNotNull(result.getOutput());
+        Assertions.assertFalse(result.getOutput().isEmpty());
+        Assertions.assertTrue(output.contains("mutually exclusive"));
 
         registry.removeDataSource(ds);
     }
