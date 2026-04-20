@@ -161,39 +161,43 @@ public class ProjectManagementTest extends DBVRTest {
         var cmd = DBVRTestSuite.getApplication().createCommandLine();
         CLIProcessResult result = cmd.executeCommandLineCommands(null, false, false, args);
 
-        Assertions.assertTrue(String.join("\n", result.getOutput()).contains("Resource name '.test_prj_hidden' can't start with dot"), "Error message expected for hidden project creation");
+        Assertions.assertTrue(String.join("\n", result.getOutput()).contains("Resource name '.test_prj_hidden' can't start with dot"));
     }
 
     @Test
     public void testSetDefaultProject() throws Exception {
-        String name = "test_prj_" + UUID.randomUUID();
-        DBPProject project = DBWorkbench.getPlatform().getWorkspace().createProject(name, "Default test");
-        projectsToDelete.add(project);
-
         DBPProject originalActive = DBWorkbench.getPlatform().getWorkspace().getActiveProject();
-
-        String[] args = {
-            "project", "default", project.getId()
-        };
-
         var cmd = DBVRTestSuite.getApplication().createCommandLine();
-        CLIProcessResult result = cmd.executeCommandLineCommands(null, false, false, args);
 
-        Assertions.assertNotNull(result.getOutput());
-        Assertions.assertTrue(String.join("\n", result.getOutput()).contains("Project '" + name + "' set as default."));
+        try {
+            String name = "test_prj_" + UUID.randomUUID();
+            DBPProject project = DBWorkbench.getPlatform().getWorkspace().createProject(name, "Default test");
+            projectsToDelete.add(project);
 
-        String[] listArgs = {
-            "project", "list"
-        };
-        CLIProcessResult listResult = cmd.executeCommandLineCommands(null, false, false, listArgs);
-        String listOutput = String.join("\n", listResult.getOutput());
-        Assertions.assertTrue(listOutput.contains("yes"), "Default project should be marked in list output");
 
-        // Restore the original active project so subsequent tests see a valid workspace state
-        if (originalActive != null) {
-            String[] restoreArgs = { "project", "default", originalActive.getId() };
-            cmd.executeCommandLineCommands(null, false, false, restoreArgs);
+            String[] args = {
+                "project", "default", project.getId()
+            };
+
+            CLIProcessResult result = cmd.executeCommandLineCommands(null, false, false, args);
+
+            Assertions.assertNotNull(result.getOutput());
+            Assertions.assertTrue(String.join("\n", result.getOutput()).contains("Project '" + name + "' set as default."));
+
+            String[] listArgs = {
+                "project", "list"
+            };
+            CLIProcessResult listResult = cmd.executeCommandLineCommands(null, false, false, listArgs);
+            String listOutput = String.join("\n", listResult.getOutput());
+            Assertions.assertTrue(listOutput.contains("yes"), "Default project should be marked in list output");
+
+        } finally {
+            if (originalActive != null) {
+                String[] restoreArgs = { "project", "default", originalActive.getId() };
+                cmd.executeCommandLineCommands(null, false, false, restoreArgs);
+            }
         }
+
     }
 
     @Test
