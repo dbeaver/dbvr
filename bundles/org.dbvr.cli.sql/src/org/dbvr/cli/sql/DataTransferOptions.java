@@ -33,7 +33,7 @@ public class DataTransferOptions {
     @NotNull
     @CommandLine.Option(names = {"-format", "--output-format"},
         arity = "1",
-        description = "Write the execution result in a specific format (csv, xml, etc. csv by default)",
+        description = "Write the execution result in a specific format (csv, xml, etc. txt by default)",
         defaultValue = "txt")
     private String outputFormat = "txt";
 
