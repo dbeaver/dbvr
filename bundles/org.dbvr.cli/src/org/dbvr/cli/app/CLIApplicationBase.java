@@ -56,6 +56,7 @@ public class CLIApplicationBase extends BaseApplicationImpl {
 
     private DBPPreferenceStore preferenceStore;
     private boolean stateless = false;
+    private boolean keepAlive = false;
 
     protected CLIApplicationBase() {
 
@@ -140,7 +141,14 @@ public class CLIApplicationBase extends BaseApplicationImpl {
         return exitCode;
     }
 
+    public void setKeepAlive(boolean keepAlive) {
+        this.keepAlive = keepAlive;
+    }
+
     protected void beforeApplicationExit() {
+        if (keepAlive) {
+            return;
+        }
         //Manually disable QM at the end of the application's execution,
         //since we need to wait for it to finish in cases where database queries complete before QM initializes,
         //and we need to avoid partial deactivation of plugins while QM is running

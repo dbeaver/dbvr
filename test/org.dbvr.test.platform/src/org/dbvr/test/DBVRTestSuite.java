@@ -45,6 +45,7 @@ public class DBVRTestSuite {
             return;
         }
         applicationCE = new CLIApplicationCE();
+        applicationCE.setKeepAlive(true);
         Thread thread = new Thread(
             () -> {
                 try {
