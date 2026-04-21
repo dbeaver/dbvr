@@ -18,16 +18,27 @@ package org.dbvr.cli.command.project;
 
 import org.jkiss.dbeaver.model.cli.CLIConstants;
 import org.jkiss.dbeaver.model.cli.CLIException;
+import org.jkiss.dbeaver.model.cli.help.CLIExample;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import picocli.CommandLine;
 
-@CommandLine.Command(name = "create", description = "Create new project")
+@CommandLine.Command(name = CreateProject.COMMAND_CREATE, description = "Create new project")
+@CLIExample(examples = {
+    CreateProject.EXAMPLE
+})
 public class CreateProject extends AbstractProjectCommand {
+    public static final String COMMAND_CREATE = "create";
+    public static final String OPTION_NAME = "--name";
+    public static final String OPTION_DESCRIPTION = "--description";
 
-    @CommandLine.Option(names = {"-n", "--name"}, description = "Project name", required = true)
+    static final String EXAMPLE = ProjectManagementCommand.COMMAND_PROJECT + " " + COMMAND_CREATE
+        + " " + OPTION_NAME + " MyProject "
+        + " " + OPTION_DESCRIPTION + " \"This is my project\"";
+
+    @CommandLine.Option(names = {"-n", OPTION_NAME}, description = "Project name", required = true)
     private String name;
 
-    @CommandLine.Option(names = {"-d", "--description"}, description = "Project description")
+    @CommandLine.Option(names = {"-d", OPTION_DESCRIPTION}, description = "Project description")
     private String description;
 
     @Override

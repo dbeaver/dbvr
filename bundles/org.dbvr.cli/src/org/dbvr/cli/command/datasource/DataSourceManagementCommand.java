@@ -23,7 +23,7 @@ import org.jkiss.dbeaver.model.cli.CLIUtils;
 import picocli.CommandLine;
 
 @CommandLine.Command(
-    name = "datasource",
+    name = DataSourceManagementCommand.COMMAND_DATASOURCE,
     description = "Datasource management",
     subcommands = {
         CreateDatasource.class,
@@ -34,9 +34,8 @@ import picocli.CommandLine;
         MoveDataSource.class
     }
 )
-public class DataSourceManagementHandler extends CLIAbstractSubcommand {
-    @CommandLine.Spec
-    private CommandLine.Model.CommandSpec spec;
+public class DataSourceManagementCommand extends CLIAbstractSubcommand {
+    public static final String COMMAND_DATASOURCE = "datasource";
 
     @Override
     public void run() throws CLIException {

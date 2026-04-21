@@ -4,12 +4,16 @@
     <extension point="org.jkiss.dbeaver.commandLine">
         <parameter
             exitAfterExecute="true"
-            handler="org.dbvr.cli.command.datasource.DataSourceManagementHandler"/>
+            handler="org.dbvr.cli.command.datasource.DataSourceManagementCommand"/>
         <parameter
             exitAfterExecute="true"
             handler="org.dbvr.cli.command.driver.DriverManagerHandler"/>
         <parameter
             exitAfterExecute="true"
-            handler="org.dbvr.cli.command.project.ProjectManagementHandler"/>
+            handler="org.dbvr.cli.command.project.ProjectManagementCommand"/>
+    </extension>
+
+    <extension point="org.jkiss.dbeaver.service">
+        <service name="org.jkiss.dbeaver.runtime.ui.UIServiceDrivers" class="org.dbvr.cli.service.CLIServiceDriver"/>
     </extension>
 </plugin>

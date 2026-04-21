@@ -33,6 +33,7 @@ import org.jkiss.dbeaver.model.cli.command.AbstractTopLevelCommand;
 import org.jkiss.dbeaver.model.impl.app.BaseApplicationImpl;
 import org.jkiss.dbeaver.model.impl.preferences.BundlePreferenceStore;
 import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
+import org.jkiss.dbeaver.model.qm.QMUtils;
 import org.jkiss.dbeaver.registry.BasePlatformImpl;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.ui.DBPPlatformUI;
@@ -54,6 +55,7 @@ public class CLIApplicationBase extends BaseApplicationImpl {
     private static final String[] DEFAULT_ARGS = new String[] {AbstractTopLevelCommand.HELP_OPTION};
 
     private DBPPreferenceStore preferenceStore;
+    private boolean stateless = false;
 
     protected CLIApplicationBase() {
 
@@ -78,6 +80,9 @@ public class CLIApplicationBase extends BaseApplicationImpl {
     public Object start(IApplicationContext context) throws Exception {
         // hide standard Eclipse exit message if exit code is not OK (otherwise it may be confusing)
         System.setProperty(ECLIPSE_EXIT_DATA, "");
+
+        String[] args = Platform.getApplicationArgs();
+        this.stateless = ArrayUtils.contains(args, CLITopLevelCommand.OPTION_STATELESS);
         // Register core components
         initializeApplicationServices();
 
@@ -112,7 +117,7 @@ public class CLIApplicationBase extends BaseApplicationImpl {
 
         int exitCode;
         try {
-            CLIProcessResult processResult = executeCommandLine(Platform.getApplicationArgs());
+            CLIProcessResult processResult = executeCommandLine(args);
             var out = processResult.getPostAction() == CLIProcessResult.PostAction.ERROR
                 ? System.err
                 : System.out;
@@ -130,7 +135,16 @@ public class CLIApplicationBase extends BaseApplicationImpl {
             // hide standard Eclipse exit message if exit code is not OK (otherwise it may be confusing)
             System.setProperty(ECLIPSE_EXIT_DATA, "");
         }
+
+        beforeApplicationExit();
         return exitCode;
+    }
+
+    protected void beforeApplicationExit() {
+        //Manually disable QM at the end of the application's execution,
+        //since we need to wait for it to finish in cases where database queries complete before QM initializes,
+        //and we need to avoid partial deactivation of plugins while QM is running
+        QMUtils.disposePlatform();
     }
 
     public CLIProcessResult executeCommandLine(@NotNull String[] args) throws DBException {
@@ -210,5 +224,9 @@ public class CLIApplicationBase extends BaseApplicationImpl {
 
     public synchronized boolean isStarted() {
         return started;
+    }
+
+    public boolean isStateless() {
+        return stateless;
     }
 }

@@ -27,6 +27,7 @@ import picocli.CommandLine;
 
 @CommandLine.Command(name = "dbvr", description = "dbvr commands")
 public class CLITopLevelCommand extends AbstractTopLevelCommand {
+    public static final String OPTION_STATELESS = "--stateless";
     @NonExecutableOption
     @CommandLine.Option(
         names = {NOSPASH_OPTION},
@@ -35,6 +36,15 @@ public class CLITopLevelCommand extends AbstractTopLevelCommand {
     )
     private boolean noSplash;
 
+    @NonExecutableOption
+    @CommandLine.Option(
+        names = {OPTION_STATELESS},
+        scope = CommandLine.ScopeType.INHERIT,
+        description = "Disables some functionality related to state storage",
+        defaultValue = "false"
+    )
+    private boolean stateless;
+
     protected CLITopLevelCommand(
         @Nullable ApplicationInstanceController controller,
         @NotNull CLIContextImpl context,
@@ -42,4 +52,5 @@ public class CLITopLevelCommand extends AbstractTopLevelCommand {
     ) {
         super(controller, context, meta);
     }
+
 }

@@ -23,7 +23,7 @@ import org.jkiss.dbeaver.model.cli.CLIUtils;
 import picocli.CommandLine;
 
 @CommandLine.Command(
-    name = "project",
+    name = ProjectManagementCommand.COMMAND_PROJECT,
     description = "Project management commands",
     subcommands = {
         ListProjects.class,
@@ -33,12 +33,12 @@ import picocli.CommandLine;
         SetDefaultProject.class
     }
 )
-public class ProjectManagementHandler extends CLIAbstractSubcommand {
-
+public class ProjectManagementCommand extends CLIAbstractSubcommand {
+    public static final String COMMAND_PROJECT = "project";
     @Override
     public void run() throws CLIException {
         if (spec.commandLine().getParseResult().subcommand() == null) {
-            CLIUtils.getHelpFromCommand(spec);
+            context().addResult(CLIUtils.getHelpFromCommand(spec));
             context().setPostAction(CLIProcessResult.PostAction.SHUTDOWN);
         }
     }

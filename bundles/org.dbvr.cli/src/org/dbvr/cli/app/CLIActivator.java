@@ -70,6 +70,9 @@ public class CLIActivator extends Plugin {
 
     @Override
     public void stop(BundleContext context) throws Exception {
+        if (CLIPlatform.instance != null) {
+            CLIPlatform.instance.dispose();
+        }
         super.stop(context);
         instance = null;
     }

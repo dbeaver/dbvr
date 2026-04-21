@@ -35,7 +35,7 @@ import java.util.Map;
 public abstract class AbstractProjectCommand extends CLIAbstractSubcommand {
 
     @CommandLine.ParentCommand
-    private ProjectManagementHandler parent;
+    private ProjectManagementCommand parent;
 
     @NotNull
     protected String serializeProjectList() {
