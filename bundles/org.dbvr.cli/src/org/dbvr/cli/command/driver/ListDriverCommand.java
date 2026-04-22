@@ -20,10 +20,11 @@ import org.jkiss.dbeaver.model.cli.CLIAbstractSubcommand;
 import org.jkiss.dbeaver.model.cli.CLIException;
 import org.jkiss.dbeaver.model.cli.CLIProcessResult;
 import org.jkiss.dbeaver.model.cli.CLIUtils;
+import org.jkiss.dbeaver.model.connection.DBPDataSourceProviderDescriptor;
+import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.model.preferences.DBPPropertyDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceProviderDescriptor;
 import org.jkiss.dbeaver.registry.DataSourceProviderRegistry;
-import org.jkiss.dbeaver.registry.driver.DriverDescriptor;
 import picocli.CommandLine;
 
 import java.util.*;
@@ -42,28 +43,28 @@ public class ListDriverCommand extends CLIAbstractSubcommand {
 
     @Override
     public void run() throws CLIException {
-        List<DriverDescriptor> drivers = getSupportedDBInstances();
+        List<DBPDriver> drivers = getSupportedDBInstances();
         if (drivers.isEmpty()) {
             return;
         }
 
-        Map<DataSourceProviderDescriptor, List<DriverDescriptor>> groupedDrivers = new TreeMap<>(
-            Comparator.comparing(DataSourceProviderDescriptor::getName)
+        Map<DBPDataSourceProviderDescriptor, List<DBPDriver>> groupedDrivers = new TreeMap<>(
+            Comparator.comparing(DBPDataSourceProviderDescriptor::getName)
         );
 
-        for (DriverDescriptor driver : drivers) {
+        for (DBPDriver driver : drivers) {
             groupedDrivers.computeIfAbsent(driver.getProviderDescriptor(), k -> new ArrayList<>()).add(driver);
         }
 
         StringBuilder outBuilder = new StringBuilder();
-        for (Map.Entry<DataSourceProviderDescriptor, List<DriverDescriptor>> entry : groupedDrivers.entrySet()) {
-            DataSourceProviderDescriptor provider = entry.getKey();
-            List<DriverDescriptor> providerDrivers = entry.getValue();
-            providerDrivers.sort(Comparator.comparing(DriverDescriptor::getName));
+        for (Map.Entry<DBPDataSourceProviderDescriptor, List<DBPDriver>> entry : groupedDrivers.entrySet()) {
+            DBPDataSourceProviderDescriptor provider = entry.getKey();
+            List<DBPDriver> providerDrivers = entry.getValue();
+            providerDrivers.sort(Comparator.comparing(DBPDriver::getName));
 
             outBuilder.append(String.format("%s (%s)%n", provider.getId(), provider.getName()));
 
-            for (DriverDescriptor driver : providerDrivers) {
+            for (DBPDriver driver : providerDrivers) {
                 outBuilder.append(String.format("    %s (%s)%s%n",
                     driver.getId(),
                     driver.getName(),
@@ -88,21 +89,21 @@ public class ListDriverCommand extends CLIAbstractSubcommand {
         context().addResult(outBuilder.toString());
     }
 
-    private List<DriverDescriptor> getSupportedDBInstances() {
+    private List<DBPDriver> getSupportedDBInstances() {
         DataSourceProviderRegistry dataSourceRegistry = DataSourceProviderRegistry.getInstance();
         List<DataSourceProviderDescriptor> dataSourceProviders = dataSourceRegistry.getDataSourceProviders();
-        List<DriverDescriptor> supportedDataBases = new ArrayList<>();
+        List<DBPDriver> supportedDataBases = new ArrayList<>();
         for (DataSourceProviderDescriptor providerDescriptor : dataSourceProviders) {
             if (providerId != null && !providerDescriptor.getId().equals(providerId)) {
                 continue;
             }
-            for (DriverDescriptor driver : providerDescriptor.getDrivers()) {
+            for (DBPDriver driver : providerDescriptor.getDrivers()) {
                 if (driver.getReplacedBy() == null) {
                     supportedDataBases.add(driver);
                 }
             }
         }
-        supportedDataBases.sort(Comparator.comparing(DriverDescriptor::getName));
+        supportedDataBases.sort(Comparator.comparing(DBPDriver::getName));
         return supportedDataBases;
     }
 
