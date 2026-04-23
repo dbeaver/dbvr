@@ -93,7 +93,6 @@ public abstract class AbstractMetaObjectCommand extends CLIAbstractSubcommand {
             container = getChildContainer(monitor, container, databaseName);
         } else if (container != null
             && !(this instanceof DatabaseCommand)
-            && !(this instanceof SchemaCommand)
             && containsObjectOfType(monitor, container, DBSCatalog.class)
         ) {
             throw new CLIException("Database name not specified", CLIConstants.EXIT_CODE_ERROR);
