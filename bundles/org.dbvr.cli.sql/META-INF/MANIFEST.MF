@@ -11,6 +11,5 @@ Export-Package: org.dbvr.cli.sql
 Require-Bundle: org.jkiss.dbeaver.model.sql,
  org.jkiss.dbeaver.data.transfer,
  org.jkiss.dbeaver.registry,
- org.jkiss.dbeaver.model.cli,
  org.dbvr.cli
 Automatic-Module-Name: org.dbvr.cli.sql

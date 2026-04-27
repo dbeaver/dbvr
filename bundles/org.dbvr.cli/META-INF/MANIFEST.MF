@@ -9,9 +9,8 @@ Bundle-ActivationPolicy: lazy
 Bundle-Activator: org.dbvr.cli.app.CLIActivator
 Bundle-RequiredExecutionEnvironment: JavaSE-21
 Require-Bundle: org.jkiss.dbeaver.model;visibility:=reexport,
- org.jkiss.dbeaver.registry;visibility:=reexport,
- org.jkiss.dbeaver.model.cli;visibility:=reexport
+ org.jkiss.dbeaver.model.cli;visibility:=reexport,
+ org.jkiss.dbeaver.registry
 Export-Package: org.dbvr.cli.app,
- org.dbvr.cli.model,
  org.dbvr.cli.command.datasource
 Automatic-Module-Name: org.dbvr.app.ce
