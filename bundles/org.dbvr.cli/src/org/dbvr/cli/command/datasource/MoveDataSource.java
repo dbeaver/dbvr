@@ -68,7 +68,7 @@ public class MoveDataSource extends CLIAbstractSubcommand {
 
         context().setPostAction(CLIProcessResult.PostAction.SHUTDOWN);
         context().addResult(
-            "Datasource " + newContainer.getName() + " [k" + newContainer.getId() + "] moved to project '" + targetProject.getName() + "'"
+            "Datasource " + newContainer.getName() + " [" + newContainer.getId() + "] moved to project '" + targetProject.getName() + "'"
         );
     }
 }
