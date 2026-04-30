@@ -29,7 +29,6 @@ import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.model.cli.CLIConstants;
 import org.jkiss.dbeaver.model.cli.CLIProcessResult;
-import org.jkiss.dbeaver.model.cli.command.AbstractTopLevelCommand;
 import org.jkiss.dbeaver.model.impl.app.BaseApplicationImpl;
 import org.jkiss.dbeaver.model.impl.preferences.BundlePreferenceStore;
 import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
@@ -51,7 +50,6 @@ public class CLIApplicationBase extends BaseApplicationImpl {
     private static final Log log = Log.getLog(CLIApplicationBase.class);
     protected Path workspaceDirCurrent;
     private boolean started = false;
-    private static final String[] DEFAULT_ARGS = new String[] {AbstractTopLevelCommand.HELP_OPTION};
 
     private DBPPreferenceStore preferenceStore;
     private boolean stateless = false;
@@ -116,6 +114,7 @@ public class CLIApplicationBase extends BaseApplicationImpl {
 
         int exitCode;
         try {
+            var exec = System.currentTimeMillis();
             CLIProcessResult processResult = executeCommandLine(args);
             var out = processResult.getPostAction() == CLIProcessResult.PostAction.ERROR
                 ? System.err
@@ -144,16 +143,13 @@ public class CLIApplicationBase extends BaseApplicationImpl {
 
     public CLIProcessResult executeCommandLine(@NotNull String[] args) throws DBException {
         CLICommandLine commandLine = createCommandLine();
-        String[] appArgs = commandLine.preprocessCommandLine(args);
-        if (ArrayUtils.isEmpty(appArgs)) {
-            appArgs = DEFAULT_ARGS;
-        }
+        commandLine.preprocessCommandLine(args);
         try {
             return commandLine.executeCommandLineCommands(
                 null,
                 false,
                 false,
-                appArgs
+                args
             );
         } catch (Exception e) {
             throw new DBException("Error executing command line: " + e.getMessage(), e);

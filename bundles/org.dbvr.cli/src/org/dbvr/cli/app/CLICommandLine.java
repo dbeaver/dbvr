@@ -25,6 +25,7 @@ import org.jkiss.dbeaver.model.cli.CLIRunMeta;
 import org.jkiss.dbeaver.model.cli.command.AbstractTopLevelCommand;
 
 public class CLICommandLine extends ApplicationCommandLine<ApplicationInstanceController> {
+    private static final String[] DEFAULT_ARGS = new String[] {AbstractTopLevelCommand.HELP_OPTION};
 
     public CLICommandLine() {
     }
@@ -36,5 +37,12 @@ public class CLICommandLine extends ApplicationCommandLine<ApplicationInstanceCo
         @NotNull CLIRunMeta runMeta
     ) {
         return new CLITopLevelCommand(applicationInstanceController, context, runMeta);
+    }
+
+
+    @NotNull
+    @Override
+    protected String[] getDefaultArgs() {
+        return DEFAULT_ARGS;
     }
 }
