@@ -114,7 +114,6 @@ public class CLIApplicationBase extends BaseApplicationImpl {
 
         int exitCode;
         try {
-            var exec = System.currentTimeMillis();
             CLIProcessResult processResult = executeCommandLine(args);
             var out = processResult.getPostAction() == CLIProcessResult.PostAction.ERROR
                 ? System.err
