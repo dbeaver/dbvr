@@ -68,7 +68,7 @@ public class CLIApplicationBase extends BaseApplicationImpl {
         String workingDirectory = RuntimeUtils.getWorkingDirectory(BasePlatformImpl.DBEAVER_DATA_DIR);
 
         // Workspace dir
-        workspaceDirCurrent = Path.of(workingDirectory, DEFAULT_WORKSPACE_FOLDER);
+        workspaceDirCurrent = RuntimeUtils.getWorkspacePath(workingDirectory, DEFAULT_WORKSPACE_FOLDER);
         Log.setLogHandler(new VoidLogHandler());
     }
 
