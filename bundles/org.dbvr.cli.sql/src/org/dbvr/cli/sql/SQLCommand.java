@@ -86,7 +86,7 @@ public class SQLCommand extends CLIAbstractSubcommand {
     @CommandLine.Option(names = "--print-queries", description = "Print queries before execution")
     private boolean printQueries;
 
-    @CommandLine.Option(names = "--disable-status", description = "Disable execution status output (execution time, rows count)")
+    @CommandLine.Option(names = "--disable-status", description = "Disable execution status output")
     private boolean disableStatus;
 
     @CommandLine.ArgGroup(exclusive = true, multiplicity = "1")
