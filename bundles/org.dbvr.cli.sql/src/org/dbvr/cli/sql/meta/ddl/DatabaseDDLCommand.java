@@ -23,12 +23,21 @@ import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPDataSource;
+import org.jkiss.dbeaver.model.cli.CLIConstants;
+import org.jkiss.dbeaver.model.cli.CLIException;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
+import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.DBSObjectContainer;
+import org.jkiss.dbeaver.model.struct.rdb.DBSCatalog;
 import picocli.CommandLine;
+
+import java.util.Collection;
 
 @CommandLine.Command(name = "ddl", description = "Get database DDL")
 public class DatabaseDDLCommand extends AbstractDDLCommand {
+
+    private static final String UNSUPPORTED_MESSAGE = "Database DDL is not supported for this database type. " +
+        "Try a lower-level DDL command, such as 'meta schema ddl' or 'meta table ddl'.";
 
     @CommandLine.ParentCommand
     private DatabaseCommand parent;
@@ -60,6 +69,42 @@ public class DatabaseDDLCommand extends AbstractDDLCommand {
         @NotNull DBRProgressMonitor monitor,
         @NotNull DBPDataSource dataSource
     ) throws DBException {
-        return parent.getBaseContainer(monitor, dataSource, containerOptions.getDatabaseName(), null);
+        // The database is the target object itself, so the datasource is the base container to search in.
+        return parent.getBaseContainer(monitor, dataSource, null, null);
+    }
+
+    @Override
+    protected void checkDDLSupported(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull DBPDataSource dataSource
+    ) throws DBException {
+        if (!hasDatabases(monitor, dataSource)) {
+            throw new CLIException(UNSUPPORTED_MESSAGE, CLIConstants.EXIT_CODE_ERROR);
+        }
+    }
+
+    @NotNull
+    @Override
+    protected String getUnsupportedDDLMessage(@NotNull String objectName) {
+        return UNSUPPORTED_MESSAGE;
+    }
+
+    private boolean hasDatabases(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull DBPDataSource dataSource
+    ) throws DBException {
+        if (!(dataSource instanceof DBSObjectContainer container)) {
+            return false;
+        }
+        Collection<? extends DBSObject> children = container.getChildren(monitor);
+        if (children == null) {
+            return false;
+        }
+        for (DBSObject child : children) {
+            if (child instanceof DBSCatalog) {
+                return true;
+            }
+        }
+        return false;
     }
 }
