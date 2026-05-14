@@ -222,9 +222,31 @@ public class MetaLocalCommandTest extends DBVRTest {
             CLIProcessResult ddlResult = cmd.executeCommandLineCommands(null, false, false, ddlArgs);
             Assert.assertNotNull(ddlResult);
             String ddlOutput = ddlResult.getOutput() != null ? String.join("\n", ddlResult.getOutput()) : "";
-            Assert.assertEquals(CLIConstants.EXIT_CODE_OK, ddlResult.getExitCode());
+            Assert.assertEquals(CLIConstants.EXIT_CODE_ERROR, ddlResult.getExitCode());
             Assert.assertTrue(
-                ddlOutput.contains("Database doesn't support databases/catalogs")
+                ddlOutput.contains("Database DDL is not supported for this database type")
+            );
+        } finally {
+            h2Ds.getRegistry().removeDataSource(h2Ds);
+        }
+    }
+
+    @Test
+    public void testDatabaseDDLNoDatabaseName() throws Exception {
+        DBPDataSourceContainer h2Ds = createFakeDataSource("h2-test-db-ddl-noname");
+        try {
+            var cmd = DBVRTestSuite.getApplication().createCommandLine();
+            var ddlArgs = new String[] {
+                "meta", "database", "ddl",
+                "--datasource=" + h2Ds.getName()
+            };
+            CLIProcessResult ddlResult = cmd.executeCommandLineCommands(null, false, false, ddlArgs);
+            Assert.assertNotNull(ddlResult);
+            String ddlOutput = ddlResult.getOutput() != null ? String.join("\n", ddlResult.getOutput()) : "";
+            Assert.assertEquals(CLIConstants.EXIT_CODE_ERROR, ddlResult.getExitCode());
+            Assert.assertTrue(
+                "Output should explain that database DDL is unsupported, but was: " + ddlOutput,
+                ddlOutput.contains("Database DDL is not supported for this database type")
             );
         } finally {
             h2Ds.getRegistry().removeDataSource(h2Ds);
