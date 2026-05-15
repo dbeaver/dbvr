@@ -40,6 +40,8 @@ public class TestCommand extends CLIAbstractSubcommand {
     public static final String TEST_DOUBLE = "--test-double";
     public static final String TEST_REQ_FIRST = "--test-req-first";
     public static final String TEST_REQ_IN_MIDDLE = "--test-req-middle";
+    public static final String TEST_ONLY_SHORT_NAME = "-w";
+
 
     public static final String EXAMPLE_COMMAND1 = TEST_COMMAND_NAME + " " + TEST_DOUBLE + "12.00";
     public static final String EXAMPLE_COMMAND2 = TEST_COMMAND_NAME + " " + TEST_PARAM_NAME_NOT_REQ + "ASDASD";
@@ -63,6 +65,9 @@ public class TestCommand extends CLIAbstractSubcommand {
 
     @CommandLine.Option(names = {TEST_DOUBLE}, description = "A double")
     private Double doubleValue;
+
+    @CommandLine.Option(names = {TEST_ONLY_SHORT_NAME}, description = "A short name command")
+    private boolean commandWithoutLongName;
 
 
     //must be sorted to the top in help
