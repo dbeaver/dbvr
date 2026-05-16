@@ -34,7 +34,6 @@ To build this repository locally, you need:
 - Local sibling checkouts of dependencies referenced by `project.deps`:
   - `dbeaver-common`
   - `dbeaver`
-  - `dbeaver-jdbc-libsql`
 
 The root Maven build inherits from `../dbeaver`, and the product aggregate also includes sibling modules from `../../../dbeaver-common` and `../../../dbeaver`.
 
@@ -43,7 +42,6 @@ The root Maven build inherits from `../dbeaver`, and the product aggregate also 
 ```bash
 git clone https://github.com/dbeaver/dbeaver-common.git
 git clone https://github.com/dbeaver/dbeaver.git
-git clone https://github.com/dbeaver/dbeaver-jdbc-libsql.git
 git clone https://github.com/dbeaver/dbvr.git
 ```
 
