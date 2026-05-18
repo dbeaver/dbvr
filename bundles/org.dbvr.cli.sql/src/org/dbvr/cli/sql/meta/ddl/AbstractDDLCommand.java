@@ -37,6 +37,8 @@ import java.util.Map;
 
 public abstract class AbstractDDLCommand extends AbstractMetaCommand {
 
+    public static final String COMMAND_NAME = "ddl";
+
     @CommandLine.Option(names = {"--full"}, description = "Show full DDL")
     protected boolean fullDDL;
 

@@ -29,12 +29,13 @@ import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.DBSObjectContainer;
 import picocli.CommandLine;
 
-@CommandLine.Command(name = "table", description = "Table meta operations",
+@CommandLine.Command(name = TableCommand.COMMAND_NAME, description = "Table meta operations",
     subcommands = {
         TableListCommand.class,
         TableDDLCommand.class
     })
 public class TableCommand extends AbstractMetaObjectCommand {
+    public static final String COMMAND_NAME = "table";
 
     @Override
     public boolean isRelevantObject(@NotNull DBSObject object) {

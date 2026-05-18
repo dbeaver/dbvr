@@ -18,7 +18,10 @@ package org.dbvr.cli.sql.meta.ddl;
 
 import org.dbvr.cli.sql.meta.AbstractMetaObjectCommand;
 import org.dbvr.cli.sql.meta.DatabaseCommand;
+import org.dbvr.cli.sql.meta.MetaCommand;
 import org.dbvr.cli.sql.meta.MetaDatabaseOptions;
+import org.dbvr.cli.sql.meta.SchemaCommand;
+import org.dbvr.cli.sql.meta.TableCommand;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -33,11 +36,15 @@ import picocli.CommandLine;
 
 import java.util.Collection;
 
-@CommandLine.Command(name = "ddl", description = "Get database DDL")
+@CommandLine.Command(name = AbstractDDLCommand.COMMAND_NAME, description = "Get database DDL")
 public class DatabaseDDLCommand extends AbstractDDLCommand {
 
     private static final String UNSUPPORTED_MESSAGE = "Database DDL is not supported for this database type. " +
-        "Try a lower-level DDL command, such as 'meta schema ddl' or 'meta table ddl'.";
+        "Try a lower-level DDL command, such as '"
+        + MetaCommand.COMMAND_NAME + " " + SchemaCommand.COMMAND_NAME + " " + AbstractDDLCommand.COMMAND_NAME
+        + "' or '"
+        + MetaCommand.COMMAND_NAME + " " + TableCommand.COMMAND_NAME + " " + AbstractDDLCommand.COMMAND_NAME
+        + "'.";
 
     @CommandLine.ParentCommand
     private DatabaseCommand parent;
