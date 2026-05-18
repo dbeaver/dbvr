@@ -38,30 +38,46 @@ To build this repository locally, you need:
 
 The root Maven build inherits from `../dbeaver`, and the product aggregate also includes sibling modules from `../../../dbeaver-common` and `../../../dbeaver`.
 
-### Clone the required repositories
+## Repository layout
+
+`dbvr` is built together with sibling repositories. Clone all of them into the
+same parent directory so the relative paths in the Maven/Tycho build resolve
+correctly
 
 ```bash
 git clone https://github.com/dbeaver/dbeaver-common.git
 git clone https://github.com/dbeaver/dbeaver.git
 git clone https://github.com/dbeaver/dbeaver-jdbc-libsql.git
 git clone https://github.com/dbeaver/dbvr.git
+git clone https://github.com/dbeaver/idea-rcp-launch-config-generator.git
+git clone https://github.com/dbeaver/dbeaver-osgi-common.git
 ```
-
-Arrange them as sibling directories so the relative paths in the Maven/Tycho build resolve correctly.
-
-### Build the project
-
-From the `dbvr` repository root:
-
+## Build product
 ```bash
 mvn -f product/aggregate/pom.xml \
-  -Dheadless-platform \
-  -Pproduct-dbvr-ce \
-  -Dbuild.all-environments \
-  package
+-Dheadless-platform \
+-Pproduct-dbvr-ce \
+-Dbuild.all-environments \
+package
 ```
 
-This is the same aggregate build profile used by the repository CI workflow.
+## Develop in IDEA
+
+To generate IntelliJ IDEA project files and RCP launch configurations, run from the `dbvr` repository root:
+
+```bash
+./generate_workspace.sh
+```
+
+On Windows use `generate_workspace.cmd`.
+
+Then run
+```bash
+cd ../dbeaver
+```
+```bash
+mvn generate-sources
+```
 
 ### Run the CLI
 
