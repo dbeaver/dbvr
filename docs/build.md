@@ -20,7 +20,7 @@ git clone https://github.com/dbeaver/dbeaver.git
 git clone https://github.com/dbeaver/dbeaver-jdbc-libsql.git
 git clone https://github.com/dbeaver/dbvr.git
 git clone https://github.com/dbeaver/idea-rcp-launch-config-generator.git
-git clone https://github.com/dbeaver/dbeaver-osgi-common.gitlfdf
+git clone https://github.com/dbeaver/dbeaver-osgi-common.git
 ```
 
 ## Build the product
