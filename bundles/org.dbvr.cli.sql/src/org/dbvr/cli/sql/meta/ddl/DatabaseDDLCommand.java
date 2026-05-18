@@ -16,12 +16,7 @@
  */
 package org.dbvr.cli.sql.meta.ddl;
 
-import org.dbvr.cli.sql.meta.AbstractMetaObjectCommand;
-import org.dbvr.cli.sql.meta.DatabaseCommand;
-import org.dbvr.cli.sql.meta.MetaCommand;
-import org.dbvr.cli.sql.meta.MetaDatabaseOptions;
-import org.dbvr.cli.sql.meta.SchemaCommand;
-import org.dbvr.cli.sql.meta.TableCommand;
+import org.dbvr.cli.sql.meta.*;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
@@ -76,7 +71,6 @@ public class DatabaseDDLCommand extends AbstractDDLCommand {
         @NotNull DBRProgressMonitor monitor,
         @NotNull DBPDataSource dataSource
     ) throws DBException {
-        // The database is the target object itself, so the datasource is the base container to search in.
         return parent.getBaseContainer(monitor, dataSource, null, null);
     }
 
