@@ -49,7 +49,7 @@ public abstract class AbstractDDLCommand extends AbstractMetaCommand {
     protected abstract String getObjectTypeName();
 
     @Nullable
-    protected abstract String getTargetObjectName();
+    protected abstract String getTargetObjectName(@NotNull DBPDataSource dataSource) throws DBException;
 
     @Nullable
     protected abstract DBSObjectContainer getBaseContainer(
@@ -66,7 +66,7 @@ public abstract class AbstractDDLCommand extends AbstractMetaCommand {
         AbstractMetaObjectCommand parent = getParentCommand();
         DBPDataSource dataSource = connectDataSource();
         checkDDLSupported(monitor, dataSource);
-        String objectName = getTargetObjectName();
+        String objectName = getTargetObjectName(dataSource);
         if (CommonUtils.isEmpty(objectName)) {
             throw new CLIException(
                 getObjectTypeName() + " name is not specified",

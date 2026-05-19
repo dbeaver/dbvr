@@ -17,6 +17,7 @@
 package org.dbvr.cli.sql.meta.ddl;
 
 import org.dbvr.cli.sql.meta.AbstractMetaObjectCommand;
+import org.dbvr.cli.sql.meta.MetaFullNameOptions;
 import org.dbvr.cli.sql.meta.MetaSchemaOptions;
 import org.dbvr.cli.sql.meta.SchemaCommand;
 import org.jkiss.code.NotNull;
@@ -36,6 +37,26 @@ public class SchemaDDLCommand extends AbstractDDLCommand {
     @CommandLine.Mixin
     private MetaSchemaOptions containerOptions;
 
+    @CommandLine.Mixin
+    private MetaFullNameOptions fullNameOptions;
+
+    private MetaFullNameOptions.Resolved resolved;
+
+    @NotNull
+    private MetaFullNameOptions.Resolved resolved(@NotNull DBPDataSource dataSource) throws DBException {
+        if (resolved == null) {
+            resolved = fullNameOptions.resolve(
+                dataSource,
+                containerOptions.getDatabaseName(),
+                null,
+                containerOptions.getSchemaName(),
+                1,
+                true
+            );
+        }
+        return resolved;
+    }
+
     @NotNull
     @Override
     protected AbstractMetaObjectCommand getParentCommand() {
@@ -50,8 +71,8 @@ public class SchemaDDLCommand extends AbstractDDLCommand {
 
     @Nullable
     @Override
-    protected String getTargetObjectName() {
-        return containerOptions.getSchemaName();
+    protected String getTargetObjectName(@NotNull DBPDataSource dataSource) throws DBException {
+        return resolved(dataSource).objectName();
     }
 
     @Nullable
@@ -60,6 +81,10 @@ public class SchemaDDLCommand extends AbstractDDLCommand {
         @NotNull DBRProgressMonitor monitor,
         @NotNull DBPDataSource dataSource
     ) throws DBException {
-        return parent.getBaseContainer(monitor, dataSource, containerOptions.getDatabaseName(), null);
+        MetaFullNameOptions.Resolved r = resolved(dataSource);
+        if (r.fromFullName()) {
+            return parent.resolveContainerByPath(monitor, dataSource, r.containerPath());
+        }
+        return parent.getBaseContainer(monitor, dataSource, r.databaseName(), null);
     }
 }

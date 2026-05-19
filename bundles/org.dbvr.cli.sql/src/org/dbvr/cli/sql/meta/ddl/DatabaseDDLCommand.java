@@ -47,6 +47,9 @@ public class DatabaseDDLCommand extends AbstractDDLCommand {
     @CommandLine.Mixin
     private MetaDatabaseOptions containerOptions;
 
+    @CommandLine.Mixin
+    private MetaFullNameOptions fullNameOptions;
+
     @NotNull
     @Override
     protected AbstractMetaObjectCommand getParentCommand() {
@@ -61,8 +64,15 @@ public class DatabaseDDLCommand extends AbstractDDLCommand {
 
     @Nullable
     @Override
-    protected String getTargetObjectName() {
-        return containerOptions.getDatabaseName();
+    protected String getTargetObjectName(@NotNull DBPDataSource dataSource) throws DBException {
+        return fullNameOptions.resolve(
+            dataSource,
+            null,
+            null,
+            containerOptions.getDatabaseName(),
+            0,
+            true
+        ).objectName();
     }
 
     @Nullable

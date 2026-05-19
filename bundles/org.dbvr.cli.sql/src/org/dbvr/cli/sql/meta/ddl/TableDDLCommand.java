@@ -17,6 +17,7 @@
 package org.dbvr.cli.sql.meta.ddl;
 
 import org.dbvr.cli.sql.meta.AbstractMetaObjectCommand;
+import org.dbvr.cli.sql.meta.MetaFullNameOptions;
 import org.dbvr.cli.sql.meta.MetaSchemaOptions;
 import org.dbvr.cli.sql.meta.TableCommand;
 import org.jkiss.code.NotNull;
@@ -36,9 +37,29 @@ public class TableDDLCommand extends AbstractDDLCommand {
     @CommandLine.Mixin
     private MetaSchemaOptions containerOptions;
 
+    @CommandLine.Mixin
+    private MetaFullNameOptions fullNameOptions;
+
     @Nullable
     @CommandLine.Option(names = {"--table-name", "-tn"}, description = "Table name")
     protected String tableName;
+
+    private MetaFullNameOptions.Resolved resolved;
+
+    @NotNull
+    private MetaFullNameOptions.Resolved resolved(@NotNull DBPDataSource dataSource) throws DBException {
+        if (resolved == null) {
+            resolved = fullNameOptions.resolve(
+                dataSource,
+                containerOptions.getDatabaseName(),
+                containerOptions.getSchemaName(),
+                tableName,
+                2,
+                true
+            );
+        }
+        return resolved;
+    }
 
     @NotNull
     @Override
@@ -54,8 +75,8 @@ public class TableDDLCommand extends AbstractDDLCommand {
 
     @Nullable
     @Override
-    protected String getTargetObjectName() {
-        return tableName;
+    protected String getTargetObjectName(@NotNull DBPDataSource dataSource) throws DBException {
+        return resolved(dataSource).objectName();
     }
 
     @Nullable
@@ -64,6 +85,10 @@ public class TableDDLCommand extends AbstractDDLCommand {
         @NotNull DBRProgressMonitor monitor,
         @NotNull DBPDataSource dataSource
     ) throws DBException {
-        return parent.getBaseContainer(monitor, dataSource, containerOptions.getDatabaseName(), containerOptions.getSchemaName());
+        MetaFullNameOptions.Resolved r = resolved(dataSource);
+        if (r.fromFullName()) {
+            return parent.resolveContainerByPath(monitor, dataSource, r.containerPath());
+        }
+        return parent.getBaseContainer(monitor, dataSource, r.databaseName(), r.schemaName());
     }
 }
