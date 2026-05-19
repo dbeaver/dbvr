@@ -38,15 +38,6 @@ public class MetaFullNameOptions {
     )
     protected String fullName;
 
-    /**
-     * Resolved options.
-     *
-     * <p>When the user supplied {@code --full-name}, {@link #fromFullName} is {@code true} and
-     * {@link #containerPath} holds the tokens that must be walked through the container hierarchy
-     * by name (e.g. for {@code lm.lm_customer} on a table command: {@code containerPath=[lm]},
-     * {@code objectName="lm_customer"}). The {@code databaseName} and {@code schemaName} fields
-     * are populated only from the explicit per-option values.
-     */
     public record Resolved(
         boolean fromFullName,
         @NotNull List<String> containerPath,
