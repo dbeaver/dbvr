@@ -29,12 +29,13 @@ import org.jkiss.dbeaver.model.struct.rdb.DBSCatalog;
 import org.jkiss.dbeaver.model.struct.rdb.DBSSchema;
 import picocli.CommandLine;
 
-@CommandLine.Command(name = "schema", description = "Schema operations",
+@CommandLine.Command(name = SchemaCommand.COMMAND_NAME, description = "Schema operations",
     subcommands = {
         SchemaListCommand.class,
         SchemaDDLCommand.class
     })
 public class SchemaCommand extends AbstractMetaObjectCommand {
+    public static final String COMMAND_NAME = "schema";
 
     @Override
     public boolean isRelevantObject(@NotNull DBSObject object) {
