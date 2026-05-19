@@ -37,6 +37,8 @@ import java.util.Map;
 
 public abstract class AbstractDDLCommand extends AbstractMetaCommand {
 
+    public static final String COMMAND_NAME = "ddl";
+
     @CommandLine.Option(names = {"--full"}, description = "Show full DDL")
     protected boolean fullDDL;
 
@@ -57,20 +59,20 @@ public abstract class AbstractDDLCommand extends AbstractMetaCommand {
 
     @Override
     public void run() throws CLIException {
+        getParentCommand().executeWithMonitor("Get " + getObjectTypeName() + " DDL", this::execute);
+    }
+
+    protected void execute(@NotNull DBRProgressMonitor monitor) throws DBException {
         AbstractMetaObjectCommand parent = getParentCommand();
+        DBPDataSource dataSource = connectDataSource();
+        checkDDLSupported(monitor, dataSource);
         String objectName = getTargetObjectName();
         if (CommonUtils.isEmpty(objectName)) {
             throw new CLIException(
-                "Object name is not specified",
+                getObjectTypeName() + " name is not specified",
                 CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS
             );
         }
-        parent.executeWithMonitor("Get " + getObjectTypeName() + " DDL", monitor -> execute(monitor, objectName));
-    }
-
-    protected void execute(@NotNull DBRProgressMonitor monitor, @NotNull String objectName) throws DBException {
-        AbstractMetaObjectCommand parent = getParentCommand();
-        DBPDataSource dataSource = connectDataSource();
         DBSObjectContainer container = getBaseContainer(monitor, dataSource);
         if (container == null) {
             return;
@@ -90,10 +92,19 @@ public abstract class AbstractDDLCommand extends AbstractMetaCommand {
             context().addResult(ddl.trim());
             context().setPostAction(CLIProcessResult.PostAction.SHUTDOWN);
         } else {
-            throw new CLIException(
-                getObjectTypeName() + " '" + objectName + "' does not support DDL",
-                CLIConstants.EXIT_CODE_ERROR
-            );
+            throw new CLIException(getUnsupportedDDLMessage(objectName), CLIConstants.EXIT_CODE_ERROR);
         }
+    }
+
+    protected void checkDDLSupported(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull DBPDataSource dataSource
+    ) throws DBException {
+        // supported by default
+    }
+
+    @NotNull
+    protected String getUnsupportedDDLMessage(@NotNull String objectName) {
+        return getObjectTypeName() + " '" + objectName + "' does not support DDL";
     }
 }

@@ -30,12 +30,13 @@ import org.jkiss.dbeaver.model.struct.rdb.DBSCatalog;
 import picocli.CommandLine;
 
 
-@CommandLine.Command(name = "database", description = "Database (catalog) operations",
+@CommandLine.Command(name = DatabaseCommand.COMMAND_NAME, description = "Database (catalog) operations",
     subcommands = {
         DatabaseListCommand.class,
         DatabaseDDLCommand.class
     })
 public class DatabaseCommand extends AbstractMetaObjectCommand {
+    public static final String COMMAND_NAME = "database";
 
     @Override
     public boolean isRelevantObject(@NotNull DBSObject object) {
