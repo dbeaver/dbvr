@@ -33,8 +33,7 @@ public class MetaFullNameOptions {
     @Nullable
     @CommandLine.Option(
         names = {"--full-name", "-fn"},
-        description = "Fully qualified name (e.g. database.schema.table). "
-            + "Mutually exclusive with --database-name, --schema-name and the per-command object name option."
+        description = "Fully qualified name (e.g. database.schema.table)"
     )
     protected String fullName;
 
