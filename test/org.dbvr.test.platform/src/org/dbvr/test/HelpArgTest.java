@@ -89,6 +89,7 @@ public class HelpArgTest extends DBVRTest {
         Assert.assertTrue(findOptionLine(allArgsByLine, TestCommand.TEST_INT_LIST).contains("(integer[])"));
         Assert.assertTrue(findOptionLine(allArgsByLine, TestCommand.TEST_DOUBLE).contains("(double)"));
         Assert.assertTrue(findOptionLine(allArgsByLine, TestCommand.TEST_STRING_LIST).contains("(string[])"));
+        Assert.assertTrue(findOptionLine(allArgsByLine, TestCommand.TEST_ONLY_SHORT_NAME).contains("(boolean)"));
 
 
         String example1 = allArgsByLine[allArgsByLine.length - 2].trim();

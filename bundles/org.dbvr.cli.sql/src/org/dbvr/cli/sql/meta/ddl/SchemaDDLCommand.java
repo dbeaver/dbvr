@@ -27,7 +27,7 @@ import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSObjectContainer;
 import picocli.CommandLine;
 
-@CommandLine.Command(name = "ddl", description = "Get schema DDL")
+@CommandLine.Command(name = AbstractDDLCommand.COMMAND_NAME, description = "Get schema DDL")
 public class SchemaDDLCommand extends AbstractDDLCommand {
 
     @CommandLine.ParentCommand
