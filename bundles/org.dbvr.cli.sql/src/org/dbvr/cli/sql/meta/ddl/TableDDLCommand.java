@@ -16,20 +16,27 @@
  */
 package org.dbvr.cli.sql.meta.ddl;
 
-import org.dbvr.cli.sql.meta.AbstractMetaObjectCommand;
-import org.dbvr.cli.sql.meta.MetaFullNameOptions;
-import org.dbvr.cli.sql.meta.MetaSchemaOptions;
-import org.dbvr.cli.sql.meta.TableCommand;
+import org.dbvr.cli.sql.meta.*;
 import org.jkiss.code.NotNull;
 import org.jkiss.code.Nullable;
 import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPDataSource;
+import org.jkiss.dbeaver.model.cli.help.CLIExample;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSObjectContainer;
 import picocli.CommandLine;
 
 @CommandLine.Command(name = AbstractDDLCommand.COMMAND_NAME, description = "Get table DDL")
+@CLIExample(examples = {
+    TableDDLCommand.EXAMPLE_EXPLICIT,
+    TableDDLCommand.EXAMPLE_FULL_NAME
+})
 public class TableDDLCommand extends AbstractDDLCommand {
+
+    static final String EXAMPLE_EXPLICIT = MetaCommand.COMMAND_NAME + " " + TableCommand.COMMAND_NAME + " "
+        + AbstractDDLCommand.COMMAND_NAME + " -ds my-datasource-id --database-name my_database --schema-name my_schema --table-name my_table";
+    static final String EXAMPLE_FULL_NAME = MetaCommand.COMMAND_NAME + " " + TableCommand.COMMAND_NAME + " "
+        + AbstractDDLCommand.COMMAND_NAME + " -ds my-datasource-id --full-name my_database.my_schema.my_table";
 
     @CommandLine.ParentCommand
     private TableCommand parent;
