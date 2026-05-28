@@ -2,7 +2,7 @@
 <?pde version="3.5"?>
 
 <product name="dbvr" uid="org.dbvr.app.ce.product" id="org.dbvr.app.ce.product"
-    application="org.dbvr.app.ce.application" version="26.1.0.qualifier" useFeatures="true"
+    application="org.dbvr.app.ce.application" version="26.1.1.qualifier" useFeatures="true"
     includeLaunchers="true">
 
     <configIni use="default">
