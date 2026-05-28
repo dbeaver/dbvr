@@ -1,13 +1,13 @@
-# DBeaver CLI
+# dbvr Community, CLI from DBeaver
 
 [![Build](https://github.com/dbeaver/dbvr/actions/workflows/push-pr-devel.yml/badge.svg?branch=devel)](https://github.com/dbeaver/dbvr/actions/workflows/push-pr-devel.yml)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
 
-DBeaver CLI (`dbvr`) is a command-line interface for working with databases.
-It can act as as standalone CLI application or with conjunction with DBeaver and CloudBeaver. 
+dbvr Community, a universal CLI for database querying, is a command-line interface for working with databases.
+It can act as a standalone CLI application or in conjunction with DBeaver and CloudBeaver.
 It provides a scriptable way to manage database projects and data sources, inspect metadata, and execute SQL from the terminal.
 
-## Why DBeaver CLI is useful
+## Why dbvr Community is useful
 
 - **Automate database workflows** with a terminal-first interface built on top of the DBeaver platform
 - **Manage projects and data sources** without opening a GUI
@@ -40,7 +40,7 @@ The root Maven build inherits from `../dbeaver`, and the product aggregate also 
 ## Repository layout
 
 `dbvr` is built together with sibling repositories. Clone all of them into the
-same parent directory so the relative paths in the Maven/Tycho build resolve
+same parent directory, so the relative paths in the Maven/Tycho build resolve
 correctly
 
 ```bash
@@ -67,7 +67,7 @@ To generate IntelliJ IDEA project files and RCP launch configurations, run from 
 ./generate_workspace.sh
 ```
 
-On Windows use `generate_workspace.cmd`.
+On Windows, use `generate_workspace.cmd`.
 
 Then run
 ```bash
@@ -132,20 +132,20 @@ dbvr driver list --show-properties
 Run an inline query using an existing datasource:
 
 ```bash
-dbvr sql -ds my-datasource-id --format csv "select * from my_table"
+dbvr sql -ds my-datasource-id -format csv "select * from my_table"
 ```
 
 Read SQL from a file or standard input:
 
 ```bash
-dbvr sql -ds my-datasource-id --format json --input-file query.sql
-cat query.sql | dbvr sql -ds my-datasource --format json
+dbvr sql -ds my-datasource-id -format json --input-file query.sql
+cat query.sql | dbvr sql -ds my-datasource -format json
 ```
 
 Write results to a file:
 
 ```bash
-dbvr sql -ds my-datasource-id --format csv --output-file result.csv "select * from my_table"
+dbvr sql -ds my-datasource-id -format csv -output-file result.csv "select * from my_table"
 ```
 
 ### Explore metadata
@@ -153,10 +153,10 @@ dbvr sql -ds my-datasource-id --format csv --output-file result.csv "select * fr
 Examples of supported metadata operations include listing databases, listing tables, and getting DDL for database objects.
 
 ```bash
-dbvr -ds my-datasource-id database list
+dbvr meta database list -ds my-datasource-id 
 # or
-# dbvr -ds my-datasource-id schema list ...
-# dbvr -ds my-datasource-id table ddl ...
+# dbvr meta schema list -ds my-datasource-id ...
+# dbvr meta table ddl -ds my-datasource-id -sn=public -tn=orders ...
 ```
 
 > Exact options and available subcommands may vary by command. Use `dbvr <command> --help` to inspect the current CLI surface.
