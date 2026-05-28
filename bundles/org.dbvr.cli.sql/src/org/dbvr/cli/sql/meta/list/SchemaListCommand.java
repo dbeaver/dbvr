@@ -17,6 +17,7 @@
 package org.dbvr.cli.sql.meta.list;
 
 import org.dbvr.cli.sql.meta.AbstractMetaObjectCommand;
+import org.dbvr.cli.sql.meta.MetaFullNameOptions;
 import org.dbvr.cli.sql.meta.MetaSchemaOptions;
 import org.dbvr.cli.sql.meta.SchemaCommand;
 import org.jkiss.code.NotNull;
@@ -36,6 +37,9 @@ public class SchemaListCommand extends AbstractListCommand {
     @CommandLine.Mixin
     private MetaSchemaOptions containerOptions;
 
+    @CommandLine.Mixin
+    private MetaFullNameOptions fullNameOptions;
+
     @NotNull
     @Override
     protected AbstractMetaObjectCommand getParentCommand() {
@@ -54,6 +58,17 @@ public class SchemaListCommand extends AbstractListCommand {
         @NotNull DBRProgressMonitor monitor,
         @NotNull DBPDataSource dataSource
     ) throws DBException {
-        return parent.getBaseContainer(monitor, dataSource, containerOptions.getDatabaseName(), null);
+        MetaFullNameOptions.Resolved r = fullNameOptions.resolve(
+            dataSource,
+            containerOptions.getDatabaseName(),
+            null,
+            null,
+            1,
+            false
+        );
+        if (r.fromFullName()) {
+            return parent.resolveContainerByPath(monitor, dataSource, r.containerPath());
+        }
+        return parent.getBaseContainer(monitor, dataSource, r.databaseName(), null);
     }
 }

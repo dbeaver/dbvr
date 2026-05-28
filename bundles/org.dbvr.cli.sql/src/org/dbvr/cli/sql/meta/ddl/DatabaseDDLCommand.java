@@ -23,6 +23,7 @@ import org.jkiss.dbeaver.DBException;
 import org.jkiss.dbeaver.model.DBPDataSource;
 import org.jkiss.dbeaver.model.cli.CLIConstants;
 import org.jkiss.dbeaver.model.cli.CLIException;
+import org.jkiss.dbeaver.model.cli.help.CLIExample;
 import org.jkiss.dbeaver.model.runtime.DBRProgressMonitor;
 import org.jkiss.dbeaver.model.struct.DBSObject;
 import org.jkiss.dbeaver.model.struct.DBSObjectContainer;
@@ -32,7 +33,16 @@ import picocli.CommandLine;
 import java.util.Collection;
 
 @CommandLine.Command(name = AbstractDDLCommand.COMMAND_NAME, description = "Get database DDL")
+@CLIExample(examples = {
+    DatabaseDDLCommand.EXAMPLE_EXPLICIT,
+    DatabaseDDLCommand.EXAMPLE_FULL_NAME
+})
 public class DatabaseDDLCommand extends AbstractDDLCommand {
+
+    static final String EXAMPLE_EXPLICIT = MetaCommand.COMMAND_NAME + " " + DatabaseCommand.COMMAND_NAME + " "
+        + AbstractDDLCommand.COMMAND_NAME + " -ds my-datasource-id --database-name my_database";
+    static final String EXAMPLE_FULL_NAME = MetaCommand.COMMAND_NAME + " " + DatabaseCommand.COMMAND_NAME + " "
+        + AbstractDDLCommand.COMMAND_NAME + " -ds my-datasource-id --full-name my_database";
 
     private static final String UNSUPPORTED_MESSAGE = "Database DDL is not supported for this database type. " +
         "Try a lower-level DDL command, such as '"
@@ -46,6 +56,9 @@ public class DatabaseDDLCommand extends AbstractDDLCommand {
 
     @CommandLine.Mixin
     private MetaDatabaseOptions containerOptions;
+
+    @CommandLine.Mixin
+    private MetaFullNameOptions fullNameOptions;
 
     @NotNull
     @Override
@@ -61,8 +74,15 @@ public class DatabaseDDLCommand extends AbstractDDLCommand {
 
     @Nullable
     @Override
-    protected String getTargetObjectName() {
-        return containerOptions.getDatabaseName();
+    protected String getTargetObjectName(@NotNull DBPDataSource dataSource) throws DBException {
+        return fullNameOptions.resolve(
+            dataSource,
+            null,
+            null,
+            containerOptions.getDatabaseName(),
+            0,
+            true
+        ).objectName();
     }
 
     @Nullable

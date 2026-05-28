@@ -31,6 +31,7 @@ import org.jkiss.utils.CommonUtils;
 import picocli.CommandLine;
 
 import java.util.Collection;
+import java.util.List;
 
 @CommandLine.Command
 public abstract class AbstractMetaObjectCommand extends CLIAbstractSubcommand {
@@ -127,6 +128,28 @@ public abstract class AbstractMetaObjectCommand extends CLIAbstractSubcommand {
             }
         }
         return false;
+    }
+
+    @Nullable
+    public DBSObjectContainer resolveContainerByPath(
+        @NotNull DBRProgressMonitor monitor,
+        @NotNull DBPDataSource dataSource,
+        @NotNull List<String> pathTokens
+    ) throws DBException {
+        if (!(dataSource instanceof DBSObjectContainer container)) {
+            if (pathTokens.isEmpty()) {
+                return null;
+            }
+            throw new CLIException(
+                "Datasource '" + dataSource.getContainer().getName() + "' does not support nested objects",
+                CLIConstants.EXIT_CODE_ERROR
+            );
+        }
+        DBSObjectContainer current = container;
+        for (String token : pathTokens) {
+            current = getChildContainer(monitor, current, token);
+        }
+        return current;
     }
 
     @NotNull
