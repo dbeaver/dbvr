@@ -29,11 +29,9 @@ import org.jkiss.dbeaver.model.DBConstants;
 import org.jkiss.dbeaver.model.app.DBPPlatform;
 import org.jkiss.dbeaver.model.cli.CLIConstants;
 import org.jkiss.dbeaver.model.cli.CLIProcessResult;
-import org.jkiss.dbeaver.model.cli.command.AbstractTopLevelCommand;
 import org.jkiss.dbeaver.model.impl.app.BaseApplicationImpl;
 import org.jkiss.dbeaver.model.impl.preferences.BundlePreferenceStore;
 import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
-import org.jkiss.dbeaver.model.qm.QMUtils;
 import org.jkiss.dbeaver.registry.BasePlatformImpl;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.ui.DBPPlatformUI;
@@ -52,7 +50,6 @@ public class CLIApplicationBase extends BaseApplicationImpl {
     private static final Log log = Log.getLog(CLIApplicationBase.class);
     protected Path workspaceDirCurrent;
     private volatile boolean started = false;
-    private static final String[] DEFAULT_ARGS = new String[] {AbstractTopLevelCommand.HELP_OPTION};
 
     private DBPPreferenceStore preferenceStore;
     private boolean stateless = false;
@@ -92,8 +89,9 @@ public class CLIApplicationBase extends BaseApplicationImpl {
                 URL wsLocationURL = workspaceDirCurrent.toUri().toURL();
                 instanceLoc.set(wsLocationURL, false);
             } else {
-                var locationPath = Path.of(instanceLoc.getURL().toURI());
-                Path defPath = instanceLoc.getDefault() == null ? null : Path.of(instanceLoc.getDefault().toURI());
+                URL locationURL = instanceLoc.getURL();
+                Path locationPath = RuntimeUtils.getLocalPathFromURL(locationURL);
+                Path defPath = instanceLoc.getDefault() == null ? null : RuntimeUtils.getLocalPathFromURL(instanceLoc.getDefault());
                 if (!locationPath.equals(defPath)) {
                     workspaceDirCurrent = locationPath;
                 }
@@ -141,24 +139,17 @@ public class CLIApplicationBase extends BaseApplicationImpl {
     }
 
     protected void beforeApplicationExit() {
-        //Manually disable QM at the end of the application's execution,
-        //since we need to wait for it to finish in cases where database queries complete before QM initializes,
-        //and we need to avoid partial deactivation of plugins while QM is running
-        QMUtils.disposePlatform();
     }
 
     public CLIProcessResult executeCommandLine(@NotNull String[] args) throws DBException {
         CLICommandLine commandLine = createCommandLine();
-        String[] appArgs = commandLine.preprocessCommandLine(args);
-        if (ArrayUtils.isEmpty(appArgs)) {
-            appArgs = DEFAULT_ARGS;
-        }
+        commandLine.preprocessCommandLine(args);
         try {
             return commandLine.executeCommandLineCommands(
                 null,
                 false,
                 false,
-                appArgs
+                args
             );
         } catch (Exception e) {
             throw new DBException("Error executing command line: " + e.getMessage(), e);

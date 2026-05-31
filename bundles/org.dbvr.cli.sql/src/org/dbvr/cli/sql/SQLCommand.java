@@ -86,6 +86,9 @@ public class SQLCommand extends CLIAbstractSubcommand {
     @CommandLine.Option(names = "--print-queries", description = "Print queries before execution")
     private boolean printQueries;
 
+    @CommandLine.Option(names = "--disable-status", description = "Disable execution status output")
+    private boolean disableStatus;
+
     @CommandLine.ArgGroup(exclusive = true, multiplicity = "1")
     private CreateOrFindDataSource dataSourceOptions;
 
@@ -286,24 +289,26 @@ public class SQLCommand extends CLIAbstractSubcommand {
                 consumer.finishTransfer(monitor, false);
                 DBCStatistics statistics = scriptProcessor.getTotalStatistics();
 
-                String statusMessage;
-                if (statistics.getRowsFetched() > 0) {
-                    statusMessage = "Rows read: " + statistics.getRowsFetched() + ", (" + statistics.getTotalTime() + "ms)\n";
-                } else if (statistics.getRowsUpdated() > 0) {
-                    statusMessage = "Rows updated: " + statistics.getRowsUpdated() + " (" + statistics.getTotalTime() + "ms)\n";
-                } else {
-                    statusMessage = "OK\n";
-                }
+                if (!disableStatus) {
+                    String statusMessage;
+                    if (statistics.getRowsFetched() > 0) {
+                        statusMessage = "Rows read: " + statistics.getRowsFetched() + ", (" + statistics.getTotalTime() + "ms)\n";
+                    } else if (statistics.getRowsUpdated() > 0) {
+                        statusMessage = "Rows updated: " + statistics.getRowsUpdated() + " (" + statistics.getTotalTime() + "ms)\n";
+                    } else {
+                        statusMessage = "OK\n";
+                    }
 
-                if (outputFile == null) {
-                    out.write(statusMessage.getBytes(settings.getOutputEncoding()));
-                } else {
-                    context().addResult(statusMessage);
-                    if (statistics.getRowsFetched() <= 0) {
-                        if (statistics.getRowsUpdated() > 0) {
-                            out.write((statistics.getRowsUpdated() + "\n").getBytes(settings.getOutputEncoding()));
-                        } else {
-                            out.write("OK\n".getBytes(settings.getOutputEncoding()));
+                    if (outputFile == null) {
+                        out.write(statusMessage.getBytes(settings.getOutputEncoding()));
+                    } else {
+                        context().addResult(statusMessage);
+                        if (statistics.getRowsFetched() <= 0) {
+                            if (statistics.getRowsUpdated() > 0) {
+                                out.write((statistics.getRowsUpdated() + "\n").getBytes(settings.getOutputEncoding()));
+                            } else {
+                                out.write("OK\n".getBytes(settings.getOutputEncoding()));
+                            }
                         }
                     }
                 }

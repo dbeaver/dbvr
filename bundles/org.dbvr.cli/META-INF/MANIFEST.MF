@@ -3,15 +3,14 @@ Bundle-ManifestVersion: 2
 Bundle-Vendor: DBeaver Corp
 Bundle-Name: DBeaver CLI Model
 Bundle-SymbolicName: org.dbvr.cli;singleton:=true
-Bundle-Version: 1.0.11.qualifier
-Bundle-Release-Date: 20260504
+Bundle-Version: 1.0.14.qualifier
+Bundle-Release-Date: 20260622
 Bundle-ActivationPolicy: lazy
 Bundle-Activator: org.dbvr.cli.app.CLIActivator
 Bundle-RequiredExecutionEnvironment: JavaSE-21
 Require-Bundle: org.jkiss.dbeaver.model;visibility:=reexport,
- org.jkiss.dbeaver.registry;visibility:=reexport,
- org.jkiss.dbeaver.model.cli;visibility:=reexport
+ org.jkiss.dbeaver.model.cli;visibility:=reexport,
+ org.jkiss.dbeaver.registry
 Export-Package: org.dbvr.cli.app,
- org.dbvr.cli.model,
  org.dbvr.cli.command.datasource
 Automatic-Module-Name: org.dbvr.app.ce

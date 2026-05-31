@@ -6,5 +6,8 @@
         <parameter
             exitAfterExecute="true"
             handler="org.dbvr.cli.sql.SQLCommand"/>
+        <parameter
+            exitAfterExecute="true"
+            handler="org.dbvr.cli.sql.meta.MetaCommand"/>
     </extension>
 </plugin>

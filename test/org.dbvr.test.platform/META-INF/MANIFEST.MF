@@ -19,4 +19,5 @@ Require-Bundle: org.junit,
  org.dbvr.cli;visibility:=reexport,
  org.jkiss.dbeaver.net.ssh,
  org.jkiss.dbeaver.ext.h2,
- org.dbvr.cli.sql
+ org.dbvr.cli.sql,
+ org.jkiss.dbeaver.model.cli
