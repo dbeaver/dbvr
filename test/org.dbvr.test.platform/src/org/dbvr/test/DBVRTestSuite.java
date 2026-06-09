@@ -19,7 +19,6 @@ package org.dbvr.test;
 import org.dbvr.cli.app.ce.CLIApplicationCE;
 import org.jkiss.code.NotNull;
 import org.jkiss.dbeaver.DBException;
-import org.jkiss.dbeaver.model.impl.app.AbstractApplication;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.junit.platform.suite.api.SelectClasses;
 import org.junit.platform.suite.api.Suite;
@@ -71,8 +70,9 @@ public class DBVRTestSuite extends DBVRTest {
     @NotNull
     public static CLIApplicationCE getApplication() throws DBException {
         if (applicationCE == null) {
-            Object instance = AbstractApplication.getInstanceOrNull();
-            if (instance instanceof CLIApplicationCE ce) {
+            // running inside OSGi: the runner already started the app, read it from the platform
+            if (DBWorkbench.isPlatformStarted()
+                && DBWorkbench.getPlatform().getApplication() instanceof CLIApplicationCE ce) {
                 applicationCE = ce;
             }
             if (applicationCE == null) {
