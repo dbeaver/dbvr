@@ -48,5 +48,4 @@ public abstract class DBVRTest implements IAsyncApplication {
             return false;
         }
     }
-
 }
