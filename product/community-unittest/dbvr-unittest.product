@@ -59,6 +59,7 @@
 
     <features>
         <feature id="org.dbvr.app.ce.test.feature"/>
+        <feature id="org.jkiss.dbeaver.test.base.feature"/>
     </features>
 
     <configurations>

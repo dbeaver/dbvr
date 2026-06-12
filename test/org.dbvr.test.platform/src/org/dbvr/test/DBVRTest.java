@@ -16,23 +16,36 @@
  */
 package org.dbvr.test;
 
-import org.jkiss.junit.osgi.OSGITestRunner;
 import org.jkiss.junit.osgi.annotation.RunWithApplication;
 import org.jkiss.junit.osgi.annotation.RunWithProduct;
-import org.jkiss.junit.osgi.annotation.RunnerProxy;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.jkiss.junit.osgi.behaviors.IAsyncApplication;
+import org.jkiss.junit.osgi.extension.OSGITestExtension;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.extension.ExtendWith;
 
 @RunWithProduct("dbvr-unittest.product")
-@RunnerProxy(MockitoJUnitRunner.class)
-@RunWith(OSGITestRunner.class)
+@ExtendWith(OSGITestExtension.class)
 @RunWithApplication(
     bundleName = "org.dbvr.app.ce",
     registryName = "org.dbvr.app.ce.application",
+    waitForWorkbench = false,
     properties = {
         @RunWithApplication.Property(name = "osgi.instance.area", value = "./target/workpsace")
     }
 )
-public abstract class DBVRTest {
+public abstract class DBVRTest implements IAsyncApplication {
 
+    @BeforeAll
+    public static void setUpApplication() throws Exception {
+        DBVRTestSuite.initApplication();
+    }
+
+    @Override
+    public boolean verifyLaunched() {
+        try {
+            return DBVRTestSuite.getApplication().isStarted();
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }

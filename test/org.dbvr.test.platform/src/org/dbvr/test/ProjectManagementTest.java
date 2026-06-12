@@ -21,9 +21,9 @@ import org.jkiss.dbeaver.model.app.DBPProject;
 import org.jkiss.dbeaver.model.cli.CLIProcessResult;
 import org.jkiss.dbeaver.model.impl.app.BaseProjectImpl;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -37,7 +37,7 @@ public class ProjectManagementTest extends DBVRTest {
 
     private final List<DBPProject> projectsToDelete = new ArrayList<>();
 
-    @After
+    @AfterEach
     public void tearDown() {
         for (DBPProject project : projectsToDelete) {
             try {
@@ -63,9 +63,9 @@ public class ProjectManagementTest extends DBVRTest {
         cmd.executeCommandLineCommands(null, false, false, args);
 
         DBPProject project = DBWorkbench.getPlatform().getWorkspace().getProject(name);
-        Assert.assertNotNull(project);
+        Assertions.assertNotNull(project);
         projectsToDelete.add(project);
-        Assert.assertEquals(desc, project.getDescription());
+        Assertions.assertEquals(desc, project.getDescription());
     }
 
     @Test
@@ -84,11 +84,11 @@ public class ProjectManagementTest extends DBVRTest {
         cmd.executeCommandLineCommands(null, false, false, args);
 
         DBPProject renamedProject = DBWorkbench.getPlatform().getWorkspace().getProject(newName);
-        Assert.assertNotNull(renamedProject);
+        Assertions.assertNotNull(renamedProject);
         if (renamedProject != project) {
             projectsToDelete.add(renamedProject);
         }
-        Assert.assertEquals(newDesc, renamedProject.getDescription());
+        Assertions.assertEquals(newDesc, renamedProject.getDescription());
     }
 
     @Test
@@ -104,7 +104,7 @@ public class ProjectManagementTest extends DBVRTest {
         var cmd = DBVRTestSuite.getApplication().createCommandLine();
         cmd.executeCommandLineCommands(null, false, false, args);
 
-        Assert.assertNull(DBWorkbench.getPlatform().getWorkspace().getProject(name));
+        Assertions.assertNull(DBWorkbench.getPlatform().getWorkspace().getProject(name));
     }
 
     @Test
@@ -120,13 +120,13 @@ public class ProjectManagementTest extends DBVRTest {
         var cmd = DBVRTestSuite.getApplication().createCommandLine();
         CLIProcessResult result = cmd.executeCommandLineCommands(null, false, false, args);
 
-        Assert.assertNotNull(result.getOutput());
+        Assertions.assertNotNull(result.getOutput());
         boolean found = false;
         String allOutput = String.join("\n", result.getOutput());
         if (allOutput.contains(name)) {
             found = true;
         }
-        Assert.assertTrue("Project " + name + " not found in output: " + result.getOutput(), found);
+        Assertions.assertTrue(found, "Project " + name + " not found in output: " + result.getOutput());
     }
 
     @Test
@@ -142,13 +142,13 @@ public class ProjectManagementTest extends DBVRTest {
         var cmd = DBVRTestSuite.getApplication().createCommandLine();
         CLIProcessResult result = cmd.executeCommandLineCommands(null, false, false, args);
 
-        Assert.assertNotNull(result.getOutput());
+        Assertions.assertNotNull(result.getOutput());
         boolean found = false;
         String allOutput = String.join("\n", result.getOutput());
         if (allOutput.contains(name)) {
             found = true;
         }
-        Assert.assertTrue("Project " + name + " (no desc) not found in output: " + result.getOutput(), found);
+        Assertions.assertTrue(found, "Project " + name + " (no desc) not found in output: " + result.getOutput());
     }
 
     @Test
@@ -161,32 +161,43 @@ public class ProjectManagementTest extends DBVRTest {
         var cmd = DBVRTestSuite.getApplication().createCommandLine();
         CLIProcessResult result = cmd.executeCommandLineCommands(null, false, false, args);
 
-        Assert.assertTrue("Error message expected for hidden project creation",
-            String.join("\n", result.getOutput()).contains("Resource name '.test_prj_hidden' can't start with dot"));
+        Assertions.assertTrue(String.join("\n", result.getOutput()).contains("Resource name '.test_prj_hidden' can't start with dot"));
     }
 
     @Test
     public void testSetDefaultProject() throws Exception {
-        String name = "test_prj_" + UUID.randomUUID();
-        DBPProject project = DBWorkbench.getPlatform().getWorkspace().createProject(name, "Default test");
-        projectsToDelete.add(project);
-
-        String[] args = {
-            "project", "default", project.getId()
-        };
-
+        DBPProject originalActive = DBWorkbench.getPlatform().getWorkspace().getActiveProject();
         var cmd = DBVRTestSuite.getApplication().createCommandLine();
-        CLIProcessResult result = cmd.executeCommandLineCommands(null, false, false, args);
 
-        Assert.assertNotNull(result.getOutput());
-        Assert.assertTrue(String.join("\n", result.getOutput()).contains("Project '" + name + "' set as default."));
+        try {
+            String name = "test_prj_" + UUID.randomUUID();
+            DBPProject project = DBWorkbench.getPlatform().getWorkspace().createProject(name, "Default test");
+            projectsToDelete.add(project);
 
-        String[] listArgs = {
-            "project", "list"
-        };
-        CLIProcessResult listResult = cmd.executeCommandLineCommands(null, false, false, listArgs);
-        String listOutput = String.join("\n", listResult.getOutput());
-        Assert.assertTrue("Default project should be marked in list output", listOutput.contains("yes"));
+
+            String[] args = {
+                "project", "default", project.getId()
+            };
+
+            CLIProcessResult result = cmd.executeCommandLineCommands(null, false, false, args);
+
+            Assertions.assertNotNull(result.getOutput());
+            Assertions.assertTrue(String.join("\n", result.getOutput()).contains("Project '" + name + "' set as default."));
+
+            String[] listArgs = {
+                "project", "list"
+            };
+            CLIProcessResult listResult = cmd.executeCommandLineCommands(null, false, false, listArgs);
+            String listOutput = String.join("\n", listResult.getOutput());
+            Assertions.assertTrue(listOutput.contains("yes"), "Default project should be marked in list output");
+
+        } finally {
+            if (originalActive != null) {
+                String[] restoreArgs = { "project", "default", originalActive.getId() };
+                cmd.executeCommandLineCommands(null, false, false, restoreArgs);
+            }
+        }
+
     }
 
     @Test
@@ -196,17 +207,17 @@ public class ProjectManagementTest extends DBVRTest {
         projectsToDelete.add(project);
 
         Path projectFile = project.getAbsolutePath().resolve(BaseProjectImpl.PROJECT_FILE);
-        Assert.assertTrue("Project file must exist", Files.exists(projectFile));
+        Assertions.assertTrue(Files.exists(projectFile), "Project file must exist");
         String content = Files.readString(projectFile);
-        Assert.assertTrue("Project file must contain project name", content.contains("<name>" + name + "</name>"));
-        Assert.assertTrue("Project file must contain DBeaver nature", content.contains("org.jkiss.dbeaver.DBeaverNature"));
+        Assertions.assertTrue(content.contains("<name>" + name + "</name>"), "Project file must contain project name");
+        Assertions.assertTrue(content.contains("org.jkiss.dbeaver.DBeaverNature"), "Project file must contain DBeaver nature");
 
         // Test rename
         String newName = name + "_ren";
         DBWorkbench.getPlatform().getWorkspace().renameProject(project, newName);
         Path newProjectFile = project.getAbsolutePath().resolve(BaseProjectImpl.PROJECT_FILE);
-        Assert.assertTrue("Project file must exist after rename", Files.exists(newProjectFile));
+        Assertions.assertTrue(Files.exists(newProjectFile), "Project file must exist after rename");
         String newContent = Files.readString(newProjectFile);
-        Assert.assertTrue("Project file must contain new project name", newContent.contains("<name>" + newName + "</name>"));
+        Assertions.assertTrue(newContent.contains("<name>" + newName + "</name>"), "Project file must contain new project name");
     }
 }

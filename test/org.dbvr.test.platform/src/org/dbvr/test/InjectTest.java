@@ -19,8 +19,8 @@ package org.dbvr.test;
 import org.dbvr.cli.app.ce.command.TestCommand;
 import org.dbvr.cli.app.ce.command.TestTransformer;
 import org.jkiss.utils.CommonUtils;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 public class InjectTest extends DBVRTest {
     @Test
@@ -30,7 +30,7 @@ public class InjectTest extends DBVRTest {
         };
 
         var result = DBVRTestSuite.getApplication().executeCommandLine(args);
-        Assert.assertFalse(CommonUtils.isEmpty(result.getOutput()));
-        Assert.assertTrue(result.getOutput().getFirst().contains(TestTransformer.RANDOM_PARAM_NAME));
+        Assertions.assertFalse(CommonUtils.isEmpty(result.getOutput()));
+        Assertions.assertTrue(result.getOutput().getFirst().contains(TestTransformer.RANDOM_PARAM_NAME));
     }
 }

@@ -23,8 +23,8 @@ import org.jkiss.dbeaver.model.cli.CLIProcessResult;
 import org.jkiss.dbeaver.model.connection.DBPConnectionConfiguration;
 import org.jkiss.dbeaver.model.connection.DBPDriver;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
@@ -41,8 +41,8 @@ public class AuthModelsTest extends DBVRTest {
         var cmd = DBVRTestSuite.getApplication().createCommandLine();
         CLIProcessResult result = cmd.executeCommandLineCommands(null, false, false, args);
 
-        Assert.assertNotNull(result.getOutput());
-        Assert.assertFalse(result.getOutput().isEmpty());
+        Assertions.assertNotNull(result.getOutput());
+        Assertions.assertFalse(result.getOutput().isEmpty());
     }
 
     @Test
@@ -56,12 +56,12 @@ public class AuthModelsTest extends DBVRTest {
         var cmd = DBVRTestSuite.getApplication().createCommandLine();
         CLIProcessResult result = cmd.executeCommandLineCommands(null, false, false, args);
 
-        Assert.assertNotNull(result.getOutput());
-        Assert.assertFalse(result.getOutput().isEmpty());
+        Assertions.assertNotNull(result.getOutput());
+        Assertions.assertFalse(result.getOutput().isEmpty());
         
         String output = result.getOutput().getFirst();
-        Assert.assertTrue(output.contains("Applicable Drivers: H2 Embedded"));
-        Assert.assertTrue(output.contains("Auth Model ID: native"));
+        Assertions.assertTrue(output.contains("Applicable Drivers: H2 Embedded"));
+        Assertions.assertTrue(output.contains("Auth Model ID: native"));
     }
 
     @Test
@@ -75,12 +75,12 @@ public class AuthModelsTest extends DBVRTest {
         var cmd = DBVRTestSuite.getApplication().createCommandLine();
         CLIProcessResult result = cmd.executeCommandLineCommands(null, false, false, args);
 
-        Assert.assertNotNull(result.getOutput());
-        Assert.assertFalse(result.getOutput().isEmpty());
+        Assertions.assertNotNull(result.getOutput());
+        Assertions.assertFalse(result.getOutput().isEmpty());
         
         String output = result.getOutput().getFirst();
-        Assert.assertTrue(output.contains("Auth Model ID:"));
-        Assert.assertTrue(output.contains("Applicable Drivers:"));
+        Assertions.assertTrue(output.contains("Auth Model ID:"));
+        Assertions.assertTrue(output.contains("Applicable Drivers:"));
     }
 
     @Test
@@ -96,12 +96,12 @@ public class AuthModelsTest extends DBVRTest {
             var cmd = DBVRTestSuite.getApplication().createCommandLine();
             CLIProcessResult result = cmd.executeCommandLineCommands(null, false, false, args);
 
-            Assert.assertNotNull(result.getOutput());
-            Assert.assertFalse(result.getOutput().isEmpty());
+            Assertions.assertNotNull(result.getOutput());
+            Assertions.assertFalse(result.getOutput().isEmpty());
             
             String output = result.getOutput().getFirst();
-            Assert.assertTrue(output.contains("Applicable Drivers: H2 Embedded"));
-            Assert.assertTrue(output.contains("Auth Model ID: native"));
+            Assertions.assertTrue(output.contains("Applicable Drivers: H2 Embedded"));
+            Assertions.assertTrue(output.contains("Auth Model ID: native"));
         } finally {
             ds.getRegistry().removeDataSource(ds);
         }

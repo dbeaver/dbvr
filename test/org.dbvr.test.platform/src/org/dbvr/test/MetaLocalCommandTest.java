@@ -30,16 +30,16 @@ import org.jkiss.dbeaver.model.exec.DBCStatement;
 import org.jkiss.dbeaver.model.exec.DBCStatementType;
 import org.jkiss.dbeaver.model.runtime.VoidProgressMonitor;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.UUID;
 
 public class MetaLocalCommandTest extends DBVRTest {
 
-    @Before
+    @BeforeEach
     public void setUp() {
     }
 
@@ -55,11 +55,11 @@ public class MetaLocalCommandTest extends DBVRTest {
             CLIProcessResult result = cmd.executeCommandLineCommands(null, false, false, args);
 
             List<String> output = result.getOutput();
-            Assert.assertNotNull(output);
-            Assert.assertTrue(
+            Assertions.assertNotNull(output);
+            Assertions.assertTrue(
                 output.contains("Database doesn't support databases/catalogs")
             );
-            Assert.assertEquals("Should be OK exit code", CLIConstants.EXIT_CODE_OK, result.getExitCode());
+            Assertions.assertEquals(CLIConstants.EXIT_CODE_OK, result.getExitCode(), "Should be OK exit code");
         } finally {
             h2Ds.getRegistry().removeDataSource(h2Ds);
         }
@@ -75,12 +75,12 @@ public class MetaLocalCommandTest extends DBVRTest {
             };
             var cmd = DBVRTestSuite.getApplication().createCommandLine();
             CLIProcessResult result = cmd.executeCommandLineCommands(null, false, false, args);
-            Assert.assertNotNull("Result should not be null", result);
+            Assertions.assertNotNull(result, "Result should not be null");
             List<String> output = result.getOutput();
-            Assert.assertNotNull(output);
+            Assertions.assertNotNull(output);
             String fullOutput = String.join("\n", output);
             boolean hasPublic = fullOutput.lines().anyMatch(s -> s.trim().equalsIgnoreCase("PUBLIC"));
-            Assert.assertTrue("H2 should have PUBLIC schema, but output was: " + fullOutput, hasPublic);
+            Assertions.assertTrue(hasPublic, "H2 should have PUBLIC schema, but output was: " + fullOutput);
         } finally {
             h2Ds.getRegistry().removeDataSource(h2Ds);
         }
@@ -99,9 +99,9 @@ public class MetaLocalCommandTest extends DBVRTest {
                 "--schema-name=PUBLIC"
             };
             CLIProcessResult listResult = cmd.executeCommandLineCommands(null, false, false, listArgs);
-            Assert.assertNotNull(listResult);
+            Assertions.assertNotNull(listResult);
             String listOutput = listResult.getOutput() != null ? String.join("\n", listResult.getOutput()) : "";
-            Assert.assertTrue("Output should contain TEST_TABLE", listOutput.contains("TEST_TABLE"));
+            Assertions.assertTrue(listOutput.contains("TEST_TABLE"), "Output should contain TEST_TABLE");
         } finally {
             h2Ds.getRegistry().removeDataSource(h2Ds);
         }
@@ -121,10 +121,10 @@ public class MetaLocalCommandTest extends DBVRTest {
                 "--table-name=TEST_TABLE"
             };
             CLIProcessResult ddlResult = cmd.executeCommandLineCommands(null, false, false, ddlArgs);
-            Assert.assertNotNull(ddlResult);
+            Assertions.assertNotNull(ddlResult);
             String ddlOutput = ddlResult.getOutput() != null ? String.join("\n", ddlResult.getOutput()) : "";
-            Assert.assertTrue(ddlOutput.toUpperCase().contains("CREATE TABLE"));
-            Assert.assertTrue(ddlOutput.toUpperCase().contains("TEST_TABLE"));
+            Assertions.assertTrue(ddlOutput.toUpperCase().contains("CREATE TABLE"));
+            Assertions.assertTrue(ddlOutput.toUpperCase().contains("TEST_TABLE"));
         } finally {
             h2Ds.getRegistry().removeDataSource(h2Ds);
         }
@@ -136,7 +136,7 @@ public class MetaLocalCommandTest extends DBVRTest {
             h2Ds.connect(new VoidProgressMonitor(), true, false);
             dataSource = h2Ds.getDataSource();
         }
-        Assert.assertNotNull(dataSource);
+        Assertions.assertNotNull(dataSource);
 
         try (DBCSession session = DBUtils.openUtilSession(new VoidProgressMonitor(), dataSource, "Create test table")) {
             try (
@@ -165,9 +165,9 @@ public class MetaLocalCommandTest extends DBVRTest {
                 "--schema-name=PUBLIC"
             };
             CLIProcessResult ddlResult = cmd.executeCommandLineCommands(null, false, false, ddlArgs);
-            Assert.assertNotNull(ddlResult);
+            Assertions.assertNotNull(ddlResult);
             String ddlOutput = ddlResult.getOutput() != null ? String.join("\n", ddlResult.getOutput()) : "";
-            Assert.assertTrue(ddlOutput.contains("does not support DDL"));
+            Assertions.assertTrue(ddlOutput.contains("does not support DDL"));
         } finally {
             h2Ds.getRegistry().removeDataSource(h2Ds);
         }
@@ -184,8 +184,8 @@ public class MetaLocalCommandTest extends DBVRTest {
             };
             var cmd = DBVRTestSuite.getApplication().createCommandLine();
             CLIProcessResult result = cmd.executeCommandLineCommands(null, false, false, args);
-            Assert.assertNotNull(result);
-            Assert.assertEquals(CLIConstants.EXIT_CODE_ERROR, result.getExitCode());
+            Assertions.assertNotNull(result);
+            Assertions.assertEquals(CLIConstants.EXIT_CODE_ERROR, result.getExitCode());
         } finally {
             h2Ds.getRegistry().removeDataSource(h2Ds);
         }
@@ -202,8 +202,8 @@ public class MetaLocalCommandTest extends DBVRTest {
             };
             var cmd = DBVRTestSuite.getApplication().createCommandLine();
             CLIProcessResult result = cmd.executeCommandLineCommands(null, false, false, args);
-            Assert.assertNotNull(result);
-            Assert.assertEquals(CLIConstants.EXIT_CODE_ERROR, result.getExitCode());
+            Assertions.assertNotNull(result);
+            Assertions.assertEquals(CLIConstants.EXIT_CODE_ERROR, result.getExitCode());
         } finally {
             h2Ds.getRegistry().removeDataSource(h2Ds);
         }
@@ -220,10 +220,10 @@ public class MetaLocalCommandTest extends DBVRTest {
                 "--database-name=PUBLIC"
             };
             CLIProcessResult ddlResult = cmd.executeCommandLineCommands(null, false, false, ddlArgs);
-            Assert.assertNotNull(ddlResult);
+            Assertions.assertNotNull(ddlResult);
             String ddlOutput = ddlResult.getOutput() != null ? String.join("\n", ddlResult.getOutput()) : "";
-            Assert.assertEquals(CLIConstants.EXIT_CODE_ERROR, ddlResult.getExitCode());
-            Assert.assertTrue(
+            Assertions.assertEquals(CLIConstants.EXIT_CODE_ERROR, ddlResult.getExitCode());
+            Assertions.assertTrue(
                 ddlOutput.contains("Database DDL is not supported for this database type")
             );
         } finally {
@@ -241,12 +241,12 @@ public class MetaLocalCommandTest extends DBVRTest {
                 "--datasource=" + h2Ds.getName()
             };
             CLIProcessResult ddlResult = cmd.executeCommandLineCommands(null, false, false, ddlArgs);
-            Assert.assertNotNull(ddlResult);
+            Assertions.assertNotNull(ddlResult);
             String ddlOutput = ddlResult.getOutput() != null ? String.join("\n", ddlResult.getOutput()) : "";
-            Assert.assertEquals(CLIConstants.EXIT_CODE_ERROR, ddlResult.getExitCode());
-            Assert.assertTrue(
-                "Output should explain that database DDL is unsupported, but was: " + ddlOutput,
-                ddlOutput.contains("Database DDL is not supported for this database type")
+            Assertions.assertEquals(CLIConstants.EXIT_CODE_ERROR, ddlResult.getExitCode());
+            Assertions.assertTrue(
+                ddlOutput.contains("Database DDL is not supported for this database type"),
+                "Output should explain that database DDL is unsupported, but was: " + ddlOutput
             );
         } finally {
             h2Ds.getRegistry().removeDataSource(h2Ds);
