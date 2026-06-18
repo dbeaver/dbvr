@@ -32,7 +32,6 @@ import org.jkiss.dbeaver.model.cli.CLIProcessResult;
 import org.jkiss.dbeaver.model.impl.app.BaseApplicationImpl;
 import org.jkiss.dbeaver.model.impl.preferences.BundlePreferenceStore;
 import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
-import org.jkiss.dbeaver.registry.BasePlatformImpl;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.ui.DBPPlatformUI;
 import org.jkiss.dbeaver.runtime.ui.console.ConsoleUserInterface;
@@ -48,27 +47,13 @@ import java.nio.file.Path;
  */
 public class CLIApplicationBase extends BaseApplicationImpl {
     private static final Log log = Log.getLog(CLIApplicationBase.class);
-    protected Path workspaceDirCurrent;
+
     private volatile boolean started = false;
 
     private DBPPreferenceStore preferenceStore;
     private boolean stateless = false;
 
     protected CLIApplicationBase() {
-
-        // Explicitly set UTF-8 as default file encoding
-        // In some places Eclipse reads this property directly.
-        //System.setProperty(StandardConstants.ENV_FILE_ENCODING, GeneralUtils.UTF8_ENCODING);
-
-        // Detect default workspace location
-        // Since 6.1.3 it is different for different OSes
-        // Windows: %AppData%/DBeaverData
-        // MacOS: ~/Library/DBeaverData
-        // Linux: $XDG_DATA_HOME/DBeaverData
-        String workingDirectory = RuntimeUtils.getWorkingDirectory(BasePlatformImpl.DBEAVER_DATA_DIR);
-
-        // Workspace dir
-        workspaceDirCurrent = RuntimeUtils.getWorkspacePath(workingDirectory, DEFAULT_WORKSPACE_FOLDER);
         Log.setLogHandler(new VoidLogHandler());
     }
 
@@ -86,18 +71,18 @@ public class CLIApplicationBase extends BaseApplicationImpl {
         Location instanceLoc = Platform.getInstanceLocation();
         try {
             if (!instanceLoc.isSet()) { // true if -data not provided
-                URL wsLocationURL = workspaceDirCurrent.toUri().toURL();
+                URL wsLocationURL = getWorkspacePath().toUri().toURL();
                 instanceLoc.set(wsLocationURL, false);
             } else {
                 URL locationURL = instanceLoc.getURL();
                 Path locationPath = RuntimeUtils.getLocalPathFromURL(locationURL);
                 Path defPath = instanceLoc.getDefault() == null ? null : RuntimeUtils.getLocalPathFromURL(instanceLoc.getDefault());
                 if (!locationPath.equals(defPath)) {
-                    workspaceDirCurrent = locationPath;
+                    setWorkspacePath(locationPath);
                 }
             }
         } catch (Exception e) {
-            log.error("Error setting workspace location to " + workspaceDirCurrent, e);
+            log.error("Error setting workspace location", e);
             throw e;
         }
         this.preferenceStore = new BundlePreferenceStore(CLIActivator.getInstance().getBundle()) {
@@ -176,12 +161,6 @@ public class CLIApplicationBase extends BaseApplicationImpl {
         return DBConstants.DEFAULT_PROJECT_NAME;
     }
 
-    @Nullable
-    @Override
-    public Path getDefaultWorkingFolder() {
-        return workspaceDirCurrent;
-    }
-
     @NotNull
     @Override
     public Class<? extends DBPPlatform> getPlatformClass() {
@@ -210,7 +189,7 @@ public class CLIApplicationBase extends BaseApplicationImpl {
 
     @NotNull
     public CLIWorkspace createWorkspace(@NotNull CLIPlatform cliPlatform) {
-        return new CLIWorkspace(cliPlatform, workspaceDirCurrent);
+        return new CLIWorkspace(cliPlatform, getWorkspacePath());
     }
 
     public synchronized boolean isStarted() {
