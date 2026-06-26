@@ -344,7 +344,6 @@ public class SQLCommand extends CLIAbstractSubcommand {
                     context().addResult(result);
                     byteArrayOutputStream.reset();
                 }
-                // json status goes to stderr (one object per statement, NDJSON) so stdout stays a clean data stream
                 if (!disableStatus && isJsonLog()) {
                     printJsonLog(buildOkStatusJson(statistics));
                 }
