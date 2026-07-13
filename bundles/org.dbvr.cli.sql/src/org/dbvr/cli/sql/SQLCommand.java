@@ -62,9 +62,6 @@ import java.util.*;
 public class SQLCommand extends CLIAbstractSubcommand {
     private static final Log log = Log.getLog(SQLCommand.class);
 
-    private static final String LOG_FORMAT_TEXT = "text";
-    private static final String LOG_FORMAT_JSON = "json";
-
     @CommandLine.Parameters(
         index = "0",
         arity = "0..1",
@@ -93,13 +90,6 @@ public class SQLCommand extends CLIAbstractSubcommand {
     @CommandLine.Option(names = "--disable-status", description = "Disable execution status output")
     private boolean disableStatus;
 
-    @CommandLine.Option(
-        names = "--outputLog",
-        arity = "1",
-        description = "Status/log output format: 'text' (default) or 'json'",
-        defaultValue = LOG_FORMAT_TEXT)
-    private String outputLog = LOG_FORMAT_TEXT;
-
     @CommandLine.ArgGroup(exclusive = true, multiplicity = "1")
     private CreateOrFindDataSource dataSourceOptions;
 
@@ -118,21 +108,6 @@ public class SQLCommand extends CLIAbstractSubcommand {
 
     @Override
     public void run() throws CLIException {
-        validateOutputLog();
-        if (!isJsonLog()) {
-            runInternal();
-            return;
-        }
-        try {
-            runInternal();
-        } catch (CLIException e) {
-            reportErrorAsJson(e.getExitCode(), e);
-        } catch (Exception e) {
-            reportErrorAsJson(CLIConstants.EXIT_CODE_ERROR, e);
-        }
-    }
-
-    private void runInternal() throws CLIException {
         CLIConnectionUtils.connect(
             dataSourceOptions.existDataSourceIdOrName,
             dataSourceOptions.tempDataSourceOptions,
@@ -361,17 +336,8 @@ public class SQLCommand extends CLIAbstractSubcommand {
         return settings;
     }
 
-    private void validateOutputLog() throws CLIException {
-        if (!LOG_FORMAT_TEXT.equalsIgnoreCase(outputLog) && !LOG_FORMAT_JSON.equalsIgnoreCase(outputLog)) {
-            throw new CLIException(
-                "Invalid --outputLog value '" + outputLog + "'. Expected '" + LOG_FORMAT_TEXT + "' or '" + LOG_FORMAT_JSON + "'",
-                CLIConstants.EXIT_CODE_ILLEGAL_ARGUMENTS
-            );
-        }
-    }
-
     private boolean isJsonLog() {
-        return LOG_FORMAT_JSON.equalsIgnoreCase(outputLog);
+        return context().getLogFormat() == CLILogFormat.JSON;
     }
 
     @NotNull
@@ -387,33 +353,8 @@ public class SQLCommand extends CLIAbstractSubcommand {
         return JSONUtils.GSON.toJson(status);
     }
 
-    private void reportErrorAsJson(short code, @NotNull Throwable error) {
-        Map<String, Object> status = new LinkedHashMap<>();
-        status.put("status", "error");
-        status.put("code", code);
-        List<String> messages = collectMessages(error);
-        status.put("message", messages.isEmpty() ? error.getClass().getSimpleName() : messages.getFirst());
-        if (messages.size() > 1) {
-            status.put("details", Map.of("messages", messages));
-        }
-        printJsonLog(JSONUtils.GSON.toJson(status));
-        context().setPostAction(CLIProcessResult.PostAction.ERROR);
-    }
-
     private static void printJsonLog(@NotNull String json) {
         System.err.println(json);
-    }
-
-    @NotNull
-    private static List<String> collectMessages(@NotNull Throwable error) {
-        List<String> messages = new ArrayList<>();
-        for (Throwable e = error; e != null; e = e.getCause()) {
-            String message = e.getMessage();
-            if (CommonUtils.isNotEmpty(message) && !messages.contains(message)) {
-                messages.add(message);
-            }
-        }
-        return messages;
     }
 
     private static class LogOutputWriter implements DBCOutputWriter {
