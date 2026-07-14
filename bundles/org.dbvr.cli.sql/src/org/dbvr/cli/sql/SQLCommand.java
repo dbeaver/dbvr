@@ -342,15 +342,23 @@ public class SQLCommand extends CLIAbstractSubcommand {
 
     @NotNull
     private static String buildOkStatusJson(@NotNull DBCStatistics statistics) {
-        Map<String, Object> status = new LinkedHashMap<>();
-        status.put("status", "ok");
-        if (statistics.getRowsFetched() > 0) {
-            status.put("rows", statistics.getRowsFetched());
-        } else if (statistics.getRowsUpdated() > 0) {
-            status.put("updated", statistics.getRowsUpdated());
+        return JSONUtils.GSON.toJson(new SQLExecutionStatus(statistics));
+    }
+
+    private record SQLExecutionStatus(
+        @NotNull String status,
+        @Nullable Long rows,
+        @Nullable Long updated,
+        long durationMs
+    ) {
+        SQLExecutionStatus(@NotNull DBCStatistics statistics) {
+            this(
+                "ok",
+                statistics.getRowsFetched() > 0 ? statistics.getRowsFetched() : null,
+                statistics.getRowsFetched() <= 0 && statistics.getRowsUpdated() > 0 ? statistics.getRowsUpdated() : null,
+                statistics.getTotalTime()
+            );
         }
-        status.put("durationMs", statistics.getTotalTime());
-        return JSONUtils.GSON.toJson(status);
     }
 
     private static void printJsonLog(@NotNull String json) {
