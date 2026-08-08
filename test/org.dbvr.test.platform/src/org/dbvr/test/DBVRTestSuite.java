@@ -27,6 +27,7 @@ import org.junit.platform.suite.api.Suite;
 @Suite
 @SelectClasses({
     HelpArgTest.class,
+    VersionArgTest.class,
     DataSourceManagementTest.class,
     ProjectManagementTest.class,
     AuthModelsTest.class,
