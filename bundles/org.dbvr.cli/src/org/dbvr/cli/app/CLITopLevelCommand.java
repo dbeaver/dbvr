@@ -45,14 +45,6 @@ public class CLITopLevelCommand extends AbstractTopLevelCommand {
     )
     private boolean stateless;
 
-    @CommandLine.Option(
-        names = {"-v"},
-        hidden = true,
-        versionHelp = true,
-        scope = CommandLine.ScopeType.INHERIT
-    )
-    private boolean versionAlias;
-
     protected CLITopLevelCommand(
         @Nullable ApplicationInstanceController controller,
         @NotNull CLIContextImpl context,
