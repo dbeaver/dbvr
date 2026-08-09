@@ -40,10 +40,6 @@ public class VersionAliasTransformer implements CommandLine.IModelTransformer {
         String[] names = Arrays.copyOf(versionOption.names(), versionOption.names().length + 1);
         names[names.length - 1] = VERSION_ALIAS;
         commandSpec.remove(versionOption);
-        // Subcommands (at every depth) added before this transformer runs already hold their own
-        // inherited copy of versionOption (picocli pushes INHERIT-scoped options down the whole
-        // subcommand tree on addSubcommand()). Remove those stale copies too, otherwise addOption()
-        // below fails when it re-cascades the replacement option through the same tree.
         removeStaleVersionCopies(commandSpec);
         commandSpec.addOption(OptionSpec.builder(versionOption).names(names).build());
         return commandSpec;
