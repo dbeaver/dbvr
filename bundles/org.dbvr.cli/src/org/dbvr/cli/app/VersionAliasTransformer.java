@@ -23,10 +23,6 @@ import picocli.CommandLine.Model.OptionSpec;
 
 import java.util.Arrays;
 
-/**
- * Adds a lowercase {@code -v} alias to the existing {@code -V}/{@code --version} option
- * instead of declaring a competing {@code versionHelp} option.
- */
 public class VersionAliasTransformer implements CommandLine.IModelTransformer {
     private static final String VERSION_ALIAS = "-v";
 
@@ -40,19 +36,7 @@ public class VersionAliasTransformer implements CommandLine.IModelTransformer {
         String[] names = Arrays.copyOf(versionOption.names(), versionOption.names().length + 1);
         names[names.length - 1] = VERSION_ALIAS;
         commandSpec.remove(versionOption);
-        removeStaleVersionCopies(commandSpec);
         commandSpec.addOption(OptionSpec.builder(versionOption).names(names).build());
         return commandSpec;
-    }
-
-    private void removeStaleVersionCopies(@NotNull CommandSpec commandSpec) {
-        for (CommandLine subcommand : commandSpec.subcommands().values()) {
-            CommandSpec subSpec = subcommand.getCommandSpec();
-            OptionSpec staleCopy = subSpec.findOption("--version");
-            if (staleCopy != null) {
-                subSpec.remove(staleCopy);
-            }
-            removeStaleVersionCopies(subSpec);
-        }
     }
 }

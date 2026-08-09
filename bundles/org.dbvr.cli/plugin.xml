@@ -11,7 +11,9 @@
         <parameter
             exitAfterExecute="true"
             handler="org.dbvr.cli.command.project.ProjectManagementCommand"/>
-        <transformer transformer="org.dbvr.cli.app.VersionAliasTransformer"/>
+        <transformer
+            command="org.dbvr.cli.app.CLITopLevelCommand"
+            transformer="org.dbvr.cli.app.VersionAliasTransformer"/>
     </extension>
 
     <extension point="org.jkiss.dbeaver.service">
