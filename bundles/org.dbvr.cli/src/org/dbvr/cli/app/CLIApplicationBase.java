@@ -34,7 +34,6 @@ import org.jkiss.dbeaver.model.impl.preferences.BundlePreferenceStore;
 import org.jkiss.dbeaver.model.preferences.DBPPreferenceStore;
 import org.jkiss.dbeaver.runtime.DBWorkbench;
 import org.jkiss.dbeaver.runtime.ui.DBPPlatformUI;
-import org.jkiss.dbeaver.runtime.ui.console.ConsoleUserInterface;
 import org.jkiss.dbeaver.utils.RuntimeUtils;
 import org.jkiss.utils.ArrayUtils;
 import org.jkiss.utils.CommonUtils;
@@ -59,7 +58,7 @@ public class CLIApplicationBase extends BaseApplicationImpl {
 
     @NotNull
     @Override
-    public Object start(IApplicationContext context) throws Exception {
+    public Object start(@NotNull IApplicationContext context) throws Exception {
         // hide standard Eclipse exit message if exit code is not OK (otherwise it may be confusing)
         System.setProperty(ECLIPSE_EXIT_DATA, "");
 
@@ -168,8 +167,9 @@ public class CLIApplicationBase extends BaseApplicationImpl {
     }
 
     @Override
+    @NotNull
     public Class<? extends DBPPlatformUI> getPlatformUIClass() {
-        return ConsoleUserInterface.class;
+        return CLIUserInterface.class;
     }
 
     @Override
