@@ -50,6 +50,7 @@ public class HelpArgTest extends DBVRTest {
         CLIProcessResult result = DBVRTestSuite.getApplication().executeCommandLine(new String[] {"sql", "--help"});
 
         Assertions.assertNotNull(result.getOutput());
+        Assertions.assertTrue(result.getOutput().stream().anyMatch(line -> line.contains("--default-catalog")));
         Assertions.assertTrue(result.getOutput().stream().anyMatch(line -> line.contains("--default-schema")));
     }
 

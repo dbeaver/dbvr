@@ -24,11 +24,18 @@ import picocli.CommandLine;
 
 public class DefaultSchemaOption implements DataSourceUpdater {
     @Nullable
+    @CommandLine.Option(names = "--default-catalog", arity = "1", description = "Default catalog name")
+    private String defaultCatalog;
+
+    @Nullable
     @CommandLine.Option(names = "--default-schema", arity = "1", description = "Default schema name")
     private String defaultSchema;
 
     @Override
     public void updateDataSource(@NotNull DBPDataSourceContainer dataSource) {
+        if (defaultCatalog != null) {
+            dataSource.getConnectionConfiguration().getBootstrap().setDefaultCatalogName(defaultCatalog);
+        }
         if (defaultSchema != null) {
             dataSource.getConnectionConfiguration().getBootstrap().setDefaultSchemaName(defaultSchema);
         }
