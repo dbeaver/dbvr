@@ -44,6 +44,9 @@ public class SQLCommandTest extends DBVRTest {
 
     @AfterEach
     public void tearDown() throws DBException {
+        if (dataSource == null) {
+            return;
+        }
         if (dataSource.isConnected()) {
             dataSource.disconnect(new VoidProgressMonitor());
         }
