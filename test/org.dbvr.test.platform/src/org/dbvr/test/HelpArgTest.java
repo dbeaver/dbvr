@@ -45,6 +45,15 @@ public class HelpArgTest extends DBVRTest {
         Assertions.assertEquals(resultWithArg.getOutput(), resultNoArg.getOutput());
     }
 
+    @Test
+    public void testSqlHelpContainsDefaultSchema() throws Exception {
+        CLIProcessResult result = DBVRTestSuite.getApplication().executeCommandLine(new String[] {"sql", "--help"});
+
+        Assertions.assertNotNull(result.getOutput());
+        Assertions.assertTrue(result.getOutput().stream().anyMatch(line -> line.contains("--default-catalog")));
+        Assertions.assertTrue(result.getOutput().stream().anyMatch(line -> line.contains("--default-schema")));
+    }
+
 
     @Test
     public void testHelpFormatAndOptionsOrder() throws Exception {

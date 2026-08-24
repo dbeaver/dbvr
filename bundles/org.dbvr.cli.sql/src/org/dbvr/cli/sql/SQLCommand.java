@@ -84,6 +84,9 @@ public class SQLCommand extends CLIAbstractSubcommand {
     @CommandLine.Mixin
     private DataSourceAuthOptions authOptions;
 
+    @CommandLine.Mixin
+    private DefaultSchemaOption defaultSchemaOption;
+
     @CommandLine.Option(names = "--print-queries", description = "Print queries before execution")
     private boolean printQueries;
 

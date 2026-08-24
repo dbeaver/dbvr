@@ -31,7 +31,8 @@ import org.junit.platform.suite.api.Suite;
     ProjectManagementTest.class,
     AuthModelsTest.class,
     InjectTest.class,
-    MetaLocalCommandTest.class
+    MetaLocalCommandTest.class,
+    SQLCommandTest.class
 })
 public class DBVRTestSuite extends DBVRTest {
     private static CLIApplicationCE applicationCE;
