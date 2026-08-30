@@ -8,8 +8,6 @@ Bundle-Release-Date: 20260921
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-21
 Export-Package: org.dbvr.cli.sql
-Require-Bundle: org.jkiss.dbeaver.model.sql,
- org.jkiss.dbeaver.data.transfer,
- org.jkiss.dbeaver.registry,
- org.dbvr.cli
+Require-Bundle: org.jkiss.dbeaver.data.transfer,
+ org.dbvr.cli;visibility:=reexport
 Automatic-Module-Name: org.dbvr.cli.sql

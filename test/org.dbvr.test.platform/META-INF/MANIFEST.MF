@@ -9,12 +9,7 @@ Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-ActivationPolicy: lazy
 Require-Bundle: org.dbvr.app.ce,
  org.dbvr.app.ce.test,
- org.jkiss.dbeaver.model.sql,
- org.jkiss.dbeaver.data.transfer,
- org.jkiss.dbeaver.registry,
  org.jkiss.dbeaver.osgi.test.runner;visibility:=reexport,
- org.dbvr.cli;visibility:=reexport,
  org.jkiss.dbeaver.net.ssh,
  org.jkiss.dbeaver.ext.h2,
- org.dbvr.cli.sql,
- org.jkiss.dbeaver.model.cli
+ org.dbvr.cli.sql
