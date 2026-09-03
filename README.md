@@ -23,62 +23,11 @@ It provides a scriptable way to manage database projects and data sources, inspe
 - `sql` command to execute SQL from a literal query, a file, or standard input
 - `meta` commands for working with database, schema, and table information
 
-## Getting started
-
-### Prerequisites
-
-To build this repository locally, you need:
-
-- Java
-- Maven
-- Local sibling checkouts of dependencies referenced by `project.deps`:
-  - `dbeaver-common`
-  - `dbeaver`
-
-The root Maven build inherits from `../dbeaver`, and the product aggregate also includes sibling modules from `../../../dbeaver-common` and `../../../dbeaver`.
-
-## Repository layout
-
-`dbvr` is built together with sibling repositories. Clone all of them into the
-same parent directory, so the relative paths in the Maven/Tycho build resolve
-correctly
-
-```bash
-git clone https://github.com/dbeaver/dbeaver-common.git
-git clone https://github.com/dbeaver/dbeaver.git
-git clone https://github.com/dbeaver/dbvr.git
-git clone https://github.com/dbeaver/idea-rcp-launch-config-generator.git
-git clone https://github.com/dbeaver/dbeaver-osgi-common.git
-```
-## Build product
-```bash
-mvn -f product/aggregate/pom.xml \
--Dheadless-platform \
--Pproduct-dbvr-ce \
--Dbuild.all-environments \
-package
-```
-
-## Develop in IDEA
-
-To generate IntelliJ IDEA project files and RCP launch configurations, run from the `dbvr` repository root: `./tools/generate_workspace.sh`.
-On Windows, use `generate_workspace.cmd`.
-
-Then run
-```bash
-cd ../dbeaver
-mvn generate-sources
-```
-
 ### Run the CLI
 
 The packaged product creates a `dbvr` executable for Linux and Windows, and a `dbvr.app` bundle for macOS.
 
-After building or downloading a packaged distribution, add the executable to your `PATH` and run:
-
-```bash
-dbvr --help
-```
+After building or downloading a packaged distribution, add the executable to your `PATH` and run: `dbvr --help`
 
 ## Usage examples
 
@@ -86,38 +35,6 @@ dbvr --help
 
 ```bash
 dbvr --help
-```
-
-### Work with projects
-
-Create a project:
-
-```bash
-dbvr project create --name MyProject --description "This is my project"
-```
-
-List projects:
-
-```bash
-dbvr project list
-```
-
-Set the default project:
-
-```bash
-dbvr project default MyProject
-```
-
-### Inspect available drivers
-
-```bash
-dbvr driver list
-```
-
-Show driver properties:
-
-```bash
-dbvr driver list --show-properties
 ```
 
 ### Execute SQL
@@ -153,6 +70,38 @@ dbvr meta database list -ds my-datasource-id
 ```
 
 > Exact options and available subcommands may vary by command. Use `dbvr <command> --help` to inspect the current CLI surface.
+
+### Work with projects
+
+Create a project:
+
+```bash
+dbvr project create --name MyProject --description "This is my project"
+```
+
+List projects:
+
+```bash
+dbvr project list
+```
+
+Set the default project:
+
+```bash
+dbvr project default MyProject
+```
+
+### Inspect available drivers
+
+```bash
+dbvr driver list
+```
+
+Show driver properties:
+
+```bash
+dbvr driver list --show-properties
+```
 
 ## Where to get help
 
