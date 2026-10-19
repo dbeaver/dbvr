@@ -95,6 +95,18 @@ public class HelpArgTest extends DBVRTest {
     }
 
     @Test
+    public void testCompletionContainsContributedCommands() throws Exception {
+        CLIProcessResult result = DBVRTestSuite.getApplication().executeCommandLine(new String[] {"completion"});
+        String script = result.getOutput().getFirst();
+
+        Assertions.assertEquals(CLIProcessResult.PostAction.SHUTDOWN, result.getPostAction());
+        Assertions.assertTrue(script.contains("driver"));
+        Assertions.assertTrue(script.contains("project"));
+        Assertions.assertTrue(script.contains("sql"));
+        Assertions.assertTrue(script.contains(TestCommand.TEST_COMMAND_NAME));
+    }
+
+    @Test
     public void testUnknownCommandsStillReportTheirLocation() throws Exception {
         var app = DBVRTestSuite.getApplication();
         CLIProcessResult unknownRoot = app.executeCommandLine(new String[] {"unknown-command"});
