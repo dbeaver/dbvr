@@ -16,9 +16,12 @@
  */
 package org.dbvr.test;
 
+import org.dbvr.cli.app.CLITopLevelCommand;
 import org.dbvr.cli.app.ce.command.TestCommand;
 import org.jkiss.code.NotNull;
+import org.jkiss.dbeaver.model.cli.CLIConstants;
 import org.jkiss.dbeaver.model.cli.CLIProcessResult;
+import org.jkiss.dbeaver.model.cli.command.AbstractTopLevelCommand;
 import org.jkiss.utils.CommonUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -43,6 +46,67 @@ public class HelpArgTest extends DBVRTest {
         String[] noArgs = {};
         CLIProcessResult resultNoArg = DBVRTestSuite.getApplication().executeCommandLine(noArgs);
         Assertions.assertEquals(resultWithArg.getOutput(), resultNoArg.getOutput());
+    }
+
+    @Test
+    public void testRootHelpIncludesOtherCommands() throws Exception {
+        CLIProcessResult result = DBVRTestSuite.getApplication().executeCommandLine(new String[] {"--help"});
+        String help = result.getOutput().getFirst();
+
+        Assertions.assertTrue(help.contains("driver"));
+        Assertions.assertTrue(help.contains("project"));
+        Assertions.assertTrue(help.contains("sql"));
+    }
+
+    @Test
+    public void testRootHelpAliasesMatch() throws Exception {
+        var app = DBVRTestSuite.getApplication();
+        var help = app.executeCommandLine(new String[] {AbstractTopLevelCommand.HELP_OPTION}).getOutput();
+
+        Assertions.assertEquals(help,
+            app.executeCommandLine(new String[] {AbstractTopLevelCommand.SHORT_HELP_OPTION}).getOutput());
+        Assertions.assertEquals(help,
+            app.executeCommandLine(new String[] {AbstractTopLevelCommand.LEGACY_HELP_OPTION}).getOutput());
+    }
+
+    @Test
+    public void testRootVersionOptionsMatchFullParser() throws Exception {
+        var app = DBVRTestSuite.getApplication();
+        for (String option : new String[] {"-v", "-V", "--version"}) {
+            CLIProcessResult rootOnly = app.executeCommandLine(new String[] {option});
+            CLIProcessResult fullParser = app.executeCommandLine(
+                new String[] {CLITopLevelCommand.OPTION_STATELESS, option});
+
+            Assertions.assertEquals(fullParser.getOutput(), rootOnly.getOutput());
+            Assertions.assertEquals(fullParser.getExitCode(), rootOnly.getExitCode());
+            Assertions.assertEquals(CLIProcessResult.PostAction.SHUTDOWN, rootOnly.getPostAction());
+        }
+    }
+
+    @Test
+    public void testSelectedCommandHelpMatchesOptionFirstInvocation() throws Exception {
+        var app = DBVRTestSuite.getApplication();
+        CLIProcessResult selected = app.executeCommandLine(new String[] {"driver", "--help"});
+        CLIProcessResult optionFirst = app.executeCommandLine(
+            new String[] {CLITopLevelCommand.OPTION_STATELESS, "driver", "--help"});
+
+        Assertions.assertEquals(optionFirst.getOutput(), selected.getOutput());
+        Assertions.assertEquals(optionFirst.getExitCode(), selected.getExitCode());
+    }
+
+    @Test
+    public void testUnknownCommandsStillReportTheirLocation() throws Exception {
+        var app = DBVRTestSuite.getApplication();
+        CLIProcessResult unknownRoot = app.executeCommandLine(new String[] {"unknown-command"});
+        CLIProcessResult unknownOption = app.executeCommandLine(new String[] {"--unknown-option"});
+        CLIProcessResult unknownSubcommand = app.executeCommandLine(new String[] {"driver", "unknown-subcommand"});
+
+        Assertions.assertEquals(CLIConstants.EXIT_CODE_ERROR, unknownRoot.getExitCode());
+        Assertions.assertTrue(unknownRoot.getOutput().getFirst().contains("after 'dbvr'"));
+        Assertions.assertEquals(CLIConstants.EXIT_CODE_ERROR, unknownOption.getExitCode());
+        Assertions.assertTrue(unknownOption.getOutput().getFirst().contains("after 'dbvr'"));
+        Assertions.assertEquals(CLIConstants.EXIT_CODE_ERROR, unknownSubcommand.getExitCode());
+        Assertions.assertTrue(unknownSubcommand.getOutput().getFirst().contains("after 'driver'"));
     }
 
     @Test
