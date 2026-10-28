@@ -15,5 +15,8 @@
 
     <extension point="org.jkiss.dbeaver.service">
         <service name="org.jkiss.dbeaver.runtime.ui.UIServiceDrivers" class="org.dbvr.cli.service.CLIServiceDriver"/>
+        <service name="org.jkiss.dbeaver.runtime.ui.UIServiceConnectionInit"
+                 class="org.dbvr.cli.service.CLIServiceConnectionInit"
+                 headless="true"/>
     </extension>
 </plugin>
