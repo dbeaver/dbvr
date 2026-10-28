@@ -15,5 +15,8 @@
 
     <extension point="org.jkiss.dbeaver.service">
         <service name="org.jkiss.dbeaver.runtime.ui.UIServiceDrivers" class="org.dbvr.cli.service.CLIServiceDriver"/>
+        <service name="org.jkiss.dbeaver.ext.h2.util.H2InitConfirmation"
+                 class="org.dbvr.cli.service.CLIServiceH2InitConfirmation"
+                 headless="true"/>
     </extension>
 </plugin>
