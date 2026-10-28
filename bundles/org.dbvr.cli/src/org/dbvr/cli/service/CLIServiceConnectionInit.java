@@ -17,10 +17,10 @@
 package org.dbvr.cli.service;
 
 import org.jkiss.code.NotNull;
-import org.jkiss.dbeaver.ext.h2.util.H2InitConfirmation;
 import org.jkiss.dbeaver.model.DBPDataSourceContainer;
+import org.jkiss.dbeaver.runtime.ui.UIServiceConnectionInit;
 
-public class CLIServiceH2InitConfirmation implements H2InitConfirmation {
+public class CLIServiceConnectionInit implements UIServiceConnectionInit {
     @Override
     public boolean confirmInitScript(@NotNull DBPDataSourceContainer container, @NotNull String script) {
         return true;
