@@ -2,8 +2,8 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: DBeaver Test Suite
 Bundle-SymbolicName: org.dbvr.test.platform
-Bundle-Version: 1.0.0.qualifier
-Bundle-Release-Date: 20251117
+Bundle-Version: 1.0.1.qualifier
+Bundle-Release-Date: 20261130
 Bundle-Vendor: DBeaver Corp
 Bundle-RequiredExecutionEnvironment: JavaSE-21
 Bundle-ActivationPolicy: lazy
