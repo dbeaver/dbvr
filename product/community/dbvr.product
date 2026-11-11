@@ -14,7 +14,7 @@
 
         <vmArgs>
             -XX:+IgnoreUnrecognizedVMOptions
-            -Dosgi.requiredJavaVersion=21
+            -Dosgi.requiredJavaVersion=25
             -Dfile.encoding=UTF-8
             -Ddbeaver.disable.remote.cli.execution=true
             --enable-native-access=ALL-UNNAMED
