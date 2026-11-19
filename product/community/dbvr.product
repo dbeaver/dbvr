@@ -14,6 +14,7 @@
 
         <vmArgs>
             -XX:+IgnoreUnrecognizedVMOptions
+            -XX:-UseBASE64Intrinsics
             -Dosgi.requiredJavaVersion=21
             -Dfile.encoding=UTF-8
             -Ddbeaver.disable.remote.cli.execution=true
